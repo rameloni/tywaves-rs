@@ -1,0 +1,13 @@
+[package]
+name = "tywaves"
+version = "0.1.0"
+edition = "2021"
+authors = ["Raffaele Meloni <raffaele.meloni99@gmail.com"]
+description = "Library for reading and elaborating typed waveform files in Rust."
+include = ["Cargo.toml", "src/"]
+
+[dependencies]
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.113"
+serde_stacker = "0.1"
+eyre = "0.6.12"

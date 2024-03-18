@@ -1,0 +1,206 @@
+{
+  "scopes": [
+    {
+      "name": "TOP",
+      "child_variables": [],
+      "child_scopes": [
+        {
+          "name": "svsimTestbench",
+          "child_variables": [
+            {
+              "name": "clock",
+              "type_name": "Clock",
+              "hw_type": {
+                "port": {
+                  "direction": "input"
+                }
+              },
+              "real_type": {
+                "ground": {
+                  "width": 1,
+                  "vcd_name": "clock"
+                }
+              }
+            },
+            {
+              "name": "reset",
+              "type_name": "Bool",
+              "hw_type": {
+                "port": {
+                  "direction": "input"
+                }
+              },
+              "real_type": {
+                "ground": {
+                  "width": 1,
+                  "vcd_name": "reset"
+                }
+              }
+            },
+            {
+              "name": "io",
+              "type_name": "AnonymousBundle",
+              "hw_type": "wire",
+              "real_type": {
+                "bundle": {
+                  "fields": [
+                    {
+                      "name": "a",
+                      "type_name": "Bool",
+                      "hw_type": {
+                        "port": {
+                          "direction": "input"
+                        }
+                      },
+                      "real_type": {
+                        "ground": {
+                          "width": 1,
+                          "vcd_name": "io_a"
+                        }
+                      }
+                    },
+                    {
+                      "name": "b",
+                      "type_name": "Bool",
+                      "hw_type": {
+                        "port": {
+                          "direction": "input"
+                        }
+                      },
+                      "real_type": {
+                        "ground": {
+                          "width": 1,
+                          "vcd_name": "io_b"
+                        }
+                      }
+                    },
+                    {
+                      "name": "out",
+                      "type_name": "UInt",
+                      "hw_type": {
+                        "port": {
+                          "direction": "output"
+                        }
+                      },
+                      "real_type": {
+                        "ground": {
+                          "width": 1,
+                          "vcd_name": "io_out"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "child_scopes": [
+            {
+              "name": "dut",
+              "child_variables": [
+                {
+                  "name": "clock",
+                  "type_name": "Clock",
+                  "hw_type": {
+                    "port": {
+                      "direction": "input"
+                    }
+                  },
+                  "real_type": {
+                    "ground": {
+                      "width": 1,
+                      "vcd_name": "clock"
+                    }
+                  }
+                },
+                {
+                  "name": "reset",
+                  "type_name": "Bool",
+                  "hw_type": {
+                    "port": {
+                      "direction": "input"
+                    }
+                  },
+                  "real_type": {
+                    "ground": {
+                      "width": 1,
+                      "vcd_name": "reset"
+                    }
+                  }
+                },
+                {
+                  "name": "io",
+                  "type_name": "AnonymousBundle",
+                  "hw_type": "wire",
+                  "real_type": {
+                    "bundle": {
+                      "fields": [
+                        {
+                          "name": "a",
+                          "type_name": "Bool",
+                          "hw_type": {
+                            "port": {
+                              "direction": "input"
+                            }
+                          },
+                          "real_type": {
+                            "ground": {
+                              "width": 1,
+                              "vcd_name": "io_a"
+                            }
+                          }
+                        },
+                        {
+                          "name": "b",
+                          "type_name": "Bool",
+                          "hw_type": {
+                            "port": {
+                              "direction": "input"
+                            }
+                          },
+                          "real_type": {
+                            "ground": {
+                              "width": 1,
+                              "vcd_name": "io_b"
+                            }
+                          }
+                        },
+                        {
+                          "name": "out",
+                          "type_name": "UInt",
+                          "hw_type": {
+                            "port": {
+                              "direction": "output"
+                            }
+                          },
+                          "real_type": {
+                            "ground": {
+                              "width": 1,
+                              "vcd_name": "io_out"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "wire",
+                  "type_name": "SInt",
+                  "hw_type": "wire",
+                  "real_type": {
+                    "ground": {
+                      "width": 1,
+                      "vcd_name": "wire_0"
+                    }
+                  }
+                }
+              ],
+              "child_scopes": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
