@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::variable_finder::VariableFinder;
 use serde::{Deserialize, Serialize};
 
@@ -97,6 +99,10 @@ impl VariableFinder for Variable {
 }
 
 impl Variable {
+    pub fn get_full_name(&self) -> String {
+        format!("{}: {}", self.type_name, self.name)
+    }
+
     pub fn new(name: &str, type_name: &str, hw_type: HwType, real_type: RealType) -> Variable {
         Variable {
             name: name.to_string(),
@@ -143,20 +149,30 @@ impl Variable {
 
     pub fn create_val_repr(&self, raw_val_vcd: &str) -> String {
         let size = self.real_type.find_width() as usize;
-        println!("Size: {}, raw_val_vcd size: {}", size,  raw_val_vcd.len());
+        println!(
+            "Size of {} {}: \n{}, raw_val_vcd size: {}",
+            self.name,
+            self.real_type,
+            size,
+            raw_val_vcd.len()
+        );
         if raw_val_vcd.len() < size {
-            return (String::from("---"));
+            return String::from("---");
         }
         let value = match &self.real_type {
-            RealType::Ground { .. } => format!("{} {}: {raw_val_vcd}", &self.type_name, &self.name),
+            RealType::Ground { width, .. } => match width {
+                0 | 1 => raw_val_vcd.to_string(),
+                _ => format!("{} {}: {raw_val_vcd}", &self.type_name, &self.name),
+            },
             RealType::Vec { .. } => todo!("Vec type not implemented"),
             RealType::Bundle { fields, .. } => {
                 // Encode the fields recursively {x, {y, z}}
                 let mut value = format!("{} {}: {{", &self.type_name, &self.name);
+
                 let mut start_idx = 0;
                 for field in fields {
                     let end_idx = start_idx + field.real_type.find_width() as usize;
-
+                    println!("start_idx: {}, end_idx: {}", start_idx, end_idx);
                     value.push_str(&field.create_val_repr(&raw_val_vcd[start_idx..end_idx]));
                     value.push_str(", ");
                     start_idx = end_idx;
@@ -208,6 +224,28 @@ pub enum RealType {
         vcd_name: Option<String>,
     },
     Unknown,
+}
+impl Display for RealType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RealType::Ground { .. } => write!(f, "Ground"),
+            RealType::Vec { size, fields } => {
+                let fields = fields
+                    .iter()
+                    .map(|f| format!("{}", f.real_type))
+                    .collect::<Vec<_>>();
+                write!(f, "Vec[{}]: [{:?}]", size, fields)
+            }
+            RealType::Bundle { fields, .. } => {
+                let fields = fields
+                    .iter()
+                    .map(|f| format!("{}", f.real_type))
+                    .collect::<Vec<_>>();
+                write!(f, "Bundle: [{:?}]", fields)
+            }
+            RealType::Unknown => write!(f, "Unknown"),
+        }
+    }
 }
 
 impl RealType {

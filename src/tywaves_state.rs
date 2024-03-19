@@ -1,5 +1,4 @@
 use crate::{symbol_table::*, variable_finder::VariableFinder};
-use eyre::{eyre, Result};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -33,6 +32,57 @@ mod test {
 
     use super::*;
     #[rustfmt::skip]
+    fn create_io_nested_sample() -> Variable {
+        Variable::new(
+            "io",
+            "AnonymousBundle",
+            HwType::Wire,
+            RealType::Bundle {
+                vcd_name: Some("io".to_string()),
+                fields: vec![
+                    Variable::new(
+                        "a", "Bool",
+                        HwType::Port { direction: Direction::Input, },
+                        RealType::Ground { width: 1, vcd_name: "io_a".to_string(), },
+                    ),
+                    Variable::new(
+                        "b", "Bool",
+                        HwType::Port { direction: Direction::Input, },
+                        RealType::Ground { width: 1, vcd_name: "io_b".to_string(), },
+                    ),
+                    Variable::new(
+                        "out", "UInt",
+                        HwType::Port { direction: Direction::Output, },
+                        RealType::Ground { width: 1, vcd_name: "io_out".to_string(), },
+                    ),
+                    Variable::new(
+                        "io", "MyNestedBundleType",
+                        HwType::Port { direction: Direction::Input, },
+                        RealType::Bundle { 
+                            vcd_name: Some("io_io".to_string()), 
+                            fields: vec![
+                                Variable::new(
+                                    "a", "UInt_2",
+                                    HwType::Port { direction: Direction::Input, },
+                                    RealType::Ground { width: 2, vcd_name: "io_io_a".to_string(), },
+                                ),
+                                Variable::new(
+                                    "b", "UInt_2",
+                                    HwType::Port { direction: Direction::Input, },
+                                    RealType::Ground { width: 2, vcd_name: "io_io_b".to_string(), },
+                                ),
+                                Variable::new(
+                                    "out", "UInt_2",
+                                    HwType::Port { direction: Direction::Output, },
+                                    RealType::Ground { width: 2, vcd_name: "io_io_out".to_string(), },
+                                ),
+                            ]},
+                    )
+                ],
+            },
+        )
+    }
+    #[rustfmt::skip]
     fn create_io_sample() -> Variable {
         Variable::new(
             "io",
@@ -63,7 +113,7 @@ mod test {
 
     #[rustfmt::skip]
     fn sample_state() -> TywaveState {
-        let io = create_io_sample();
+        let io = create_io_nested_sample();
         let svsim_childs = vec![
             Variable::new(
                 "clock", "Clock",

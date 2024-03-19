@@ -43,7 +43,6 @@
               "hw_type": "wire",
               "real_type": {
                 "bundle": {
-                  "vcd_name": "io",
                   "fields": [
                     {
                       "name": "a",
@@ -89,8 +88,70 @@
                           "vcd_name": "io_out"
                         }
                       }
+                    },
+                    {
+                      "name": "io",
+                      "type_name": "MyNestedBundleType",
+                      "hw_type": {
+                        "port": {
+                          "direction": "input"
+                        }
+                      },
+                      "real_type": {
+                        "bundle": {
+                          "fields": [
+                            {
+                              "name": "a",
+                              "type_name": "UInt_2",
+                              "hw_type": {
+                                "port": {
+                                  "direction": "input"
+                                }
+                              },
+                              "real_type": {
+                                "ground": {
+                                  "width": 2,
+                                  "vcd_name": "io_io_a"
+                                }
+                              }
+                            },
+                            {
+                              "name": "b",
+                              "type_name": "UInt_2",
+                              "hw_type": {
+                                "port": {
+                                  "direction": "input"
+                                }
+                              },
+                              "real_type": {
+                                "ground": {
+                                  "width": 2,
+                                  "vcd_name": "io_io_b"
+                                }
+                              }
+                            },
+                            {
+                              "name": "out",
+                              "type_name": "UInt_2",
+                              "hw_type": {
+                                "port": {
+                                  "direction": "output"
+                                }
+                              },
+                              "real_type": {
+                                "ground": {
+                                  "width": 2,
+                                  "vcd_name": "io_io_out"
+                                }
+                              }
+                            }
+                          ],
+                          "vcd_name": "io_io"
+                        }
+                      }
                     }
-                  ]
+                  ],
+                  "vcd_name": "io"
                 }
               }
             }
@@ -180,8 +241,70 @@
                               "vcd_name": "io_out"
                             }
                           }
+                        },
+                        {
+                          "name": "io",
+                          "type_name": "MyNestedBundleType",
+                          "hw_type": {
+                            "port": {
+                              "direction": "input"
+                            }
+                          },
+                          "real_type": {
+                            "bundle": {
+                              "fields": [
+                                {
+                                  "name": "a",
+                                  "type_name": "UInt_2",
+                                  "hw_type": {
+                                    "port": {
+                                      "direction": "input"
+                                    }
+                                  },
+                                  "real_type": {
+                                    "ground": {
+                                      "width": 2,
+                                      "vcd_name": "io_io_a"
+                                    }
+                                  }
+                                },
+                                {
+                                  "name": "b",
+                                  "type_name": "UInt_2",
+                                  "hw_type": {
+                                    "port": {
+                                      "direction": "input"
+                                    }
+                                  },
+                                  "real_type": {
+                                    "ground": {
+                                      "width": 2,
+                                      "vcd_name": "io_io_b"
+                                    }
+                                  }
+                                },
+                                {
+                                  "name": "out",
+                                  "type_name": "UInt_2",
+                                  "hw_type": {
+                                    "port": {
+                                      "direction": "output"
+                                    }
+                                  },
+                                  "real_type": {
+                                    "ground": {
+                                      "width": 2,
+                                      "vcd_name": "io_io_out"
+                                    }
+                                  }
+                                }
+                              ],
+                              "vcd_name": "io_io"
+                            }
+                          }
                         }
-                      ]
+                      ],
+                      "vcd_name": "io"
                     }
                   }
                 },
