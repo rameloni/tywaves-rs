@@ -140,6 +140,37 @@ impl Variable {
         }
         None
     }
+
+    pub fn create_val_repr(&self, raw_val_vcd: &str) -> String {
+        let size = self.real_type.find_width() as usize;
+        println!("Size: {}, raw_val_vcd size: {}", size,  raw_val_vcd.len());
+        if raw_val_vcd.len() < size {
+            return (String::from("---"));
+        }
+        let value = match &self.real_type {
+            RealType::Ground { .. } => format!("{} {}: {raw_val_vcd}", &self.type_name, &self.name),
+            RealType::Vec { .. } => todo!("Vec type not implemented"),
+            RealType::Bundle { fields, .. } => {
+                // Encode the fields recursively {x, {y, z}}
+                let mut value = format!("{} {}: {{", &self.type_name, &self.name);
+                let mut start_idx = 0;
+                for field in fields {
+                    let end_idx = start_idx + field.real_type.find_width() as usize;
+
+                    value.push_str(&field.create_val_repr(&raw_val_vcd[start_idx..end_idx]));
+                    value.push_str(", ");
+                    start_idx = end_idx;
+                }
+                value.pop();
+                value.pop();
+                value.push_str("}");
+                value
+                // todo!("Bundle type not implemented")
+            }
+            RealType::Unknown => todo!("Unknown type not implemented"),
+        };
+        format!("{value}")
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
