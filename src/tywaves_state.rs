@@ -22,7 +22,7 @@ impl VariableFinder for TywaveState {
         // Find the variable in the top scope
         self.scopes
             .iter()
-            .find_map(|scope| scope.find_variable(subpath))
+            .find_map(|scope| scope.find_parent_variable(subpath))
     }
 }
 
