@@ -149,13 +149,7 @@ impl Variable {
 
     pub fn create_val_repr(&self, raw_val_vcd: &str) -> String {
         let size = self.real_type.find_width() as usize;
-        println!(
-            "Size of {} {}: \n{}, raw_val_vcd size: {}",
-            self.name,
-            self.real_type,
-            size,
-            raw_val_vcd.len()
-        );
+
         if raw_val_vcd.len() < size {
             return String::from("---");
         }
@@ -172,7 +166,6 @@ impl Variable {
                 let mut start_idx = 0;
                 for field in fields {
                     let end_idx = start_idx + field.real_type.find_width() as usize;
-                    println!("start_idx: {}, end_idx: {}", start_idx, end_idx);
                     value.push_str(&field.create_val_repr(&raw_val_vcd[start_idx..end_idx]));
                     value.push_str(", ");
                     start_idx = end_idx;
