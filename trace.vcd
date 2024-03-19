@@ -5,7 +5,8 @@ $timescale 1ms $end
  $scope module TOP $end
   $scope module svsimTestbench $end
    $var wire  1 # clock [0:0] $end
-   $var wire  2 ' io_a [1:0] $end
+   $var wire  3 r io [2:0] $end
+   $var wire  1 ' io_a [0:0] $end
    $var wire  1 & io_b [0:0] $end
    $var wire  1 % io_out [0:0] $end
    $var wire  1 $ reset [0:0] $end
@@ -19,7 +20,7 @@ $timescale 1ms $end
    $upscope $end
    $scope module dut1 $end
     $var wire  1 # clock $end
-    $var reg  1 ' io_a $end
+    $var reg  1 ' io_ $end
     $var wire  1 & io_b $end
     $var wire  1 % io_out $end
     $var wire  1 $ reset $end
@@ -32,15 +33,18 @@ $enddefinitions $end
 
 #0
 0#
+b010 r
 0$
 0%
-0&
+1&
 1'
 #1
 1#
 #2
 0#
+0&
 #3
+1&
 1#
 #6
 0#

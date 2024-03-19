@@ -120,7 +120,16 @@ impl Variable {
                     }
                 }
             }
-            RealType::Bundle { fields, .. } => {
+            RealType::Bundle {
+                fields,
+                vcd_name: bundle_vcd_name,
+            } => {
+                if let Some(bundle_vcd_name) = bundle_vcd_name {
+                    if bundle_vcd_name == vcd_name {
+                        return Some(self);
+                    }
+                }
+
                 for field in fields {
                     if let Some(v) = field.find_ground_variable(vcd_name) {
                         return Some(v);
@@ -155,10 +164,38 @@ pub enum Direction {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum RealType {
-    Ground { width: u64, vcd_name: String },
-    Vec { size: u64, fields: Vec<Variable> },
-    Bundle { fields: Vec<Variable> },
+    Ground {
+        width: u64,
+        vcd_name: String,
+    },
+    Vec {
+        size: u64,
+        fields: Vec<Variable>,
+    },
+    Bundle {
+        fields: Vec<Variable>,
+        vcd_name: Option<String>,
+    },
     Unknown,
+}
+
+impl RealType {
+    pub fn find_width(&self) -> u128 {
+        match self {
+            RealType::Ground { width, .. } => *width as u128,
+            RealType::Vec { size, fields } => {
+                if let Some(field) = fields.first() {
+                    *size as u128 * field.real_type.find_width()
+                } else {
+                    0
+                }
+            }
+            RealType::Bundle { fields, .. } => {
+                fields.iter().map(|f| f.real_type.find_width()).sum()
+            }
+            RealType::Unknown => 0,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -173,6 +210,7 @@ mod test {
             "AnonymousBundle",
             HwType::Wire,
             RealType::Bundle {
+                vcd_name: Some("io".to_string()),
                 fields: vec![
                     Variable::new(
                         "a",
@@ -231,6 +269,7 @@ mod test {
         let mut bundle = create_bundle();
         let subbundle = create_bundle();
         bundle.real_type = RealType::Bundle {
+            vcd_name: None,
             fields: vec![
                 Variable::new(
                     "a0aw2",

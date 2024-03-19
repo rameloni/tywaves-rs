@@ -39,6 +39,7 @@ mod test {
             "AnonymousBundle",
             HwType::Wire,
             RealType::Bundle {
+                vcd_name: Some("io".to_string()),
                 fields: vec![
                     Variable::new(
                         "a", "Bool",

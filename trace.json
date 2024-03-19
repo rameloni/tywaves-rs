@@ -43,6 +43,7 @@
               "hw_type": "wire",
               "real_type": {
                 "bundle": {
+                  "vcd_name": "io",
                   "fields": [
                     {
                       "name": "a",
