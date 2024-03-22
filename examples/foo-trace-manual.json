@@ -1,0 +1,181 @@
+{
+  "scopes": [
+    {
+      "name": "Foo",
+      "child_variables": [
+        {
+          "name": "inputSum",
+          "type_name": "MyBundle",
+          "hw_type": "wire",
+          "real_type": {
+            "bundle": {
+              "fields": [
+                {
+                  "name": "a",
+                  "type_name": "UInt<8>",
+                  "hw_type": {
+                    "port": {
+                      "direction": "input"
+                    }
+                  },
+                  "real_type": {
+                    "ground": {
+                      "width": 8,
+                      "vcd_name": "inputSum_a"
+                    }
+                  }
+                },
+                {
+                  "name": "b",
+                  "type_name": "UInt<8>",
+                  "hw_type": {
+                    "port": {
+                      "direction": "input"
+                    }
+                  },
+                  "real_type": {
+                    "ground": {
+                      "width": 8,
+                      "vcd_name": "inputSum_b"
+                    }
+                  }
+                },
+                {
+                  "name": "nestedBundle",
+                  "type_name": "AnonymousBundle",
+                  "hw_type": "wire",
+                  "real_type": {
+                    "bundle": {
+                      "fields": [
+                        {
+                          "name": "z",
+                          "type_name": "Bool",
+                          "hw_type": {
+                            "port": {
+                              "direction": "input"
+                            }
+                          },
+                          "real_type": {
+                            "ground": {
+                              "width": 1,
+                              "vcd_name": "inputSum_z"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ],
+              "vcd_name": "inputSum"
+            }
+          }
+          
+        },
+        {
+          "name": "outputSum",
+          "type_name": "SInt<8>",
+          "hw_type": {
+            "port": {
+              "direction": "output"
+            }
+          },
+          "real_type": {
+            "ground": {
+              "width": 8,
+              "vcd_name": "outputSum"
+            }
+          }
+        },
+        {
+          "name": "clock",
+          "type_name": "Clock",
+          "hw_type": {
+            "port": {
+              "direction": "input"
+            }
+          },
+          "real_type": {
+            "ground": {
+              "width": 1,
+              "vcd_name": "clock"
+            }
+          }
+        },
+        {
+          "name": "reset",
+          "type_name": "Bool",
+          "hw_type": {
+            "port": {
+              "direction": "input"
+            }
+          },
+          "real_type": {
+            "ground": {
+              "width": 1,
+              "vcd_name": "reset"
+            }
+          }
+        },
+        {
+          "name": "io",
+          "type_name": "AnonymousBundle",
+          "hw_type": "wire",
+          "real_type": {
+            "bundle": {
+              "fields": [
+                {
+                  "name": "a",
+                  "type_name": "Bool",
+                  "hw_type": {
+                    "port": {
+                      "direction": "input"
+                    }
+                  },
+                  "real_type": {
+                    "ground": {
+                      "width": 1,
+                      "vcd_name": "io_a"
+                    }
+                  }
+                },
+                {
+                  "name": "b",
+                  "type_name": "Bool",
+                  "hw_type": {
+                    "port": {
+                      "direction": "input"
+                    }
+                  },
+                  "real_type": {
+                    "ground": {
+                      "width": 1,
+                      "vcd_name": "io_b"
+                    }
+                  }
+                },
+                {
+                  "name": "out",
+                  "type_name": "Bool",
+                  "hw_type": {
+                    "port": {
+                      "direction": "output"
+                    }
+                  },
+                  "real_type": {
+                    "ground": {
+                      "width": 1,
+                      "vcd_name": "io_out"
+                    }
+                  }
+                }
+              ],
+              "vcd_name": "io"
+            }
+          }
+        }
+      ],
+      "child_scopes": []
+    }
+  ]
+}

@@ -1,0 +1,246 @@
+{
+  "scopes" : [
+    {
+      "name" : "Bar",
+      "child_variables" : [
+        {
+          "name" : "b",
+          "type_name" : "UInt<8>",
+          "hw_type" : "wire",
+          "real_type" : {
+            "ground" : {
+              "width" : 8,
+              "vcd_name" : "inputSum_b"
+            }
+          }
+        },
+        {
+          "name" : "clock",
+          "type_name" : "Clock",
+          "hw_type" : "wire",
+          "real_type" : {
+            "ground" : {
+              "width" : 1,
+              "vcd_name" : "clock"
+            }
+          }
+        },
+        {
+          "name" : "out",
+          "type_name" : "Bool",
+          "hw_type" : "wire",
+          "real_type" : {
+            "ground" : {
+              "width" : 1,
+              "vcd_name" : "io_out"
+            }
+          }
+        },
+        {
+          "name" : "outputSum",
+          "type_name" : "SInt<8>",
+          "hw_type" : "wire",
+          "real_type" : {
+            "ground" : {
+              "width" : 8,
+              "vcd_name" : "_outputSum_output"
+            }
+          }
+        },
+        {
+          "name" : "b",
+          "type_name" : "Bool",
+          "hw_type" : "wire",
+          "real_type" : {
+            "ground" : {
+              "width" : 1,
+              "vcd_name" : "io_b"
+            }
+          }
+        },
+        {
+          "name" : "io",
+          "type_name" : "AnonymousBundle",
+          "hw_type" : "unknown",
+          "real_type" : {
+            "bundle" : {
+              "fields" : [
+                {
+                  "name" : "out",
+                  "type_name" : "Bool",
+                  "hw_type" : "wire",
+                  "real_type" : {
+                    "ground" : {
+                      "width" : 1,
+                      "vcd_name" : "io_out"
+                    }
+                  }
+                },
+                {
+                  "name" : "a",
+                  "type_name" : "Bool",
+                  "hw_type" : "wire",
+                  "real_type" : {
+                    "ground" : {
+                      "width" : 1,
+                      "vcd_name" : "io_a"
+                    }
+                  }
+                },
+                {
+                  "name" : "b",
+                  "type_name" : "Bool",
+                  "hw_type" : "wire",
+                  "real_type" : {
+                    "ground" : {
+                      "width" : 1,
+                      "vcd_name" : "io_b"
+                    }
+                  }
+                }
+              ],
+              "vcd_name" : "io"
+            }
+          }
+        },
+        {
+          "name" : "a",
+          "type_name" : "Bool",
+          "hw_type" : "wire",
+          "real_type" : {
+            "ground" : {
+              "width" : 1,
+              "vcd_name" : "io_a"
+            }
+          }
+        },
+        {
+          "name" : "inputSum",
+          "type_name" : "MyBundleT",
+          "hw_type" : "unknown",
+          "real_type" : {
+            "bundle" : {
+              "fields" : [
+                {
+                  "name" : "a",
+                  "type_name" : "UInt<8>",
+                  "hw_type" : "wire",
+                  "real_type" : {
+                    "ground" : {
+                      "width" : 8,
+                      "vcd_name" : "inputSum_a"
+                    }
+                  }
+                },
+                {
+                  "name" : "b",
+                  "type_name" : "UInt<8>",
+                  "hw_type" : "wire",
+                  "real_type" : {
+                    "ground" : {
+                      "width" : 8,
+                      "vcd_name" : "inputSum_b"
+                    }
+                  }
+                },
+                {
+                  "name" : "nestedBundle",
+                  "type_name" : "AnonymousBundle",
+                  "hw_type" : "unknown",
+                  "real_type" : {
+                    "bundle" : {
+                      "fields" : [
+                        {
+                          "name" : "z",
+                          "type_name" : "Bool",
+                          "hw_type" : "wire",
+                          "real_type" : {
+                            "ground" : {
+                              "width" : 1,
+                              "vcd_name" : "nestedBundle_z"
+                            }
+                          }
+                        }
+                      ],
+                      "vcd_name" : "nestedBundle"
+                    }
+                  }
+                }
+              ],
+              "vcd_name" : "inputSum"
+            }
+          }
+        },
+        {
+          "name" : "z",
+          "type_name" : "Bool",
+          "hw_type" : "wire",
+          "real_type" : {
+            "ground" : {
+              "width" : 1,
+              "vcd_name" : "nestedBundle_z"
+            }
+          }
+        },
+        {
+          "name" : "reset",
+          "type_name" : "Bool",
+          "hw_type" : "wire",
+          "real_type" : {
+            "ground" : {
+              "width" : 1,
+              "vcd_name" : "reset"
+            }
+          }
+        },
+        {
+          "name" : "a",
+          "type_name" : "UInt<8>",
+          "hw_type" : "wire",
+          "real_type" : {
+            "ground" : {
+              "width" : 8,
+              "vcd_name" : "inputSum_a"
+            }
+          }
+        },
+        {
+          "name" : "wire",
+          "type_name" : "Bool",
+          "hw_type" : "wire",
+          "real_type" : {
+            "ground" : {
+              "width" : 1,
+              "vcd_name" : "wire_0"
+            }
+          }
+        },
+        {
+          "name" : "nestedBundle",
+          "type_name" : "AnonymousBundle",
+          "hw_type" : "unknown",
+          "real_type" : {
+            "bundle" : {
+              "fields" : [
+                {
+                  "name" : "z",
+                  "type_name" : "Bool",
+                  "hw_type" : "wire",
+                  "real_type" : {
+                    "ground" : {
+                      "width" : 1,
+                      "vcd_name" : "nestedBundle_z"
+                    }
+                  }
+                }
+              ],
+              "vcd_name" : "nestedBundle"
+            }
+          }
+        }
+      ],
+      "child_scopes" : [
+      ]
+    }
+  ]
+}
