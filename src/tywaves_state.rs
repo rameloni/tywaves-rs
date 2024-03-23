@@ -1,4 +1,6 @@
-use crate::{symbol_table::*, variable_finder::VariableFinder};
+use std::path::Path;
+
+use crate::{symbol_table::*, variable_finder::VariableFinder, vcd_rewrite::VcdRewriter};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -22,5 +24,17 @@ impl VariableFinder for TywaveState {
         self.scopes
             .iter()
             .find_map(|scope| scope.find_parent_variable(subpath))
+    }
+}
+
+impl TywaveState {
+    /// Rewrite a vcd file in order to make it compatible with Surfer for TywaveState
+    pub fn vcd_rewrite_surfer<'a>(&self, vcd: &'a Path) -> &'a Path {
+        let mut vcd_rewriter = VcdRewriter::new(vcd, self.scopes.clone());
+
+        // Rewrite the vcd file
+        let _ = vcd_rewriter.rewrite();
+        let final_file = vcd_rewriter.get_final_file();
+        Path::new(final_file)
     }
 }

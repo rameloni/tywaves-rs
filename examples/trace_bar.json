@@ -66,17 +66,6 @@
             "bundle" : {
               "fields" : [
                 {
-                  "name" : "out",
-                  "type_name" : "Bool",
-                  "hw_type" : "wire",
-                  "real_type" : {
-                    "ground" : {
-                      "width" : 1,
-                      "vcd_name" : "io_out"
-                    }
-                  }
-                },
-                {
                   "name" : "a",
                   "type_name" : "Bool",
                   "hw_type" : "wire",
@@ -87,6 +76,18 @@
                     }
                   }
                 },
+                {
+                  "name" : "out",
+                  "type_name" : "Bool",
+                  "hw_type" : "wire",
+                  "real_type" : {
+                    "ground" : {
+                      "width" : 1,
+                      "vcd_name" : "io_out"
+                    }
+                  }
+                },
+
                 {
                   "name" : "b",
                   "type_name" : "Bool",

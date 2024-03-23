@@ -180,6 +180,22 @@ impl Variable {
         };
         format!("{value}")
     }
+
+    pub fn collect_ground_variables(&self) -> Vec<RealType> {
+        let mut ground_variables: Vec<RealType> = Vec::new();
+
+        match &self.real_type {
+            RealType::Ground { .. } => ground_variables.push(self.real_type.clone()),
+            RealType::Vec { .. } => {}
+            RealType::Bundle { fields, .. } => {
+                for field in fields {
+                    ground_variables.append(&mut field.collect_ground_variables());
+                }
+            }
+            RealType::Unknown => {}
+        }
+        ground_variables
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -218,6 +234,7 @@ pub enum RealType {
     },
     Unknown,
 }
+
 impl Display for RealType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

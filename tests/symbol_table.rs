@@ -185,3 +185,42 @@ fn test_find_variable_nested_scope() {
     let variable_none = scope.find_variable(&wrong_path);
     assert_eq!(variable_none, None);
 }
+
+#[test]
+#[rustfmt::skip]
+fn test_collect_ground_variables() {
+    // Create a new variable
+    let mut bundle = create_bundle();
+    println!("Bundle: {:#?}", bundle);
+
+    let nested_bundle = Variable::new("nested", "MyNestedBundle", HwType::Wire, RealType::Bundle {
+        vcd_name: Some("nested".to_string()),
+        fields: vec![
+            Variable::new("a", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: 10, vcd_name: "nested_a".to_string() }),
+            Variable::new("b", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: 23, vcd_name: "nested_b".to_string() }),
+            Variable::new("out", "UInt", HwType::Port { direction: Direction::Output }, RealType::Ground { width: 56, vcd_name: "nested_out".to_string() }),
+        ],
+    });
+
+    bundle.real_type = RealType::Bundle {
+        vcd_name: Some("io".to_string()),
+        fields: vec![
+            Variable::new("a", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: 1, vcd_name: "io_a".to_string() }),
+            Variable::new("out", "UInt", HwType::Port { direction: Direction::Output }, RealType::Ground { width: 1, vcd_name: "io_out".to_string() }),
+            Variable::new("b", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: 1, vcd_name: "io_b".to_string() }),
+            nested_bundle,
+        ],
+    };
+
+    // Collect all ground variables
+    let ground_variables = bundle.collect_ground_variables();
+
+    // Check if the ground variables are correct
+    let expect = vec![RealType::Ground { width: 1, vcd_name: "io_a".to_string() },
+                      RealType::Ground { width: 1, vcd_name: "io_out".to_string() },
+                      RealType::Ground { width: 1, vcd_name: "io_b".to_string() },
+                      RealType::Ground { width: 10, vcd_name: "nested_a".to_string() },
+                      RealType::Ground { width: 23, vcd_name: "nested_b".to_string() },
+                      RealType::Ground { width: 56, vcd_name: "nested_out".to_string() }];
+    assert_eq!(ground_variables, expect);
+}

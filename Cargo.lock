@@ -154,6 +154,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_stacker",
+ "vcd",
 ]
 
 [[package]]
@@ -161,6 +162,12 @@ name = "unicode-ident"
 version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
+
+[[package]]
+name = "vcd"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4505774fc84de82eb04caa74d859342b0daa376f4c6df45149593245dd62c004"
 
 [[package]]
 name = "winapi"

@@ -1,5 +1,3 @@
-use std::path;
-
 use tywaves::variable_finder::VariableFinder;
 use tywaves::{symbol_table::*, tywaves_state::*};
 
@@ -56,6 +54,7 @@ fn create_io_nested_sample() -> Variable {
     )
 }
 
+#[allow(unused)]
 #[rustfmt::skip]
 fn create_io_sample() -> Variable {
     Variable::new(
