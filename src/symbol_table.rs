@@ -16,7 +16,7 @@ pub struct Scope {
 }
 
 impl VariableFinder for Scope {
-    fn find_variable<'a>(&'a self, subpath: &Vec<String>) -> Option<&'a Variable> {
+    fn find_variable<'a>(&'a self, subpath: &[String]) -> Option<&'a Variable> {
         // The head of the subpath should be the name of the scope
         let subpath = if let Some(head) = subpath.first() {
             if head != &self.name {
@@ -40,7 +40,7 @@ impl VariableFinder for Scope {
                 .find_map(|scope| scope.find_variable(&subpath))
         }
     }
-    fn find_parent_variable<'a>(&'a self, subpath: &Vec<String>) -> Option<&'a Variable> {
+    fn find_parent_variable<'a>(&'a self, subpath: &[String]) -> Option<&'a Variable> {
         // The head of the subpath should be the name of the scope
         let subpath = if let Some(head) = subpath.first() {
             if head != &self.name {
@@ -78,19 +78,19 @@ pub struct Variable {
 }
 
 impl VariableFinder for Variable {
-    fn find_variable<'a>(&'a self, subpath: &Vec<String>) -> Option<&'a Variable> {
+    fn find_variable<'a>(&'a self, subpath: &[String]) -> Option<&'a Variable> {
         if subpath.len() > 1 {
-            return None;
+            None
         } else if let Some(vcd_name) = subpath.first() {
             self.find_ground_variable(vcd_name)
         } else {
-            return None;
+            None
         }
     }
     /// This will find the first variable that will contain the ground vcd_name
-    fn find_parent_variable<'a>(&'a self, subpath: &Vec<String>) -> Option<&'a Variable> {
+    fn find_parent_variable(&self, subpath: &[String]) -> Option<&Variable> {
         // If it can find a ground variable then this is a parent
-        if let Some(_) = self.find_variable(subpath) {
+        if self.find_variable(subpath).is_some() {
             Some(self)
         } else {
             None
@@ -153,7 +153,7 @@ impl Variable {
         if raw_val_vcd.len() < size {
             return String::from("---");
         }
-        let value = match &self.real_type {
+        match &self.real_type {
             RealType::Ground { width, .. } => match width {
                 0 | 1 => raw_val_vcd.to_string(),
                 _ => format!("{} {}: {raw_val_vcd}", &self.type_name, &self.name),
@@ -172,13 +172,12 @@ impl Variable {
                 }
                 value.pop();
                 value.pop();
-                value.push_str("}");
+                value.push('}');
                 value
                 // todo!("Bundle type not implemented")
             }
             RealType::Unknown => todo!("Unknown type not implemented"),
-        };
-        format!("{value}")
+        }
     }
 
     pub fn collect_ground_variables(&self) -> Vec<RealType> {

@@ -54,6 +54,13 @@ impl VcdRewriter {
     /// Rewrite the VCD file
     pub fn rewrite(&mut self) -> Result<()> {
         self.rewrite_header()?;
+
+        // Initialize the variables: 
+        // this will prevent some errors due to some missing variables in the original VCD file
+        for v in self.rewrite_variables.iter() {
+            self.writer.change_vector(v.get_id_code(), v.get_value().iter())?;
+        }
+
         self.rewrite_commands()?;
         Ok(())
     }
@@ -217,7 +224,7 @@ impl VcdRewriteVariable {
                         // Prepend it
                         source_id_codes.insert(0, IdCodeWithShift::create(
                             vcd_var.code,
-                            vcd::Vector::zeros(width as usize),
+                            vcd::Vector::filled(Value::X, width as usize),
                         ));
                     }
                 }

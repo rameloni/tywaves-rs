@@ -12,14 +12,14 @@ pub struct TywaveState {
 }
 
 impl VariableFinder for TywaveState {
-    fn find_variable(&self, subpath: &Vec<String>) -> Option<&Variable> {
+    fn find_variable(&self, subpath: &[String]) -> Option<&Variable> {
         // Find the variable in the top scope
         self.scopes
             .iter()
             .find_map(|scope| scope.find_variable(subpath))
     }
 
-    fn find_parent_variable(&self, subpath: &Vec<String>) -> Option<&Variable> {
+    fn find_parent_variable(&self, subpath: &[String]) -> Option<&Variable> {
         // Find the variable in the top scope
         self.scopes
             .iter()
