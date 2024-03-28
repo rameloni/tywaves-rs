@@ -16,7 +16,7 @@ pub struct Scope {
 }
 
 impl VariableFinder for Scope {
-    fn find_variable<'a>(&'a self, subpath: &[String]) -> Option<&'a Variable> {
+    fn find_variable(&self, subpath: &[String]) -> Option<&Variable> {
         // The head of the subpath should be the name of the scope
         let subpath = if let Some(head) = subpath.first() {
             if head != &self.name {
@@ -40,7 +40,7 @@ impl VariableFinder for Scope {
                 .find_map(|scope| scope.find_variable(&subpath))
         }
     }
-    fn find_parent_variable<'a>(&'a self, subpath: &[String]) -> Option<&'a Variable> {
+    fn find_parent_variable(&self, subpath: &[String]) -> Option<&Variable> {
         // The head of the subpath should be the name of the scope
         let subpath = if let Some(head) = subpath.first() {
             if head != &self.name {
@@ -78,7 +78,7 @@ pub struct Variable {
 }
 
 impl VariableFinder for Variable {
-    fn find_variable<'a>(&'a self, subpath: &[String]) -> Option<&'a Variable> {
+    fn find_variable(&self, subpath: &[String]) -> Option<&Variable> {
         if subpath.len() > 1 {
             None
         } else if let Some(vcd_name) = subpath.first() {
@@ -112,7 +112,7 @@ impl Variable {
         }
     }
 
-    fn find_ground_variable<'a>(&'a self, vcd_name: &String) -> Option<&'a Variable> {
+    fn find_ground_variable(&self, vcd_name: &String) -> Option<&Variable> {
         match &self.real_type {
             RealType::Ground { vcd_name: name, .. } => {
                 if name == vcd_name {
