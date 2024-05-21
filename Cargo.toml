@@ -1,10 +1,24 @@
 [package]
-name = "tywaves"
+name = "tywaves-rs"
 version = "0.1.0"
 edition = "2021"
-authors = ["Raffaele Meloni <raffaele.meloni99@gmail.com"]
+authors = ["Raffaele Meloni <raffaele.meloni99@gmail.com>"]
 description = "Library for reading and elaborating typed waveform files in Rust."
+homepage = "https://github.com/rameloni/tywaves-rs"
+license = "Apache-2.0"
 include = ["Cargo.toml", "src/"]
+keywords = [
+    "vcd",
+    "waveform",
+    "hgldd",
+    "tywaves",
+    "types",
+    "chisel",
+    "circt",
+    "firtool",
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 serde = { version = "1.0.193", features = ["derive"] }

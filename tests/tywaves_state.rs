@@ -1,5 +1,5 @@
-use tywaves::variable_finder::VariableFinder;
-use tywaves::{symbol_table::*, tywaves_state::*};
+use tywaves_rs::variable_finder::VariableFinder;
+use tywaves_rs::{symbol_table::*, tywaves_state::*};
 
 #[rustfmt::skip]
 fn create_io_nested_sample() -> Variable {
@@ -13,17 +13,17 @@ fn create_io_nested_sample() -> Variable {
                 Variable::new(
                     "a", "Bool",
                     HwType::Port { direction: Direction::Input },
-                    RealType::Ground { width: 1, vcd_name: "io_a".to_string() },
+                    RealType::Ground { width: Width::Single(1), vcd_name: Some("io_a".to_string()), constant: None },
                 ),
                 Variable::new(
                     "b", "Bool",
                     HwType::Port { direction: Direction::Input },
-                    RealType::Ground { width: 1, vcd_name: "io_b".to_string() },
+                    RealType::Ground { width: Width::Single(1), vcd_name: Some("io_b".to_string()), constant: None },
                 ),
                 Variable::new(
                     "out", "UInt",
                     HwType::Port { direction: Direction::Output },
-                    RealType::Ground { width: 1, vcd_name: "io_out".to_string() },
+                    RealType::Ground { width: Width::Single(1), vcd_name: Some("io_out".to_string()), constant: None },
                 ),
                 Variable::new(
                     "io", "MyNestedBundleType",
@@ -34,17 +34,17 @@ fn create_io_nested_sample() -> Variable {
                             Variable::new(
                                 "a", "UInt_2",
                                 HwType::Port { direction: Direction::Input },
-                                RealType::Ground { width: 2, vcd_name: "io_io_a".to_string() },
+                                RealType::Ground { width: Width::Single(1), vcd_name: Some("io_io_a".to_string()), constant: None },
                             ),
                             Variable::new(
                                 "b", "UInt_2",
                                 HwType::Port { direction: Direction::Input },
-                                RealType::Ground { width: 2, vcd_name: "io_io_b".to_string() },
+                                RealType::Ground { width: Width::Single(1), vcd_name: Some("io_io_b".to_string()), constant: None },
                             ),
                             Variable::new(
                                 "out", "UInt_2",
                                 HwType::Port { direction: Direction::Output },
-                                RealType::Ground { width: 2, vcd_name: "io_io_out".to_string() },
+                                RealType::Ground { width: Width::Single(1), vcd_name: Some("io_io_out".to_string()), constant: None },
                             ),
                         ],
                     },
@@ -67,17 +67,17 @@ fn create_io_sample() -> Variable {
                 Variable::new(
                     "a", "Bool",
                     HwType::Port { direction: Direction::Input },
-                    RealType::Ground { width: 1, vcd_name: "io_a".to_string() },
+                    RealType::Ground { width: Width::Single(1), vcd_name: Some("io_a".to_string()), constant: None },
                 ),
                 Variable::new(
                     "b", "Bool",
                     HwType::Port { direction: Direction::Input },
-                    RealType::Ground { width: 1, vcd_name: "io_b".to_string() },
+                    RealType::Ground { width: Width::Single(1), vcd_name: Some("io_b".to_string()), constant: None },
                 ),
                 Variable::new(
                     "out", "UInt",
                     HwType::Port { direction: Direction::Output },
-                    RealType::Ground { width: 1, vcd_name: "io_out".to_string() },
+                    RealType::Ground { width: Width::Single(1), vcd_name: Some("io_out".to_string()), constant: None },
                 ),
             ],
         },
@@ -91,12 +91,12 @@ fn sample_state() -> TywaveState {
         Variable::new(
             "clock", "Clock",
             HwType::Port { direction: Direction::Input },
-            RealType::Ground { width: 1, vcd_name: "clock".to_string() },
+            RealType::Ground { width: Width::Single(1), vcd_name: Some("clock".to_string()), constant: None },
         ),
         Variable::new(
             "reset", "Bool",
             HwType::Port { direction: Direction::Input },
-            RealType::Ground { width: 1, vcd_name: "reset".to_string() },
+            RealType::Ground { width: Width::Single(1), vcd_name: Some("reset".to_string()), constant: None },
         ),
         io,
     ];
@@ -106,7 +106,7 @@ fn sample_state() -> TywaveState {
     dut_childs.push(Variable::new(
         "wire", "SInt",
         HwType::Wire,
-        RealType::Ground { width: 1, vcd_name: "wire_0".to_string() },
+        RealType::Ground { width: Width::Single(1), vcd_name: Some("wire_0".to_string()), constant: None },
     ));
 
     TywaveState {
@@ -157,9 +157,10 @@ fn test_find_variable_from_scope_path() {
     for (expected, path) in path_vecs {
         let variable = state.find_variable(&path);
         println!("Path: {:?}, Variable: {:?}", path, variable);
-        let x = variable.map(|v| match &v.real_type {
-            RealType::Ground { vcd_name, width: _ } => vcd_name.clone(),
-            _ => "unknown".to_string(),
+        let mut x: Option<String> = None;
+        variable.map(|v| match &v.real_type {
+            RealType::Ground { vcd_name, .. } => x = vcd_name.clone(),
+            _ => x = None,
         });
         println!("Found: {:?}", x);
         assert_eq!(x, expected);
