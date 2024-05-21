@@ -1,5 +1,5 @@
-use tywaves::symbol_table::*;
-use tywaves::variable_finder::VariableFinder;
+use tywaves_rs::symbol_table::*;
+use tywaves_rs::variable_finder::VariableFinder;
 
 fn create_bundle() -> Variable {
     Variable::new(
@@ -16,8 +16,9 @@ fn create_bundle() -> Variable {
                         direction: Direction::Input,
                     },
                     RealType::Ground {
-                        width: 1,
-                        vcd_name: "io_a".to_string(),
+                        width: Width::Single(1),
+                        vcd_name: Some("io_a".to_string()),
+                        constant: None,
                     },
                 ),
                 Variable::new(
@@ -27,8 +28,9 @@ fn create_bundle() -> Variable {
                         direction: Direction::Input,
                     },
                     RealType::Ground {
-                        width: 1,
-                        vcd_name: "io_b".to_string(),
+                        width: Width::Single(1),
+                        vcd_name: Some("io_b".to_string()),
+                        constant: None,
                     },
                 ),
                 Variable::new(
@@ -38,8 +40,9 @@ fn create_bundle() -> Variable {
                         direction: Direction::Output,
                     },
                     RealType::Ground {
-                        width: 1,
-                        vcd_name: "io_out".to_string(),
+                        width: Width::Single(1),
+                        vcd_name: Some("io_out".to_string()),
+                        constant: None,
                     },
                 ),
             ],
@@ -54,8 +57,9 @@ fn test_find_variable_bundle() {
     assert_eq!(
         variable.real_type,
         RealType::Ground {
-            width: 1,
-            vcd_name: "io_a".to_string(),
+            width: Width::Single(1),
+            vcd_name: Some("io_a".to_string()),
+            constant: None
         }
     );
     println!("Variable: {:#?}", variable);
@@ -77,8 +81,9 @@ fn test_find_variable_nested_bundle() {
                     direction: Direction::Input,
                 },
                 RealType::Ground {
-                    width: 1,
-                    vcd_name: "a0aw2".to_string(),
+                    width: Width::Single(1),
+                    vcd_name: Some("a0aw2".to_string()),
+                    constant: None,
                 },
             ),
             subbundle,
@@ -88,8 +93,9 @@ fn test_find_variable_nested_bundle() {
     assert_eq!(
         variable.real_type,
         RealType::Ground {
-            width: 1,
-            vcd_name: "io_a".to_string(),
+            width: Width::Single(1),
+            vcd_name: Some("io_a".to_string()),
+            constant: None
         }
     );
     println!("Variable: {:#?}", variable);
@@ -104,16 +110,18 @@ fn test_find_variable_ground() {
         "MyVariable",
         HwType::Reg,
         RealType::Ground {
-            width: 1,
-            vcd_name: "a0aw".to_string(),
+            width: Width::Single(1),
+            vcd_name: Some("a0aw".to_string()),
+            constant: None,
         },
     );
     let variable = ground.find_variable(&vec!["a0aw".to_string()]).unwrap();
     assert_eq!(
         variable.real_type,
         RealType::Ground {
-            width: 1,
-            vcd_name: "a0aw".to_string(),
+            width: Width::Single(1),
+            vcd_name: Some("a0aw".to_string()),
+            constant: None
         }
     );
 
@@ -128,13 +136,13 @@ fn test_find_variable_scope() {
     let var = Variable::new(
         "a", "MyVariable",
         HwType::Reg,
-        RealType::Ground { width: 1, vcd_name: "a0aw".to_string() },
+        RealType::Ground { width: Width::Single(1), vcd_name: Some("a0aw".to_string()), constant: None },
     );
 
     let var2 = Variable::new(
         "b", "MyVariable",
         HwType::Reg,
-        RealType::Ground { width: 1, vcd_name: "a0aw2".to_string() },
+        RealType::Ground { width: Width::Single(1), vcd_name: Some("a0aw2".to_string()), constant: None },
     );
 
     let subscope = Scope { name: "dut".to_string(), child_variables: vec![var2.clone(), var], child_scopes: vec![] };
@@ -145,7 +153,7 @@ fn test_find_variable_scope() {
 
     assert_eq!(
         variable.real_type,
-        RealType::Ground { width: 1, vcd_name: "a0aw2".to_string() }
+        RealType::Ground { width: Width::Single(1), vcd_name: Some("a0aw2".to_string()), constant: None }
     );
     let wrong_path = vec!["a0aw2".to_string()];
     let variable_none = scope.find_variable(&wrong_path);
@@ -165,7 +173,7 @@ fn test_find_variable_nested_scope() {
     let var_list: Vec<Variable> = var_list.iter().map(|(name, vcd_name)| {
         Variable::new(
             name, "MyVariable", HwType::Reg,
-            RealType::Ground { width: 1, vcd_name: vcd_name.to_string() },
+            RealType::Ground { width: Width::Single(1), vcd_name: Some(vcd_name.to_string()), constant: None },
         )
     }).collect();
     let subsubscope = Scope { name: "subdut".to_string(), child_variables: var_list.clone(), child_scopes: vec![] };
@@ -177,7 +185,7 @@ fn test_find_variable_nested_scope() {
 
         assert_eq!(
             variable.real_type,
-            RealType::Ground { width: 1, vcd_name: "aw2".to_string() }
+            RealType::Ground { width: Width::Single(1), vcd_name: Some("aw2".to_string()), constant: None }
         );
     }
 
@@ -196,18 +204,18 @@ fn test_collect_ground_variables() {
     let nested_bundle = Variable::new("nested", "MyNestedBundle", HwType::Wire, RealType::Bundle {
         vcd_name: Some("nested".to_string()),
         fields: vec![
-            Variable::new("a", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: 10, vcd_name: "nested_a".to_string() }),
-            Variable::new("b", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: 23, vcd_name: "nested_b".to_string() }),
-            Variable::new("out", "UInt", HwType::Port { direction: Direction::Output }, RealType::Ground { width: 56, vcd_name: "nested_out".to_string() }),
+            Variable::new("a", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: Width::Single(10), vcd_name: Some("nested_a".to_string()), constant: None }),
+            Variable::new("b", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: Width::Single(23), vcd_name: Some("nested_b".to_string()), constant: None }),
+            Variable::new("out", "UInt", HwType::Port { direction: Direction::Output }, RealType::Ground { width: Width::Single(56), vcd_name: Some("nested_out".to_string()), constant: None }),
         ],
     });
 
     bundle.real_type = RealType::Bundle {
         vcd_name: Some("io".to_string()),
         fields: vec![
-            Variable::new("a", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: 1, vcd_name: "io_a".to_string() }),
-            Variable::new("out", "UInt", HwType::Port { direction: Direction::Output }, RealType::Ground { width: 1, vcd_name: "io_out".to_string() }),
-            Variable::new("b", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: 1, vcd_name: "io_b".to_string() }),
+            Variable::new("a", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: Width::Single(1), vcd_name: Some("io_a".to_string()), constant: None }),
+            Variable::new("out", "UInt", HwType::Port { direction: Direction::Output }, RealType::Ground { width: Width::Single(1), vcd_name: Some("io_out".to_string()), constant: None }),
+            Variable::new("b", "Bool", HwType::Port { direction: Direction::Input }, RealType::Ground { width: Width::Single(1), vcd_name: Some("io_b".to_string()), constant: None }),
             nested_bundle,
         ],
     };
@@ -216,11 +224,11 @@ fn test_collect_ground_variables() {
     let ground_variables = bundle.collect_ground_variables();
 
     // Check if the ground variables are correct
-    let expect = vec![RealType::Ground { width: 1, vcd_name: "io_a".to_string() },
-                      RealType::Ground { width: 1, vcd_name: "io_out".to_string() },
-                      RealType::Ground { width: 1, vcd_name: "io_b".to_string() },
-                      RealType::Ground { width: 10, vcd_name: "nested_a".to_string() },
-                      RealType::Ground { width: 23, vcd_name: "nested_b".to_string() },
-                      RealType::Ground { width: 56, vcd_name: "nested_out".to_string() }];
+    let expect = vec![RealType::Ground {width: Width::Single(1), vcd_name:Some("io_a".to_string()), constant: None },
+                      RealType::Ground { width: Width::Single(1), vcd_name: Some("io_out".to_string()), constant: None },
+                      RealType::Ground { width: Width::Single(1), vcd_name: Some("io_b".to_string()), constant: None },
+                      RealType::Ground { width: Width::Single(10), vcd_name: Some("nested_a".to_string()), constant: None },
+                      RealType::Ground { width: Width::Single(23), vcd_name: Some("nested_b".to_string()), constant: None },
+                      RealType::Ground { width: Width::Single(56), vcd_name: Some("nested_out".to_string()), constant: None }];
     assert_eq!(ground_variables, expect);
 }

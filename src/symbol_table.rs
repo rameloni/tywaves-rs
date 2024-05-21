@@ -114,9 +114,14 @@ impl Variable {
 
     fn find_ground_variable(&self, vcd_name: &String) -> Option<&Variable> {
         match &self.real_type {
-            RealType::Ground { vcd_name: name, .. } => {
-                if name == vcd_name {
-                    return Some(self);
+            RealType::Ground {
+                vcd_name: ground_vcd_name,
+                ..
+            } => {
+                if let Some(ground_vcd_name) = ground_vcd_name {
+                    if ground_vcd_name == vcd_name {
+                        return Some(self);
+                    }
                 }
             }
             RealType::Vec { fields, .. } => {
@@ -154,10 +159,14 @@ impl Variable {
             return String::from("---");
         }
         match &self.real_type {
-            RealType::Ground { width, .. } => match width {
-                0 | 1 => raw_val_vcd.to_string(),
-                _ => format!("{} {}: {raw_val_vcd}", &self.type_name, &self.name),
-            },
+            RealType::Ground { width, .. } => {
+                if width.get() <= 1 {
+                    raw_val_vcd.to_string()
+                } else {
+                    format!("{} {}: {raw_val_vcd}", &self.type_name, &self.name)
+                }
+            }
+
             RealType::Vec { .. } => todo!("Vec type not implemented"),
             RealType::Bundle { fields, .. } => {
                 // Encode the fields recursively {x, {y, z}}
@@ -200,6 +209,7 @@ impl Variable {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum HwType {
+    Logic,
     Wire,
     Reg,
     Port { direction: Direction },
@@ -220,8 +230,10 @@ pub enum Direction {
 #[serde(rename_all = "snake_case")]
 pub enum RealType {
     Ground {
-        width: u64,
-        vcd_name: String,
+        // width can be either a u64 or a vec of u64 with 2 elements
+        width: Width,
+        vcd_name: Option<String>,
+        constant: Option<String>,
     },
     Vec {
         size: u64,
@@ -232,6 +244,24 @@ pub enum RealType {
         vcd_name: Option<String>,
     },
     Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", untagged)]
+pub enum Width {
+    Single(u64),
+    Multi(Vec<u64>),
+}
+impl Width {
+    pub fn get(&self) -> u64 {
+        match self {
+            Width::Single(w) => *w,
+            Width::Multi(w) => {
+                let a: u64 = w.iter().sum();
+                a + 1
+            }
+        }
+    }
 }
 
 impl Display for RealType {
@@ -260,7 +290,7 @@ impl Display for RealType {
 impl RealType {
     pub fn find_width(&self) -> u128 {
         match self {
-            RealType::Ground { width, .. } => *width as u128,
+            RealType::Ground { width, .. } => width.get() as u128,
             RealType::Vec { size, fields } => {
                 if let Some(field) = fields.first() {
                     *size as u128 * field.real_type.find_width()

@@ -147,7 +147,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tywaves"
+name = "tywaves-rs"
 version = "0.1.0"
 dependencies = [
  "eyre",
