@@ -1,6 +1,5 @@
 mod expected_tyvcd;
 
-use std::collections::HashMap;
 use std::path::Path;
 
 use test_case::test_case;

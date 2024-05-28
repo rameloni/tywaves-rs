@@ -8,7 +8,7 @@ pub fn add_instance_links(tyvcd: &mut TyVcd) {
     let copy_scopes = tyvcd.scopes.clone();
 
     // For each Scope found in the list
-    for (ref_scope, scope_def) in &mut tyvcd.scopes {
+    for scope_def in tyvcd.scopes.values_mut() {
         // 1. Check if it has instances (subscopes),
         for subscope in &mut scope_def.subscopes {
             //      1.1 if yes, search for module definitions in the same list
@@ -93,7 +93,7 @@ fn get_trace_names(expression: &Option<hgldd::Expression>) -> Option<String> {
             hgldd::Expression::BitVector(s) => Some(s.clone()),
             hgldd::Expression::IntegerNum(i) => Some(i.to_string()),
             // This variable contains an operator, this means it contains the "values" of all its child variables (to be added in kind)
-            hgldd::Expression::Operator { operands, .. } => None,
+            hgldd::Expression::Operator { .. } => None,
         }
     } else {
         None
@@ -105,9 +105,9 @@ fn get_sub_expressions(expression: &Option<hgldd::Expression>) -> Vec<hgldd::Exp
     if let Some(expression) = expression {
         match &expression {
             // This variable contains a value
-            hgldd::Expression::SigName(s) => vec![expression.clone()],
-            hgldd::Expression::BitVector(s) => vec![expression.clone()],
-            hgldd::Expression::IntegerNum(i) => vec![expression.clone()],
+            hgldd::Expression::SigName(_) => vec![expression.clone()],
+            hgldd::Expression::BitVector(_) => vec![expression.clone()],
+            hgldd::Expression::IntegerNum(_) => vec![expression.clone()],
             // This variable contains an operator, this means it contains the "values" of all its child variables (to be added in kind)
             hgldd::Expression::Operator { opcode, operands } => match opcode {
                 &hgldd::Opcode::Struct => {
@@ -133,6 +133,7 @@ fn update_trace_name(kind: &mut VariableKind, expression: &Option<hgldd::Express
     match kind {
         VariableKind::Vector { fields } | VariableKind::Struct { fields } => {
             // Update the trace name of this kind
+            #[allow(clippy::needless_range_loop)]
             for i in 0..fields.len() {
                 let trace_name = get_trace_names(&subexpressions.get(i).cloned())
                     .unwrap_or(String::from("default"));
@@ -146,7 +147,7 @@ fn update_trace_name(kind: &mut VariableKind, expression: &Option<hgldd::Express
 
 fn build_vector_fields(
     kind: &VariableKind,
-    expressions: &Vec<hgldd::Expression>,
+    expressions: &[hgldd::Expression],
     dims: &[u32],
 ) -> Vec<Variable> {
     // No fields
@@ -159,7 +160,7 @@ fn build_vector_fields(
     let size = (a - b + 1) as usize;
 
     // Find the fields of this dimension
-    let mut fields = Vec::with_capacity(size as usize);
+    let mut fields = Vec::with_capacity(size);
     for j in 0..size {
         let expr = expressions.get(j).cloned();
         let subexpressions = get_sub_expressions(&expr);
@@ -203,7 +204,6 @@ fn get_variable(hgldd_var: &hgldd::Variable, objects: &Vec<hgldd::Object>) -> Va
     // };
     let expressions = get_sub_expressions(&hgldd_var.value);
     let trace_name = get_trace_names(&hgldd_var.value);
-    let mut second_trace_name = None;
 
     // Build the kind of this type
     let kind = match &hgldd_var.type_name {
@@ -222,7 +222,6 @@ fn get_variable(hgldd_var: &hgldd::Variable, objects: &Vec<hgldd::Object>) -> Va
             VariableKind::Ground
         }
         Some(hgldd::TypeName::Custom(t)) => {
-            second_trace_name = Some(t.clone());
             // Find the custom typeName from the list of objects
             let obj = objects
                 .iter()
@@ -230,6 +229,7 @@ fn get_variable(hgldd_var: &hgldd::Variable, objects: &Vec<hgldd::Object>) -> Va
                 .unwrap();
 
             let mut fields = Vec::with_capacity(obj.port_vars.len());
+            #[allow(clippy::needless_range_loop)]
             for i in 0..obj.port_vars.len() {
                 let mut var = obj.port_vars[i].clone();
                 var.value = Some(expressions[i].clone());
@@ -254,7 +254,7 @@ fn get_variable(hgldd_var: &hgldd::Variable, objects: &Vec<hgldd::Object>) -> Va
     let trace_name = if let Some(trace_name) = trace_name {
         trace_name
     } else {
-        format!("todo ")
+        String::from("todo ")
     };
     Variable::new(trace_name, name, high_level_info, final_kind)
 }

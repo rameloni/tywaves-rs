@@ -1,10 +1,9 @@
 use tywaves_rs::tyvcd::trace_pointer::TracePointer;
 
 // External variable that will be captured.
-use crate::tyvcd::builder::*;
+
 use crate::tyvcd::spec::*;
 
-use super::*;
 use std::collections::HashMap;
 
 // Create the TyVcd for the [[tests/inputs/tyvcd/foo/foo.dd]] file.
@@ -62,7 +61,7 @@ pub fn create_foo() -> TyVcd {
     let bar = super::bar::create_bar_single();
 
     for subscope_to_update in &mut foo.scopes.get_mut("Foo").unwrap().subscopes {
-        let mut new_scope = Scope::from_other(
+        let new_scope = Scope::from_other(
             bar.scopes.get("Bar").unwrap(),
             subscope_to_update.get_trace_name(),
         );

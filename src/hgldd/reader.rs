@@ -42,10 +42,8 @@ pub fn parse_hgldd_dir(hgldd_dir_path: &Path) -> Vec<Hgldd> {
         let file = file.unwrap();
         let path = file.path();
         // Check if the file is an HGLDD file
-        if path.is_file() {
-            if path.extension().unwrap() == HGLDD_EXTENSION {
-                hgldds.append(&mut parse_hgldd_file(&path));
-            }
+        if path.is_file() && path.extension().unwrap() == HGLDD_EXTENSION {
+            hgldds.append(&mut parse_hgldd_file(&path));
         }
     }
     hgldds

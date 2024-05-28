@@ -1,11 +1,6 @@
-use tywaves_rs::tyvcd::trace_pointer::TracePointer;
-use vcd::Var;
-
 // External variable that will be captured.
-use crate::tyvcd::builder::*;
 use crate::tyvcd::spec::*;
 
-use super::*;
 use std::collections::HashMap;
 use std::vec;
 
