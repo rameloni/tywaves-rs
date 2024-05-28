@@ -8,7 +8,9 @@ use test_case::test_case;
 use tywaves_rs::hgldd;
 use tywaves_rs::tyvcd;
 
-use expected_tyvcd::foo;
+use expected_tyvcd::*;
+
+use pretty_assertions::assert_eq;
 
 #[test_case("tests/inputs/hgldd/foo.dd", 1; "Test foo.dd")]
 #[test_case("tests/inputs/hgldd/bar.dd", 1; "Test bar.dd")]
@@ -29,7 +31,31 @@ fn test_hgldd_tyvcd_builder_success(file_path: &str, exp_hgldd_len: usize) {
 
     assert_eq!(hgldd.len(), exp_hgldd_len);
 
-    for hgldd in hgldd {
-        let _tyvcd = tyvcd::builder::from_hgldd(&hgldd);
-    }
+    let _tyvcd = tyvcd::builder::from_hgldd(&hgldd);
+}
+
+#[test_case("tests/inputs/tyvcd/foo/foo.dd", foo::create_foo_single; "Test foo.dd")]
+#[test_case("tests/inputs/tyvcd/foo/bar.dd", bar::create_bar_single; "Test bar.dd")]
+#[test_case("tests/inputs/tyvcd/foo", foo::create_foo; "Test directory foo")]
+// #[test_case("tests/inputs/gcd.dd", "tests/inputs/expected_tyvcd/foo.tyvcd"; "Test gcd.dd")]
+// #[test_case("tests/inputs/hgldd/global.dd", "tests/inputs/expected_tyvcd/foo.tyvcd"; "Test global.dd")]
+fn test_tyvcd_single_file_assertions(
+    file_path: &str,
+    create_expected_output: fn() -> tyvcd::spec::TyVcd,
+) {
+    // Read the hgldd file
+    let hgldd_file = Path::new(file_path);
+    // Check if it is a directory
+
+    let hgldd = if hgldd_file.is_dir() {
+        hgldd::reader::parse_hgldd_dir(hgldd_file)
+    } else {
+        hgldd::reader::parse_hgldd_file(hgldd_file)
+    };
+
+    let mut tyvcd = tyvcd::builder::from_hgldd(&hgldd);
+    tyvcd::builder::add_instance_links(&mut tyvcd);
+
+    let expected_tyvcd = create_expected_output();
+    assert_eq!(tyvcd, expected_tyvcd);
 }

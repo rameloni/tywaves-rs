@@ -4,41 +4,76 @@ use std::collections::HashMap;
 
 use crate::hgldd::spec::{self as hgldd};
 
-pub fn from_hgldd(hgldd: &hgldd::Hgldd) -> TyVcd {
+pub fn add_instance_links(tyvcd: &mut TyVcd) {
+    let copy_scopes = tyvcd.scopes.clone();
+    
+    // For each Scope found in the list
+    for (ref_scope, scope_def) in &mut tyvcd.scopes {
+        // 1. Check if it has instances (subscopes),
+        for subscope in &mut scope_def.subscopes {
+            //      1.1 if yes, search for module definitions in the same list
+            let subscope_name = &subscope.name;
+
+            // Get the module definition
+            if let Some(module_def) = copy_scopes.get(subscope_name) {
+                // SubScope contains the actual trace_name
+                subscope.high_level_info = module_def.high_level_info.clone();
+                subscope.name = module_def.name.clone();
+                subscope.variables = module_def.variables.clone();
+                subscope.subscopes = module_def.subscopes.clone();
+            }
+        }
+    }
+
+    // Keep only the top scopes
+    let mut top_scopes = HashMap::new();
+    for (name, scope) in &tyvcd.scopes {
+        if !tyvcd.scopes.values().any(|s| s.subscopes.iter().any(|ss| &ss.name == name)) {
+            top_scopes.insert(name.clone(), scope.clone());
+        }
+    }
+    tyvcd.scopes = top_scopes;
+}
+
+pub fn from_hgldd(hgldd_list: &Vec<hgldd::Hgldd>) -> TyVcd {
     // The scopes already found and their names
     let mut scopes: HashMap<String, Scope> = HashMap::new();
     // let mut scopes = Vec::new();
 
     // Iterates over the hgldd objects
-    for obj in &hgldd.objects {
-        match obj.kind {
-            hgldd::ObjectKind::Module => {
-                // Retrieve the information of the scope
-                let high_level_info = TypeInfo::new("todo".to_string(), Vec::new());
+    for hgldd in hgldd_list {
+        for obj in &hgldd.objects {
+            match obj.kind {
+                hgldd::ObjectKind::Module => {
+                    // Retrieve the information of the scope
+                    let high_level_info = TypeInfo::new("todo".to_string(), Vec::new());
 
-                let mut scope = if let Some(module_name) = obj.module_name.clone() {
-                    Scope::empty(module_name, obj.obj_name.clone(), high_level_info)
-                } else {
-                    Scope::empty(obj.obj_name.clone(), obj.obj_name.clone(), high_level_info)
-                };
+                    let mut scope = if let Some(module_name) = obj.module_name.clone() {
+                        Scope::empty(module_name, obj.obj_name.clone(), high_level_info)
+                    } else {
+                        Scope::empty(obj.obj_name.clone(), obj.obj_name.clone(), high_level_info)
+                    };
 
-                // Check the children of this scope
+                    // Check the children of this scope
+                    if let Some(children) = &obj.children {
+                        for inst in children {
+                            let subscope = get_instance(inst);
+                            scope.subscopes.push(subscope);
+                        }
+                    }
 
-                // Check the port vars inside the module
-                for var in &obj.port_vars {
-                    let variable = get_variable(var, &hgldd.objects);
-                    scope.variables.push(variable);
+                    // Check the port vars inside the module
+                    for var in &obj.port_vars {
+                        let variable = get_variable(var, &hgldd.objects);
+                        scope.variables.push(variable);
+                    }
+
+                    // Update the found scopes
+                    scopes.insert(scope.get_trace_name(), scope);
                 }
-
-                // if let Some(child_instance) = obj.children {
-                //     todo!()
-                // }
-
-                // Update the found scopes
-                scopes.insert(scope.get_trace_name(), scope);
+                // Ignore the struct
+                hgldd::ObjectKind::Struct => {}
             }
-            // Ignore the struct
-            hgldd::ObjectKind::Struct => {}
         }
     }
     // An hgldd contains a list of objects, each o
@@ -118,7 +153,6 @@ fn build_vector_fields(
     // Get the range of the current dimension [a:b]
     let (a, b) = (dims[0], dims[1]);
     let size = (a - b + 1) as usize;
-    println!("Adjusting vector expressions: {:?}", expressions);
 
     // Find the fields of this dimension
     let mut fields = Vec::with_capacity(size as usize);
@@ -127,10 +161,7 @@ fn build_vector_fields(
         let subexpressions = get_sub_expressions(&expr);
         let trace_name = get_trace_names(&expr).unwrap_or(String::from("default"));
 
-        println!("Expression({}): {:?}", j, expressions.get(j));
         // Get subexpressions for the new dimension
-        println!("subexpressions({}): {:?}", j, subexpressions);
-        println!("trace_name({}): {:?}", j, trace_name);
 
         // Adjust the trace name of this kind
         let mut kind = kind.clone();
@@ -169,10 +200,6 @@ fn get_variable(hgldd_var: &hgldd::Variable, objects: &Vec<hgldd::Object>) -> Va
     let expressions = get_sub_expressions(&hgldd_var.value);
     let trace_name = get_trace_names(&hgldd_var.value);
     let mut second_trace_name = None;
-    println!(
-        "var: {:?},\n\t input value: {:?},\n\t trace_name: {:?}",
-        hgldd_var.var_name, hgldd_var.value, trace_name
-    );
 
     // Build the kind of this type
     let kind = match &hgldd_var.type_name {
@@ -198,12 +225,10 @@ fn get_variable(hgldd_var: &hgldd::Variable, objects: &Vec<hgldd::Object>) -> Va
                 .find(|o| o.kind == hgldd::ObjectKind::Struct && &o.obj_name == t)
                 .unwrap();
 
-            println!("obj: {:?}", obj.obj_name);
             let mut fields = Vec::with_capacity(obj.port_vars.len());
             for i in 0..obj.port_vars.len() {
                 let mut var = obj.port_vars[i].clone();
                 var.value = Some(expressions[i].clone());
-                println!("\t subvar: {:?}", var.value);
                 fields.push(get_variable(&var, objects));
             }
 
@@ -230,8 +255,21 @@ fn get_variable(hgldd_var: &hgldd::Variable, objects: &Vec<hgldd::Object>) -> Va
     Variable::new(trace_name, name, high_level_info, final_kind)
 }
 
-pub fn get_instance(hgldd_var: &hgldd::Instance) {
-    // Create a new variable
+fn get_instance(hgldd_inst: &hgldd::Instance) -> Scope {
+    let trace_name = if let Some(hdl_obj_name) = &hgldd_inst.hdl_obj_name {
+        hdl_obj_name
+    } else {
+        &hgldd_inst.name
+    };
 
-    todo!()
+    let name = if let Some(hgl_obj_name) = &hgldd_inst.obj_name {
+        hgl_obj_name
+    } else {
+        &hgldd_inst.name
+    };
+
+    let high_level_info = TypeInfo::new("todo".to_string(), Vec::new());
+
+    // Create a new scope from an instance
+    Scope::empty(trace_name.clone(), name.clone(), high_level_info)
 }

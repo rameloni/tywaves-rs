@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use super::trace_pointer::TracePointer;
 use crate::hgldd::spec as hgldd;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 /// Represents the TyVcd format
 pub struct TyVcd {
     pub scopes: HashMap<String, Scope>,
@@ -15,7 +15,7 @@ impl From<Vec<hgldd::Hgldd>> for TyVcd {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 /// Represent a scope (i.e. a module instance) in the TyVcd format
 pub struct Scope {
     /// The name of the scope in the trace.
@@ -33,6 +33,7 @@ pub struct Scope {
 }
 
 impl Scope {
+    /// Create a new empty scope without any subscopes or variables.
     pub fn empty(trace_name: String, name: String, high_level_info: TypeInfo) -> Self {
         Self {
             _id_trace_name: trace_name,
@@ -40,6 +41,18 @@ impl Scope {
             variables: Vec::new(),
             name,
             high_level_info,
+        }
+    }
+
+    /// Create a new scope from another scope with an updated trace name. 
+    /// If you want to fully copy it use the `clone` method.
+    pub fn from_other(other: &Scope, trace_name: String) -> Self {
+        Self {
+            _id_trace_name: trace_name,
+            subscopes: other.subscopes.clone(),
+            variables: other.variables.clone(),
+            name: other.name.clone(),
+            high_level_info: other.high_level_info.clone(),
         }
     }
 }
@@ -53,7 +66,7 @@ impl TracePointer for Scope {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 /// Represent a variable in the TyVcd format.
 pub struct Variable {
     /// The name of the variable in the trace.
@@ -95,7 +108,7 @@ impl TracePointer for Variable {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 /// Structure to store the type information of a variable.
 pub struct TypeInfo {
     /// The type name of the variable.
@@ -108,7 +121,7 @@ impl TypeInfo {
         Self { type_name, params }
     }
 }
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum VariableKind {
     Struct { fields: Vec<Variable> },
     Vector { fields: Vec<Variable> },
