@@ -50,4 +50,3 @@ pub fn parse_hgldd_dir(hgldd_dir_path: &Path) -> Vec<Hgldd> {
     }
     hgldds
 }
-

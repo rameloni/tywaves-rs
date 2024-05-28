@@ -22,6 +22,8 @@ pub struct Header {
 }
 
 /// An object in the HGLDD file. It can be a module or a struct.
+/// It represent a only a "type", the actual value is stored in the variables.
+/// For example a struct will contain `port_vars` with the actual values of the struct.
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -41,7 +43,7 @@ pub struct Object {
     /// The location of the object in the HDL file
     pub hdl_loc: Option<Location>,
 
-    /// variables of the module
+    /// Variables of the object (a module or a struct)
     pub port_vars: Vec<Variable>,
 
     /// Children instances of the module
@@ -49,7 +51,7 @@ pub struct Object {
 }
 
 /// Supported HGLDD object kinds
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum ObjectKind {
     Module,
@@ -58,24 +60,25 @@ pub enum ObjectKind {
 
 /// A variable in the HGLDD file
 #[skip_serializing_none]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct Variable {
     /// The source language name of the variable
-    var_name: String,
+    pub var_name: String,
 
-    hgl_loc: Option<Location>,
-    hdl_loc: Option<Location>,
+    pub hgl_loc: Option<Location>,
+    pub hdl_loc: Option<Location>,
 
     /// The value of the variable
-    value: Option<Expression>,
+    pub value: Option<Expression>,
 
     /// The type name in the target language (i.e. logic in verilog)
-    type_name: Option<TypeName>,
-    /// The dimensions range of the variable (i.e. [7:0])
-    packed_range: Option<Dims>,
-    /// The dimensions range of a variable (it can be more than one dimension, i.e. [7:0][3:0])
-    unpacked_range: Option<Dims>,
+    pub type_name: Option<TypeName>,
+    /// The dimensions range of the variable (i.e. logic [7:0] x)
+    pub packed_range: Option<PackedRange>,
+    /// The dimensions range of a vector variable (i.e. logic [7:0] x [1:0][3:0])
+    /// [7:0] is the packed_range and [1:0][3:0] is the unpacked_range (a list of dimensions)
+    pub unpacked_range: Option<UnpackedRange>,
 }
 
 /// An instance of a module
@@ -103,7 +106,7 @@ pub struct Instance {
 
 /// An emitted expression in HGLDD. An expression can refer to a signal in the target language,
 /// to a constant value or to an operator (for example for aggregates).
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum Expression {
     // TODO: add more expression types
@@ -122,16 +125,18 @@ pub enum Expression {
     },
 }
 
-/// The dimensions of a variable
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "snake_case", untagged)]
-pub enum Dims {
-    PackedRange(u32, u32),
-    UnpackedRange(Vec<u32>),
-}
+/// The dimensions of a variable (i.e. logic [7:0] x ==> PackedRange(7, 0)
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "snake_case")]
+pub struct PackedRange(pub u32, pub u32);
+
+/// The dimensionality of a variable (i.e. logic x [1:0][3:0] ==> UnpackedRange([1, 0, 3, 0])
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "snake_case")]
+pub struct UnpackedRange(pub Vec<u32>);
 
 /// The type name of a variable
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum TypeName {
     Logic,
@@ -143,7 +148,7 @@ pub enum TypeName {
 
 /// The location of an object in a file
 #[skip_serializing_none]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct Location {
     /// The index of the file in the [Header::file_info] of the HGLDD file
@@ -155,7 +160,7 @@ pub struct Location {
 }
 
 /// Opcodes for the operators in the HGLDD [Expression]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum Opcode {
     #[serde(rename = "'{")]
