@@ -6,7 +6,7 @@ use crate::hgldd::spec::{self as hgldd};
 
 pub fn add_instance_links(tyvcd: &mut TyVcd) {
     let copy_scopes = tyvcd.scopes.clone();
-    
+
     // For each Scope found in the list
     for (ref_scope, scope_def) in &mut tyvcd.scopes {
         // 1. Check if it has instances (subscopes),
@@ -28,7 +28,11 @@ pub fn add_instance_links(tyvcd: &mut TyVcd) {
     // Keep only the top scopes
     let mut top_scopes = HashMap::new();
     for (name, scope) in &tyvcd.scopes {
-        if !tyvcd.scopes.values().any(|s| s.subscopes.iter().any(|ss| &ss.name == name)) {
+        if !tyvcd
+            .scopes
+            .values()
+            .any(|s| s.subscopes.iter().any(|ss| &ss.name == name))
+        {
             top_scopes.insert(name.clone(), scope.clone());
         }
     }

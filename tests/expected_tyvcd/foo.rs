@@ -5,7 +5,7 @@ use crate::tyvcd::builder::*;
 use crate::tyvcd::spec::*;
 
 use super::*;
-use std::{collections::HashMap, process::id};
+use std::collections::HashMap;
 
 // Create the TyVcd for the [[tests/inputs/tyvcd/foo/foo.dd]] file.
 pub fn create_foo_single() -> TyVcd {

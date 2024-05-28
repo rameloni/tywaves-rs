@@ -37,8 +37,7 @@ fn test_hgldd_tyvcd_builder_success(file_path: &str, exp_hgldd_len: usize) {
 #[test_case("tests/inputs/tyvcd/foo/foo.dd", foo::create_foo_single; "Test foo.dd")]
 #[test_case("tests/inputs/tyvcd/foo/bar.dd", bar::create_bar_single; "Test bar.dd")]
 #[test_case("tests/inputs/tyvcd/foo", foo::create_foo; "Test directory foo")]
-// #[test_case("tests/inputs/gcd.dd", "tests/inputs/expected_tyvcd/foo.tyvcd"; "Test gcd.dd")]
-// #[test_case("tests/inputs/hgldd/global.dd", "tests/inputs/expected_tyvcd/foo.tyvcd"; "Test global.dd")]
+#[test_case("tests/inputs/tyvcd/withBundlesAndVecs.dd", with_bundles_and_vecs::create_with_bundles_and_vecs; "Test with bundles and vecs")]
 fn test_tyvcd_single_file_assertions(
     file_path: &str,
     create_expected_output: fn() -> tyvcd::spec::TyVcd,

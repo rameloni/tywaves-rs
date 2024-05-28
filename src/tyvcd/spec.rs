@@ -44,7 +44,7 @@ impl Scope {
         }
     }
 
-    /// Create a new scope from another scope with an updated trace name. 
+    /// Create a new scope from another scope with an updated trace name.
     /// If you want to fully copy it use the `clone` method.
     pub fn from_other(other: &Scope, trace_name: String) -> Self {
         Self {

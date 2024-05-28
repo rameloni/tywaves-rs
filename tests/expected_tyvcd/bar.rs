@@ -1,5 +1,5 @@
-use tywaves_rs::tyvcd::spec::*;
 use std::collections::HashMap;
+use tywaves_rs::tyvcd::spec::*;
 
 pub fn create_bar_single() -> TyVcd {
     let mut scopes = HashMap::new();
@@ -39,7 +39,6 @@ pub fn create_bar_single() -> TyVcd {
         TypeInfo::new("todo".to_string(), Vec::new()),
         VariableKind::Ground,
     ));
-
 
     TyVcd { scopes }
 }
