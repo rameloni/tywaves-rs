@@ -79,6 +79,34 @@ pub struct Variable {
     /// The dimensions range of a vector variable (i.e. logic [7:0] x [1:0][3:0])
     /// [7:0] is the packed_range and [1:0][3:0] is the unpacked_range (a list of dimensions)
     pub unpacked_range: Option<UnpackedRange>,
+
+    /// The source lang type information
+    pub source_lang_type_info: Option<SourceLangType>,
+}
+
+/// The source language type information of a variable
+#[skip_serializing_none]
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(rename_all = "snake_case")]
+pub struct SourceLangType {
+    /// The source language type name
+    pub type_name: Option<String>,
+    /// Constructor Parameters
+    pub params: Option<Vec<ConstructorParams>>,
+}
+
+/// The constructor parameters of a source language type
+#[skip_serializing_none]
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(rename_all = "snake_case")]
+pub struct ConstructorParams {
+    /// The name of the constructor
+    pub name: String,
+    /// The parameters of the constructor
+    #[serde(rename = "type")]
+    pub tpe: String,
+    /// The value of the constructor
+    pub value: Option<String>,
 }
 
 /// An instance of a module

@@ -38,6 +38,8 @@ fn test_parser() {
 #[test_case("tests/inputs/hgldd/foo.dd"; "Test foo.dd")]
 #[test_case("tests/inputs/hgldd/bar.dd"; "Test bar.dd")]
 #[test_case("tests/inputs/hgldd/global.dd"; "Test global.dd")]
+#[test_case("tests/inputs/hgldd/foo_with_source_lang_types.dd"; "Test source lang types on variables")]
+#[test_case("tests/inputs/hgldd/global_with_source_lang_types.dd"; "Test source lang types on subfields")]
 fn test_hgldd_parser(file_path: &str) {
     let hgldd_file = Path::new(file_path);
 
@@ -89,7 +91,7 @@ fn test_multi_hgldd_parser() {
 fn test_hgldd_parser_dir() {
     let hgldd_dir = Path::new("tests/inputs/hgldd");
     let hgldds = hgldd::reader::parse_hgldd_dir(hgldd_dir);
-    assert_eq!(hgldds.len(), 4);
+    assert_eq!(hgldds.len(), 6);
 
     // Collect the file names from the dir
     let reference_files: Vec<String> = std::fs::read_dir(hgldd_dir)
