@@ -48,6 +48,9 @@ pub struct Object {
 
     /// Children instances of the module
     pub children: Option<Vec<Instance>>,
+
+    /// Optional source lang type information for the object
+    pub source_lang_type_info: Option<SourceLangType>,
 }
 
 /// Supported HGLDD object kinds

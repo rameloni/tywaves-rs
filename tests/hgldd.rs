@@ -19,6 +19,7 @@ fn random_hgldd_file() {
         hdl_loc: None,
         port_vars: Vec::new(),
         children: Some(Vec::new()),
+        source_lang_type_info: None,
     };
     println!(
         "{}",
@@ -40,6 +41,7 @@ fn test_parser() {
 #[test_case("tests/inputs/hgldd/global.dd"; "Test global.dd")]
 #[test_case("tests/inputs/hgldd/foo_with_source_lang_types.dd"; "Test source lang types on variables")]
 #[test_case("tests/inputs/hgldd/global_with_source_lang_types.dd"; "Test source lang types on subfields")]
+#[test_case("tests/inputs/hgldd/bar_with_source_lang_types.dd"; "Test source lang types on module")]
 fn test_hgldd_parser(file_path: &str) {
     let hgldd_file = Path::new(file_path);
 
@@ -91,7 +93,7 @@ fn test_multi_hgldd_parser() {
 fn test_hgldd_parser_dir() {
     let hgldd_dir = Path::new("tests/inputs/hgldd");
     let hgldds = hgldd::reader::parse_hgldd_dir(hgldd_dir);
-    assert_eq!(hgldds.len(), 6);
+    assert_eq!(hgldds.len(), 7);
 
     // Collect the file names from the dir
     let reference_files: Vec<String> = std::fs::read_dir(hgldd_dir)
