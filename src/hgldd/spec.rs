@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
-/// The HGLDD file root struct
+/// The HGLDD file root struct.
 #[derive(Serialize, Deserialize)]
 pub struct Hgldd {
     #[serde(rename = "HGLDD")]
@@ -9,7 +9,8 @@ pub struct Hgldd {
     pub objects: Vec<Object>,
 }
 
-/// The header of an hgldd file
+/// The header of an HGLDD file.
+/// It contains generic information to access the source files and the version of the HGLDD.
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize)]
 pub struct Header {
@@ -17,11 +18,11 @@ pub struct Header {
     pub version: String,
     /// The list of files referring to the HGLDD file
     pub file_info: Vec<String>,
-    /// The index of the HDL file (i.e. sv file) in file_info
+    /// The index of the HDL file (i.e. `sv` file) in `file_info`
     pub hdl_file_index: Option<u32>,
 }
 
-/// An object in the HGLDD file. It can be a module or a struct.
+/// An object in the HGLDD file. It can be a module or a struct (please see [ObjectKind]).
 /// It represent a only a "type", the actual value is stored in the variables.
 /// For example a struct will contain `port_vars` with the actual values of the struct.
 #[skip_serializing_none]
@@ -35,6 +36,9 @@ pub struct Object {
     pub obj_name: String,
     /// The HDL name (i.e. variable name the target language, i.e. verilog)
     pub module_name: Option<String>,
+    /// Tells if the object is an external module imported from a different file in the source language.
+    /// It should be a module implemented in the target language. Thus, the source language information
+    /// may not be available
     #[serde(rename = "isExtModule")]
     pub is_ext_module: Option<u8>,
 
@@ -49,11 +53,11 @@ pub struct Object {
     /// Children instances of the module
     pub children: Option<Vec<Instance>>,
 
-    /// Optional source lang type information for the object
+    /// Optional source language type information for the object
     pub source_lang_type_info: Option<SourceLangType>,
 }
 
-/// Supported HGLDD object kinds
+/// Supported HGLDD object kinds.
 #[derive(Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum ObjectKind {
@@ -61,7 +65,7 @@ pub enum ObjectKind {
     Struct,
 }
 
-/// A variable in the HGLDD file
+/// A variable in the HGLDD file.
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -75,44 +79,43 @@ pub struct Variable {
     /// The value of the variable
     pub value: Option<Expression>,
 
-    /// The type name in the target language (i.e. logic in verilog)
+    /// The type name in the target language (i.e. `logic` in verilog)
     pub type_name: Option<TypeName>,
-    /// The dimensions range of the variable (i.e. logic [7:0] x)
+    /// The dimensions range of a vector variable (i.e. `logic [7:0] x`)
     pub packed_range: Option<PackedRange>,
-    /// The dimensions range of a vector variable (i.e. logic [7:0] x [1:0][3:0])
-    /// [7:0] is the packed_range and [1:0][3:0] is the unpacked_range (a list of dimensions)
+    /// The dimensions range of a vector variable (i.e. `logic [7:0] x [1:0][3:0]`)
     pub unpacked_range: Option<UnpackedRange>,
 
     /// The source lang type information
     pub source_lang_type_info: Option<SourceLangType>,
 }
 
-/// The source language type information of a variable
+/// The source language type information.
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct SourceLangType {
     /// The source language type name
     pub type_name: Option<String>,
-    /// Constructor Parameters
+    /// Constructor parameters
     pub params: Option<Vec<ConstructorParams>>,
 }
 
-/// The constructor parameters of a source language type
+/// The constructor parameters in a source language type
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct ConstructorParams {
-    /// The name of the constructor
+    /// The name of the parameter
     pub name: String,
-    /// The parameters of the constructor
+    /// The type of the parameter
     #[serde(rename = "type")]
     pub tpe: String,
-    /// The value of the constructor
+    /// The value of the parameter used (not always available)
     pub value: Option<String>,
 }
 
-/// An instance of a module
+/// An instance of a module.
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -156,28 +159,80 @@ pub enum Expression {
     },
 }
 
-/// The dimensions of a variable (i.e. logic [7:0] x ==> PackedRange(7, 0)
+/// The dimensions of a variable in the target language (i.e. verilog).
+/// ```verilog
+///                 // Dimensions
+/// logic [7:0] x;  // PackedRange(7, 0)
+/// ```
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct PackedRange(pub u32, pub u32);
 
-/// The dimensionality of a variable (i.e. logic x [1:0][3:0] ==> UnpackedRange([1, 0, 3, 0])
+/// The dimensionality of a variable in the target language (i.e. verilog).
+/// ```verilog
+///                            // Dimensionality
+/// logic       x [1:0][3:0];  // UnpackedRange([1, 0, 3, 0])
+/// logic [7:0] y [0:0][2:0];  // UnpackedRange([0, 0, 2, 0])
+/// ```
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct UnpackedRange(pub Vec<u32>);
 
-/// The type name of a variable
+/// The type name of a variable in HGLDD.
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum TypeName {
+    /// A verilog like logic type
     Logic,
+    /// A single bit type
     Bit,
-    /// A custom type name, when [TypeName::Logic] or [TypeName::Bit] are not enough
+    /// A custom type name, when [TypeName::Logic] or [TypeName::Bit] are not enough.
+    /// It is usually a pointer to a type defined in [Object].
+    ///
+    /// # Example
+    ///
+    /// In the example below the variable `io` is of type `BundleStruct_io`.
+    /// So, it "points" to the object `BundleStruct_io`.
+    ///
+    /// ```json
+    /// // ...
+    ///  "kind": "struct",
+    ///  "obj_name": "BundleStruct_io",
+    ///  "port_vars": [
+    ///    {
+    ///      "hgl_loc": {
+    ///        "begin_column": 7,
+    ///        "begin_line": 74,
+    ///        "end_column": 7,
+    ///        "end_line": 74,
+    ///        "file": 1
+    ///      },
+    ///      "packed_range": [
+    ///        31,
+    ///        0
+    ///      ],
+    ///      "type_name": "logic",
+    ///      "var_name": "a"
+    ///    },
+    /// // ....
+    /// {
+    ///   "var_name": "io",
+    ///   "hgl_loc": {
+    ///     "begin_column": 14,
+    ///     "begin_line": 75,
+    ///     "end_column": 14,
+    ///     "end_line": 75,
+    ///     "file": 1
+    ///   },
+    ///   "value": {"opcode":"'{","operands":[{"sig_name":"io_a_0"}]},
+    ///   "type_name": "BundleStruct_io"
+    /// }
+    /// ```
     #[serde(untagged)]
     Custom(String),
 }
 
-/// The location of an object in a file
+/// The location of an object in a file.
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -190,10 +245,11 @@ pub struct Location {
     pub end_column: Option<u32>,
 }
 
-/// Opcodes for the operators in the HGLDD [Expression]
+/// Opcodes for the operators in the HGLDD [Expression].
 #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum Opcode {
+    /// A struct operation. It links target language variable names to source language aggregate variable.
     #[serde(rename = "'{")]
     Struct,
     #[serde(rename = "^")]

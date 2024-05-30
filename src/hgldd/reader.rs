@@ -1,9 +1,10 @@
 use super::spec::Hgldd;
 use std::path::Path;
 
+/// The extension used for HGLDD files.
 pub const HGLDD_EXTENSION: &str = "dd";
 
-/// Remove eventual comments from the HGLDD content since they are not supported by json deserialization.
+/// Remove comments (if any) from the HGLDD content.
 #[inline]
 pub fn drop_comments(hgldd_str: &str) -> String {
     hgldd_str
@@ -13,7 +14,7 @@ pub fn drop_comments(hgldd_str: &str) -> String {
         .join("\n")
 }
 
-/// Parse an HGLDD string with multiple HGLDDs
+// Parse an HGLDD string with multiple HGLDDs in it
 #[inline]
 fn parse_hgldds(hgldd_str: &str) -> Vec<Hgldd> {
     // Skip the comment line (if any)
@@ -25,7 +26,8 @@ fn parse_hgldds(hgldd_str: &str) -> Vec<Hgldd> {
         .collect()
 }
 
-/// Parse an HGLDD file
+/// Parse single HGLDD file.
+/// Return a vector of the [Hgldd] definitions present in a file.
 #[inline]
 pub fn parse_hgldd_file(hgldd_path: &Path) -> Vec<Hgldd> {
     let hgldd_str = std::fs::read_to_string(hgldd_path).unwrap();
@@ -33,7 +35,8 @@ pub fn parse_hgldd_file(hgldd_path: &Path) -> Vec<Hgldd> {
 }
 
 #[inline]
-/// Parse a directory containing HGLDD files
+/// Parse a directory containing multiple HGLDD files.
+/// Return a vector of the [Hgldd] definitions present in the directory.
 pub fn parse_hgldd_dir(hgldd_dir_path: &Path) -> Vec<Hgldd> {
     // Read the directory and parse all the files
     let files = std::fs::read_dir(hgldd_dir_path).unwrap();

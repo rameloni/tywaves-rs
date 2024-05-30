@@ -137,7 +137,7 @@ fn update_trace_name(kind: &mut VariableKind, expression: &Option<hgldd::Express
             for i in 0..fields.len() {
                 let trace_name = get_trace_names(&subexpressions.get(i).cloned())
                     .unwrap_or(String::from("default"));
-                fields[i].update_trace(trace_name.clone());
+                fields[i].update_trace_name(trace_name.clone());
                 update_trace_name(&mut fields[i].kind, &subexpressions.get(i).cloned());
             }
         }
