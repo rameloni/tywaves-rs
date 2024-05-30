@@ -1,12 +1,19 @@
 use std::collections::HashMap;
 
-use super::trace_pointer::TracePointer;
-use crate::hgldd::spec as hgldd;
+use super::trace_pointer::{TraceFinder, TraceGetter};
 
+type ScopeId = String;
 /// Represents the TyVcd format.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TyVcd {
-    pub scopes: HashMap<String, Scope>,
+    pub scopes: HashMap<ScopeId, Scope>,
+}
+
+impl TraceFinder for TyVcd {
+    fn find_trace(&self, path: &[String]) -> Option<&dyn TraceGetter> {
+        // TODO: implement find trace for TyVcd
+        todo!()
+    }
 }
 
 /// Represent a scope (i.e. a module instance) in the TyVcd format.
@@ -51,11 +58,12 @@ impl Scope {
     }
 }
 
-impl TracePointer for Scope {
-    fn get_trace_name(&self) -> String {
-        self._id_trace_name.clone()
+impl TraceGetter for Scope {
+    fn get_trace_name(&self) -> &String {
+        &self._id_trace_name
     }
-    fn get_trace_path(&self) -> String {
+    fn get_trace_path(&self) -> Vec<&String> {
+        // TODO: implement get_trace_path for Scope
         todo!()
     }
 }
@@ -73,6 +81,7 @@ pub struct Variable {
     /// The kind of the variable.
     pub kind: VariableKind,
 }
+
 impl Variable {
     pub fn new(
         trace_name: String,
@@ -88,17 +97,19 @@ impl Variable {
         }
     }
 
+    /// Update the trace name of the variable.
     pub(in crate::tyvcd) fn update_trace_name(&mut self, trace_name: String) {
         self._id_trace_name = trace_name;
     }
 }
 
-impl TracePointer for Variable {
-    fn get_trace_name(&self) -> String {
-        self._id_trace_name.clone()
+impl TraceGetter for Variable {
+    fn get_trace_name(&self) -> &String {
+        &self._id_trace_name
     }
-    fn get_trace_path(&self) -> String {
-        todo!()
+    fn get_trace_path(&self) -> Vec<&String> {
+        // TODO: implement get_trace_path for Variable
+        todo!("Implement get_trace_path for Variable")
     }
 }
 
@@ -116,6 +127,7 @@ impl TypeInfo {
         Self { type_name, params }
     }
 }
+
 /// Represents the kind of a variable in the TyVcd format.
 #[derive(Debug, Clone, PartialEq)]
 pub enum VariableKind {

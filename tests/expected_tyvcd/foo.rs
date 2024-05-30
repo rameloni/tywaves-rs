@@ -1,4 +1,4 @@
-use tywaves_rs::tyvcd::trace_pointer::TracePointer;
+use tywaves_rs::tyvcd::trace_pointer::TraceGetter;
 
 // External variable that will be captured.
 
@@ -63,7 +63,7 @@ pub fn create_foo() -> TyVcd {
     for subscope_to_update in &mut foo.scopes.get_mut("Foo").unwrap().subscopes {
         let new_scope = Scope::from_other(
             bar.scopes.get("Bar").unwrap(),
-            subscope_to_update.get_trace_name(),
+            subscope_to_update.get_trace_name().clone(),
         );
 
         *subscope_to_update = new_scope;

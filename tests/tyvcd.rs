@@ -5,7 +5,7 @@ use std::path::Path;
 use test_case::test_case;
 
 use tywaves_rs::hgldd;
-use tywaves_rs::tyvcd;
+use tywaves_rs::tyvcd::{self, builder::GenericBuilder};
 
 use expected_tyvcd::*;
 
@@ -30,7 +30,8 @@ fn test_hgldd_tyvcd_builder_success(file_path: &str, exp_hgldd_len: usize) {
 
     assert_eq!(hgldd.len(), exp_hgldd_len);
 
-    let _tyvcd = tyvcd::builder::from_hgldd(&hgldd);
+    let mut builder = tyvcd::builder::TyVcdBuilder::init(hgldd);
+    builder.build();
 }
 
 #[test_case("tests/inputs/tyvcd/foo/foo.dd", foo::create_foo_single; "Test foo.dd")]
@@ -51,9 +52,15 @@ fn test_tyvcd_single_file_assertions(
         hgldd::reader::parse_hgldd_file(hgldd_file)
     };
 
-    let mut tyvcd = tyvcd::builder::from_hgldd(&hgldd);
-    tyvcd::builder::add_instance_links(&mut tyvcd);
+    let mut builder = tyvcd::builder::TyVcdBuilder::init(hgldd);
+    builder.build();
+    let tyvcd = builder.get_copy().unwrap();
 
     let expected_tyvcd = create_expected_output();
     assert_eq!(tyvcd, expected_tyvcd);
+}
+
+#[test]
+fn test_trace_pointer() {
+    todo!("Implement test_trace_pointer")
 }
