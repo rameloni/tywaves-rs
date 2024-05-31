@@ -1,8 +1,10 @@
+use core::fmt;
+
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
 /// The HGLDD file root struct.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Hgldd {
     #[serde(rename = "HGLDD")]
     pub hgldd: Header,
@@ -12,7 +14,7 @@ pub struct Hgldd {
 /// The header of an HGLDD file.
 /// It contains generic information to access the source files and the version of the HGLDD.
 #[skip_serializing_none]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Header {
     /// The version of the HGLDD file
     pub version: String,
@@ -26,7 +28,7 @@ pub struct Header {
 /// It represent a only a "type", the actual value is stored in the variables.
 /// For example a struct will contain `port_vars` with the actual values of the struct.
 #[skip_serializing_none]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct Object {
     /// The kind of the object
@@ -58,7 +60,7 @@ pub struct Object {
 }
 
 /// Supported HGLDD object kinds.
-#[derive(Serialize, Deserialize, PartialEq)]
+#[derive(Serialize, Deserialize, PartialEq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum ObjectKind {
     Module,
@@ -117,7 +119,7 @@ pub struct ConstructorParams {
 
 /// An instance of a module.
 #[skip_serializing_none]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct Instance {
     /// The name of the instance in the source language (HGL)
@@ -230,6 +232,17 @@ pub enum TypeName {
     /// ```
     #[serde(untagged)]
     Custom(String),
+}
+
+impl fmt::Display for TypeName {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let output = match self {
+            TypeName::Logic => "logic",
+            TypeName::Bit => "bit",
+            TypeName::Custom(name) => name,
+        };
+        write!(f, "{}", output)
+    }
 }
 
 /// The location of an object in a file.

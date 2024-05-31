@@ -2,8 +2,8 @@
   "HGLDD": {
     "version": "1.0",
     "file_info": [
-      "InputBar.scala",
-      "Bar.sv"
+      "../InputBar.scala",
+      "../Bar.sv"
     ],
     "hdl_file_index": 2
   },
@@ -25,6 +25,20 @@
         "end_column": 10,
         "end_line": 49,
         "file": 2
+      },
+      "source_lang_type_info": {
+        "params": [
+          {
+            "name": "size",
+            "type": "int",
+            "value": "32"
+          },
+          {
+            "name": "other",
+            "type": "bool"
+          }
+        ],
+        "type_name": "BarType"
       },
       "port_vars": [
         {

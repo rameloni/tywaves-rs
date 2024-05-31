@@ -35,13 +35,15 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                     hgldd::ObjectKind::Struct => {}
                     hgldd::ObjectKind::Module => {
                         // Retrieve the information of the scope
-                        // TODO: update high_level_info for the scope
-                        let high_level_info = TypeInfo::new("todo".to_string(), Vec::new());
                         let trace_name = if let Some(module_name) = &obj.module_name {
                             module_name
                         } else {
                             &obj.obj_name
                         };
+                        let high_level_info =
+                            Self::create_type_info_or(obj.source_lang_type_info.as_ref(), || {
+                                obj.obj_name.clone()
+                            });
 
                         // Create a scope from the module
                         let mut scope =
@@ -107,8 +109,8 @@ impl TyVcdBuilder<hgldd::Hgldd> {
             &hgldd_inst.name
         };
 
-        // TODO: update high_level_info for the instance scope
-        let high_level_info = TypeInfo::new("todo".to_string(), Vec::new());
+        // Use the name of the instance here -> it'll be replaced by calling fill_tyvcd_subscopes() (if an actual type is present)
+        let high_level_info = Self::create_type_info_or(None, || name.clone());
 
         // Create a new scope from an instance
         Scope::empty(trace_name.clone(), name.clone(), high_level_info)
@@ -124,9 +126,14 @@ impl TyVcdBuilder<hgldd::Hgldd> {
             // TODO: check how to handle this case
             String::from("todo ")
         };
-        let name: String = hgldd_var.var_name.clone();
-        // TODO: update high_level_info for this variable
-        let high_level_info: TypeInfo = TypeInfo::new("todo".to_string(), Vec::new());
+        let name = &hgldd_var.var_name;
+        let high_level_info = Self::create_type_info_or(
+            hgldd_var.source_lang_type_info.as_ref(),
+            || match &hgldd_var.type_name {
+                None => "na".to_string(), // TODO: ensure this na is fine
+                Some(e) => e.to_string(),
+            },
+        );
 
         // Get the expressions of this variable
         let expressions = helper::get_sub_expressions(hgldd_var.value.as_ref());
@@ -162,13 +169,13 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let final_kind: VariableKind =
             if let Some(hgldd::UnpackedRange(dims)) = &hgldd_var.unpacked_range {
                 VariableKind::Vector {
-                    fields: Self::create_vector_fields(&kind, &expressions, dims),
+                    fields: Self::create_vector_fields(&kind, expressions, dims, &high_level_info),
                 }
             } else {
                 kind
             };
 
-        Variable::new(trace_name, name, high_level_info, final_kind)
+        Variable::new(trace_name, name.clone(), high_level_info, final_kind)
     }
 
     // Build the fields of a vector variable.
@@ -176,6 +183,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         kind: &VariableKind,
         expressions: &[hgldd::Expression],
         dims: &[u32],
+        high_level_info: &TypeInfo,
     ) -> Vec<Variable> {
         // No fields: empty vector
         if dims.len() < 2 {
@@ -193,17 +201,22 @@ impl TyVcdBuilder<hgldd::Hgldd> {
             // let expr = expressions.get(i);
             let expr = Some(expr);
             let subexpressions = helper::get_sub_expressions(expr);
-            let trace_name =
-                helper::get_trace_name_from_expression(expr).unwrap_or(String::from("default"));
+            let trace_name = helper::get_trace_name_from_expression(expr)
+                .unwrap_or_else(|| String::from("default from create_vector_fields")); // TODO: update this default
 
             // Adjust the trace name of this kind
             let mut kind = kind.clone(); // TODO: remove this clone
-            Self::update_fields_trace_name(&mut kind, &subexpressions);
+            Self::update_fields_trace_name(&mut kind, subexpressions);
 
             let kind = if dims.len() > 2 {
                 // If there are more dimensions, this is a vector of vectors
                 VariableKind::Vector {
-                    fields: Self::create_vector_fields(&kind, &subexpressions, &dims[2..]),
+                    fields: Self::create_vector_fields(
+                        &kind,
+                        subexpressions,
+                        &dims[2..],
+                        high_level_info,
+                    ),
                 }
             } else {
                 kind
@@ -212,8 +225,9 @@ impl TyVcdBuilder<hgldd::Hgldd> {
             // Build the var
             let var = Variable::new(
                 trace_name,
-                format!("todo from build_vector_fields"),
-                TypeInfo::new("todo".to_string(), Vec::new()),
+                "todo from build_vector_fields".to_string(), // TODO: update this todo from build_vector_fields
+                high_level_info.clone(),
+                // TypeInfo::new("type_name".to_string(), Vec::new()),
                 kind,
             );
 
@@ -235,12 +249,12 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                 #[allow(clippy::needless_range_loop)]
                 for i in 0..fields.len() {
                     let expr = subexpressions.get(i);
-                    let trace_name = helper::get_trace_name_from_expression(expr)
-                        .unwrap_or(String::from("default from update_trace_name"));
-                    fields[i].update_trace_name(trace_name.clone());
+                    if let Some(trace_name) = helper::get_trace_name_from_expression(expr) {
+                        fields[i].update_trace_name(trace_name);
+                    }
                     Self::update_fields_trace_name(
                         &mut fields[i].kind,
-                        &helper::get_sub_expressions(expr),
+                        helper::get_sub_expressions(expr),
                     );
                 }
             }
@@ -291,12 +305,38 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         tyvcd.scopes = top_scopes;
         Ok(())
     }
+
+    /// Create type info from source language type in hgldd
+    fn create_type_info_or<F: Fn() -> String>(
+        src_lang_tp: Option<&hgldd::SourceLangType>,
+        default_type_name: F,
+    ) -> TypeInfo {
+        if let Some(x) = src_lang_tp {
+            let params = if let Some(x) = &x.params {
+                x.iter()
+                    .map(|x| Into::<crate::tyvcd::spec::ConstructorParams>::into(x.clone()))
+                    .collect()
+            } else {
+                Vec::new()
+            };
+            let type_name = if let Some(x) = &x.type_name {
+                x.clone()
+            } else {
+                default_type_name()
+            };
+            TypeInfo::new(type_name, params)
+        } else {
+            // TypeInfo::new("todo: missing all source lang info".to_string(), Vec::new())
+            TypeInfo::new(default_type_name(), Vec::new())
+        }
+    }
 }
 
 mod helper {
     use crate::hgldd::spec as hgldd;
 
-    // TODO: return Option<&String> instead of Option<String>
+    use super::ConstructorParams;
+
     /// Get the trace names from an hgldd expression.
     #[inline]
     pub(in crate::tyvcd) fn get_trace_name_from_expression(
@@ -306,7 +346,7 @@ mod helper {
             match &expression {
                 // This variable contains a value
                 hgldd::Expression::SigName(s) => Some(s.clone()),
-                hgldd::Expression::BitVector(s) => Some(s.clone()),
+                hgldd::Expression::BitVector(bv) => Some(bv.clone()),
                 hgldd::Expression::IntegerNum(i) => Some(i.to_string()),
                 // This variable contains an operator, this means it contains the "values" of all its child variables (to be added in kind)
                 hgldd::Expression::Operator { .. } => None,
@@ -316,32 +356,40 @@ mod helper {
         }
     }
 
-    // TODO: return Option<&String> instead of Option<String>
     #[inline]
     pub(in crate::tyvcd) fn get_sub_expressions(
         expression: Option<&hgldd::Expression>,
-    ) -> Vec<hgldd::Expression> {
+    ) -> &[hgldd::Expression] {
         if let Some(expression) = expression {
-            match &expression {
+            match expression {
                 // This variable contains a value
-                hgldd::Expression::SigName(_) => vec![expression.clone()],
-                hgldd::Expression::BitVector(_) => vec![expression.clone()],
-                hgldd::Expression::IntegerNum(_) => vec![expression.clone()],
+                hgldd::Expression::SigName(_)
+                | hgldd::Expression::BitVector(_)
+                | hgldd::Expression::IntegerNum(_) => std::slice::from_ref(expression),
                 // This variable contains an operator, this means it contains the "values" of all its child variables (to be added in kind)
                 hgldd::Expression::Operator { opcode, operands } => match opcode {
                     &hgldd::Opcode::Struct => {
                         // if operands.len() == 1 {
                         //     get_sub_expressions(&operands.first().cloned())
                         // } else {
-
-                        operands.clone()
+                        operands.as_slice()
                         // }
                     }
-                    _ => operands.clone(),
+                    _ => operands.as_slice(),
                 },
             }
         } else {
-            Vec::new()
+            &[]
+        }
+    }
+
+    impl From<hgldd::ConstructorParams> for ConstructorParams {
+        fn from(val: hgldd::ConstructorParams) -> Self {
+            ConstructorParams {
+                name: val.name,
+                tpe: val.tpe,
+                value: val.value,
+            }
         }
     }
 }

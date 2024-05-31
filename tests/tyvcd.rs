@@ -34,6 +34,7 @@ fn test_hgldd_tyvcd_builder_success(file_path: &str, exp_hgldd_len: usize) {
     builder.build();
 }
 
+#[test_case("tests/inputs/tyvcd/foo_no_types.dd", foo::create_foo_single_no_types; "Test foo_no_types.dd")]
 #[test_case("tests/inputs/tyvcd/foo/foo.dd", foo::create_foo_single; "Test foo.dd")]
 #[test_case("tests/inputs/tyvcd/foo/bar.dd", bar::create_bar_single; "Test bar.dd")]
 #[test_case("tests/inputs/tyvcd/foo", foo::create_foo; "Test directory foo")]

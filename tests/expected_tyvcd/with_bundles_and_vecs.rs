@@ -13,7 +13,14 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         Scope::empty(
             String::from("WithBundlesAndVecs"),
             String::from("WithBundlesAndVecs"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new(
+                "WithBundlesAndVecsModule".to_string(),
+                vec![ConstructorParams {
+                    name: "a_param".to_string(),
+                    tpe: "bool".to_string(),
+                    value: None,
+                }],
+            ),
         ),
     );
 
@@ -25,7 +32,7 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         .push(Variable::new(
             String::from("clock"),
             String::from("clock"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground,
         ));
 
@@ -37,7 +44,7 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         .push(Variable::new(
             String::from("reset"),
             String::from("reset"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground,
         ));
 
@@ -49,7 +56,7 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         .push(Variable::new(
             String::from(""),
             String::from("io"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("InterfaceIOBundle".to_string(), Vec::new()),
             VariableKind::Struct {
                 fields: create_io_fields(),
             },
@@ -64,13 +71,13 @@ fn create_io_fields() -> Vec<Variable> {
         Variable::new(
             String::from("io_a_0"),
             String::from("a"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("UInt<32>".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
         Variable::new(
             String::from(""),
             String::from("b"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("SubBundleB".to_string(), Vec::new()),
             VariableKind::Struct {
                 fields: create_io_b_fields(),
             },
@@ -78,7 +85,7 @@ fn create_io_fields() -> Vec<Variable> {
         Variable::new(
             String::from(""),
             String::from("vec"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("VecType".to_string(), Vec::new()),
             VariableKind::Vector {
                 fields: vec![create_io_vec_fields(), create_io_vec_0_fields()].concat(),
             },
@@ -92,13 +99,13 @@ fn create_io_b_fields() -> Vec<Variable> {
         Variable::new(
             String::from("io_b_a_0"),
             String::from("a"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("UInt<32>".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
         Variable::new(
             String::from(""),
             String::from("b"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("WithBundlesAndVecs_io_b_b".to_string(), Vec::new()),
             VariableKind::Struct {
                 fields: create_io_b_b_fields(),
             },
@@ -112,13 +119,13 @@ fn create_io_b_b_fields() -> Vec<Variable> {
         Variable::new(
             String::from("io_b_b_vec_0_0"), // todo: check
             String::from("0"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
         Variable::new(
             String::from("io_b_b_vec_1_0"),
             String::from("1"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
     ];
@@ -126,7 +133,7 @@ fn create_io_b_b_fields() -> Vec<Variable> {
     vec![Variable::new(
         String::from(""),
         String::from("vec"),
-        TypeInfo::new("todo".to_string(), Vec::new()),
+        TypeInfo::new("logic".to_string(), Vec::new()),
         VariableKind::Vector { fields: fields },
     )]
 }
@@ -137,13 +144,13 @@ fn create_io_vec_fields() -> Vec<Variable> {
         Variable::new(
             String::from("io_vec_0_x_0"),
             String::from("x"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("SInt<32>".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
         Variable::new(
             String::from(""),
             String::from("y"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("AnonymousBundle".to_string(), Vec::new()),
             VariableKind::Struct {
                 fields: create_io_vec_y_fields(),
             },
@@ -153,7 +160,7 @@ fn create_io_vec_fields() -> Vec<Variable> {
     vec![Variable::new(
         String::from(""),
         String::from("0"),
-        TypeInfo::new("todo".to_string(), Vec::new()),
+        TypeInfo::new("VecType".to_string(), Vec::new()),
         VariableKind::Struct { fields: fields },
     )]
 }
@@ -163,7 +170,7 @@ fn create_io_vec_y_fields() -> Vec<Variable> {
     vec![Variable::new(
         String::from("io_vec_0_y_z_0"),
         String::from("z"),
-        TypeInfo::new("todo".to_string(), Vec::new()),
+        TypeInfo::new("SInt<32>".to_string(), Vec::new()),
         VariableKind::Ground,
     )]
 }
@@ -174,22 +181,22 @@ fn create_io_vec_0_fields() -> Vec<Variable> {
         Variable::new(
             String::from("io_vec_1_x_0"),
             String::from("x"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("SInt<32>".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
         Variable::new(
             String::from(""),
             String::from("y"),
-            TypeInfo::new("todo".to_string(), Vec::new()),
+            TypeInfo::new("AnonymousBundle".to_string(), Vec::new()),
             VariableKind::Struct {
                 fields: create_io_vec_y_0_fields(),
             },
         ),
     ];
     vec![Variable::new(
-        String::from(""),
-        String::from("1"),
-        TypeInfo::new("todo".to_string(), Vec::new()),
+        String::from(""),  // TODO: fix this trace name
+        String::from("1"), // TODO: fix this name
+        TypeInfo::new("VecType".to_string(), Vec::new()),
         VariableKind::Struct { fields: fields },
     )]
 }
@@ -199,7 +206,7 @@ fn create_io_vec_y_0_fields() -> Vec<Variable> {
     vec![Variable::new(
         String::from("io_vec_1_y_z_0"),
         String::from("z"),
-        TypeInfo::new("todo".to_string(), Vec::new()),
+        TypeInfo::new("SInt<32>".to_string(), Vec::new()),
         VariableKind::Ground,
     )]
 }

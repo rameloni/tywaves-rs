@@ -18,6 +18,9 @@
         },
         "kind": "struct",
         "obj_name": "WithBundlesAndVecs_io_b_b",
+        "source_lang_type_info": {
+          "type_name": "AnonymousBundle"
+        },
         "port_vars": [
           {
             "hgl_loc": {
@@ -63,6 +66,9 @@
               31,
               0
             ],
+            "source_lang_type_info": {
+              "type_name": "UInt<32>"
+            },
             "type_name": "logic",
             "var_name": "a"
           },
@@ -102,6 +108,9 @@
               31,
               0
             ],
+            "source_lang_type_info": {
+              "type_name": "ShouldBeIgnored"
+            },
             "type_name": "logic",
             "var_name": "z"
           }
@@ -130,6 +139,9 @@
               31,
               0
             ],
+            "source_lang_type_info": {
+              "type_name": "SInt<32>"
+            },
             "type_name": "logic",
             "var_name": "x"
           },
@@ -140,6 +152,9 @@
               "end_column": 14,
               "end_line": 75,
               "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "AnonymousBundle"
             },
             "type_name": "WithBundlesAndVecs_io_vec_y",
             "var_name": "y"
@@ -169,6 +184,9 @@
               31,
               0
             ],
+            "source_lang_type_info": {
+              "type_name": "SInt<32>"
+            },
             "type_name": "logic",
             "var_name": "z"
           }
@@ -197,6 +215,9 @@
               31,
               0
             ],
+            "source_lang_type_info": {
+              "type_name": "SInt<32>"
+            },
             "type_name": "logic",
             "var_name": "x"
           },
@@ -207,6 +228,9 @@
               "end_column": 14,
               "end_line": 75,
               "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "AnonymousBundle"
             },
             "type_name": "WithBundlesAndVecs_io_vec_y_0",
             "var_name": "y"
@@ -232,6 +256,9 @@
               "end_line": 74,
               "file": 1
             },
+            "source_lang_type_info": {
+              "type_name": "UInt<32>"
+            },
             "packed_range": [
               31,
               0
@@ -247,6 +274,9 @@
               "end_line": 75,
               "file": 1
             },
+            "source_lang_type_info": {
+              "type_name": "SubBundleB"
+            },
             "type_name": "WithBundlesAndVecs_io_b",
             "var_name": "b"
           },
@@ -257,6 +287,9 @@
               "end_column": 14,
               "end_line": 75,
               "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "VecType"
             },
             "type_name": "WithBundlesAndVecs_io_vec_0",
             "unpacked_range": [
@@ -282,6 +315,15 @@
           "begin_line": 2,
           "end_line": 2,
           "file": 2
+        },
+        "source_lang_type_info": {
+          "params": [
+            {
+              "name": "a_param",
+              "type": "bool"
+            }
+          ],
+          "type_name": "WithBundlesAndVecsModule"
         },
         "port_vars": [
           {
@@ -316,6 +358,9 @@
               "end_column": 14,
               "end_line": 75,
               "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "InterfaceIOBundle"
             },
             "value": {"opcode":"'{","operands":[{"sig_name":"io_a_0"},{"opcode":"'{","operands":[{"sig_name":"io_b_a_0"},{"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"io_b_b_vec_0_0"},{"sig_name":"io_b_b_vec_1_0"}]}]}]},{"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"io_vec_0_x_0"},{"opcode":"'{","operands":[{"sig_name":"io_vec_0_y_z_0"}]}]},{"opcode":"'{","operands":[{"sig_name":"io_vec_1_x_0"},{"opcode":"'{","operands":[{"sig_name":"io_vec_1_y_z_0"}]}]}]}]},
             "type_name": "WithBundlesAndVecs_io"

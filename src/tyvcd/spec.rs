@@ -119,13 +119,24 @@ pub struct TypeInfo {
     /// The type name of the variable
     pub type_name: String,
     /// The parameters of the type (if any)
-    pub params: Vec<String>,
+    pub params: Vec<ConstructorParams>,
 }
 
 impl TypeInfo {
-    pub fn new(type_name: String, params: Vec<String>) -> Self {
+    pub fn new(type_name: String, params: Vec<ConstructorParams>) -> Self {
         Self { type_name, params }
     }
+}
+
+/// The constructor parameters in a source language type
+#[derive(Debug, Clone, PartialEq)]
+pub struct ConstructorParams {
+    /// The name of the parameter
+    pub name: String,
+    /// The type of the parameter
+    pub tpe: String,
+    /// The value of the parameter used (not always available)
+    pub value: Option<String>,
 }
 
 /// Represents the kind of a variable in the TyVcd format.
