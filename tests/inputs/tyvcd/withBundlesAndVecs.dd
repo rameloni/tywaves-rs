@@ -39,7 +39,7 @@
               1,
               0
             ],
-            "var_name": "vec"
+            "var_name": "vec2"
           }
         ]
       },
@@ -295,8 +295,9 @@
             "unpacked_range": [
               1,
               0
+              // TODO: make the example with multi dim vecs
             ],
-            "var_name": "vec"
+            "var_name": "vecjkjk"
           }
         ]
       },

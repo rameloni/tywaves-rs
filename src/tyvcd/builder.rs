@@ -180,7 +180,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
 
     // Build the fields of a vector variable.
     fn create_vector_fields(
-        kind: &VariableKind,
+        kind: &VariableKind, // the kind of the vector elements
         expressions: &[hgldd::Expression],
         dims: &[u32],
         high_level_info: &TypeInfo,
@@ -197,7 +197,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         // Find the fields of this dimension
         let mut fields = Vec::with_capacity(size);
         // for i in 0..size {
-        for expr in expressions {
+        for (idx, expr) in expressions.iter().enumerate() {
             // let expr = expressions.get(i);
             let expr = Some(expr);
             let subexpressions = helper::get_sub_expressions(expr);
@@ -225,7 +225,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
             // Build the var
             let var = Variable::new(
                 trace_name,
-                "todo from build_vector_fields".to_string(), // TODO: update this todo from build_vector_fields
+                idx.to_string(),
                 high_level_info.clone(),
                 // TypeInfo::new("type_name".to_string(), Vec::new()),
                 kind,
