@@ -1,10 +1,13 @@
 mod expected_tyvcd;
 
+use std::collections::HashMap;
 use std::path::Path;
 
 use test_case::test_case;
 
 use tywaves_rs::hgldd;
+use tywaves_rs::tyvcd::spec::*;
+use tywaves_rs::tyvcd::trace_pointer::*;
 use tywaves_rs::tyvcd::{self, builder::GenericBuilder};
 
 use expected_tyvcd::*;
@@ -63,5 +66,67 @@ fn test_tyvcd_single_file_assertions(
 
 #[test]
 fn test_trace_pointer() {
-    todo!("Implement test_trace_pointer")
+    let tyvcd_foo = foo::create_foo_single();
+    assert!(tyvcd_foo.find_trace(&["unknown".to_string()]).is_none());
+    assert!(tyvcd_foo.find_trace(&[]).is_none());
+
+    let foo = tyvcd_foo
+        .find_trace(&["Foo".to_string()])
+        .and_then(|trace| trace.as_any().downcast_ref::<Scope>())
+        .expect("failed to downcast");
+
+    assert_eq!(foo.get_trace_name(), "Foo");
+    // assert_eq!(foo.get_trace_path(), vec!["Foo"]);
+
+    let bar0 = tyvcd_foo
+        .find_trace(&["Foo".to_string(), "b0".to_string()])
+        .and_then(|trace| trace.as_any().downcast_ref::<Scope>())
+        .expect("failed to downcast");
+
+    assert_eq!(bar0.get_trace_name(), "b0");
+    // assert_eq!(bar.get_trace_path(), vec!["Foo", "b0"]);
+
+    let bar1 = tyvcd_foo
+        .find_trace(&["Foo".to_string(), "b1".to_string()])
+        .and_then(|trace| trace.as_any().downcast_ref::<Scope>())
+        .expect("failed to downcast");
+
+    assert_eq!(bar1.get_trace_name(), "b1");
+
+    let a = tyvcd_foo
+        .find_trace(&["Foo".to_string(), "a".to_string()])
+        .and_then(|trace| trace.as_any().downcast_ref::<Variable>())
+        .expect("failed to downcast");
+    assert_eq!(a.name, "inA");
+
+    let bar_b = tyvcd_foo.find_trace(&["Foo".to_string(), "b0".to_string(), "b".to_string()]);
+    // .unwrap()
+    // .as_any()
+    // .downcast_ref::<Variable>()
+    // .expect("failed to downcast");
+    assert!(bar_b.is_none());
+
+    let tyvcd_foo = foo::create_foo();
+    let bar_x = tyvcd_foo
+        .find_trace(&["Foo".to_string(), "b0".to_string(), "x".to_string()])
+        .and_then(|trace| trace.as_any().downcast_ref::<Variable>())
+        .expect("failed to downcast");
+
+    assert_eq!(bar_x.name, "inX");
+
+    let tyvcd_with_bundles_and_vecs = with_bundles_and_vecs::create_with_bundles_and_vecs();
+    println!("{:#?}", tyvcd_with_bundles_and_vecs);
+    let bar_x = tyvcd_with_bundles_and_vecs
+        .find_trace(&["WithBundlesAndVecs".to_string(), "io_a_0".to_string()])
+        .and_then(|trace| trace.as_any().downcast_ref::<Variable>())
+        .expect("failed to downcast");
+    assert_eq!(
+        *bar_x,
+        Variable::new(
+            String::from("io_a_0"),
+            String::from("a"),
+            TypeInfo::new("UInt<32>".to_string(), Vec::new()),
+            VariableKind::Ground,
+        )
+    );
 }

@@ -6,6 +6,7 @@ pub trait TraceGetter {
     fn get_trace_path(&self) -> Vec<&String> {
         vec![self.get_trace_name()]
     }
+    fn as_any(&self) -> &dyn std::any::Any;
 }
 
 /// Trait to find a trace path in a data structure.

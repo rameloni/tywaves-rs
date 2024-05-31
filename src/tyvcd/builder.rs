@@ -123,7 +123,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         {
             trace_name
         } else {
-            // TODO: check how to handle this case
+            // TODO: check how to handle this case -> SOLUTION: allow no trace_name -> maybe replace it with a trace_val, this todo must be completed with reference to a vcd example
             String::from("todo ")
         };
         let name = &hgldd_var.var_name;

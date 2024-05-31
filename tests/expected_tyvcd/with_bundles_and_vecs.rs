@@ -54,7 +54,7 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         .unwrap()
         .variables
         .push(Variable::new(
-            String::from(""),
+            String::from("io_trace_name"),
             String::from("io"),
             TypeInfo::new("InterfaceIOBundle".to_string(), Vec::new()),
             VariableKind::Struct {
