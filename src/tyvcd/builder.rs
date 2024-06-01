@@ -1,5 +1,4 @@
 use super::spec::*;
-use super::trace_pointer::TraceGetter;
 use std::collections::HashMap;
 
 use crate::hgldd::spec as hgldd;
@@ -63,7 +62,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                         }
 
                         // Update the found scopes
-                        scopes.insert(scope.get_trace_name().clone(), scope);
+                        scopes.insert(trace_name.clone(), scope);
                     }
                 }
             }
@@ -118,14 +117,9 @@ impl TyVcdBuilder<hgldd::Hgldd> {
 
     // Create a variable from an hgldd variable
     fn create_variable(hgldd_var: &hgldd::Variable, objects: &Vec<hgldd::Object>) -> Variable {
-        let trace_name = if let Some(trace_name) =
-            helper::get_trace_name_from_expression(hgldd_var.value.as_ref())
-        {
-            trace_name
-        } else {
-            // TODO: check how to handle this case -> SOLUTION: allow no trace_name -> maybe replace it with a trace_val, this todo must be completed with reference to a vcd example
-            String::from("todo ")
-        };
+        let trace_value =
+            helper::get_trace_value_from_expression(hgldd_var.value.as_ref()).unwrap(); // TODO: check this unwrap()
+
         let name = &hgldd_var.var_name;
         let high_level_info = Self::create_type_info_or(
             hgldd_var.source_lang_type_info.as_ref(),
@@ -175,7 +169,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                 kind
             };
 
-        Variable::new(trace_name, name.clone(), high_level_info, final_kind)
+        Variable::new(trace_value, name.clone(), high_level_info, final_kind)
     }
 
     // Build the fields of a vector variable.
@@ -201,8 +195,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
             // let expr = expressions.get(i);
             let expr = Some(expr);
             let subexpressions = helper::get_sub_expressions(expr);
-            let trace_name = helper::get_trace_name_from_expression(expr)
-                .unwrap_or_else(|| String::from("default from create_vector_fields")); // TODO: update this default
+            let trace_value = helper::get_trace_value_from_expression(expr).unwrap(); // TODO: check this unwrap()
 
             // Adjust the trace name of this kind
             let mut kind = kind.clone(); // TODO: remove this clone
@@ -224,7 +217,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
 
             // Build the var
             let var = Variable::new(
-                trace_name,
+                trace_value,
                 idx.to_string(),
                 high_level_info.clone(),
                 // TypeInfo::new("type_name".to_string(), Vec::new()),
@@ -249,8 +242,11 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                 #[allow(clippy::needless_range_loop)]
                 for i in 0..fields.len() {
                     let expr = subexpressions.get(i);
-                    if let Some(trace_name) = helper::get_trace_name_from_expression(expr) {
-                        fields[i].update_trace_name(trace_name);
+                    // if let Some(trace_name) = helper::get_trace_name_from_expression(expr) {
+                    //     fields[i].update_trace_name(trace_name);
+                    // }
+                    if let Some(trace_value) = helper::get_trace_value_from_expression(expr) {
+                        fields[i].update_trace_value(trace_value);
                     }
                     Self::update_fields_trace_name(
                         &mut fields[i].kind,
@@ -333,26 +329,46 @@ impl TyVcdBuilder<hgldd::Hgldd> {
 }
 
 mod helper {
-    use crate::hgldd::spec as hgldd;
+    use crate::{
+        hgldd::spec as hgldd,
+        tyvcd::trace_pointer::{ConstValue, TraceValue},
+    };
 
     use super::ConstructorParams;
 
     /// Get the trace names from an hgldd expression.
     #[inline]
-    pub(in crate::tyvcd) fn get_trace_name_from_expression(
+    pub(in crate::tyvcd) fn get_trace_value_from_expression(
         expression: Option<&hgldd::Expression>,
-    ) -> Option<String> {
+    ) -> Option<TraceValue> {
         if let Some(expression) = expression {
             match &expression {
                 // This variable contains a value
-                hgldd::Expression::SigName(s) => Some(s.clone()),
-                hgldd::Expression::BitVector(bv) => Some(bv.clone()),
-                hgldd::Expression::IntegerNum(i) => Some(i.to_string()),
+                hgldd::Expression::SigName(s) => Some(TraceValue::RefTraceName(s.clone())),
+                hgldd::Expression::BitVector(bv) => Some(TraceValue::Constant(
+                    ConstValue::FourValue(bv.as_bytes().to_vec(), bv.len() as u32),
+                )),
+                hgldd::Expression::IntegerNum(i) => {
+                    let bv = format!("{:b}", i);
+                    let bv = bv.as_bytes();
+                    Some(TraceValue::Constant(ConstValue::FourValue(
+                        bv.to_vec(),
+                        bv.len() as u32,
+                    )))
+                }
                 // This variable contains an operator, this means it contains the "values" of all its child variables (to be added in kind)
-                hgldd::Expression::Operator { .. } => None,
+                hgldd::Expression::Operator { opcode, operands } => {
+                    let mut v = Vec::with_capacity(operands.len());
+                    for o in operands {
+                        if let Some(x) = get_trace_value_from_expression(Some(o)) {
+                            v.push(x);
+                        }
+                    }
+                    Some(TraceValue::RefTraceValues(v))
+                }
             }
         } else {
-            None
+            Some(TraceValue::RefTraceName("todo: no expression".to_string())) // TODO: check this default
         }
     }
 

@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use tywaves_rs::tyvcd::spec::*;
+use tywaves_rs::tyvcd::{spec::*, trace_pointer::TraceValue};
 
 pub fn create_bar_single() -> TyVcd {
     let mut scopes = HashMap::new();
@@ -28,28 +28,44 @@ pub fn create_bar_single() -> TyVcd {
     );
     // inA
     scopes.get_mut("Bar").unwrap().variables.push(Variable::new(
-        String::from("x"),
+        TraceValue::RefTraceName("x".to_string()),
         String::from("inX"),
         TypeInfo::new("logic".to_string(), Vec::new()),
         VariableKind::Ground,
     ));
     // inB
     scopes.get_mut("Bar").unwrap().variables.push(Variable::new(
-        String::from(""), // TODO: add trace name for this example (check an example vcd to check the correct one)
+        // op: *
+        TraceValue::RefTraceValues(vec![
+            TraceValue::RefTraceName("x".to_string()),
+            TraceValue::RefTraceName("x".to_string()),
+        ]),
         String::from("outY"),
         TypeInfo::new("logic".to_string(), Vec::new()),
         VariableKind::Ground,
     ));
     // var1 => const
     scopes.get_mut("Bar").unwrap().variables.push(Variable::new(
-        String::from(""),
+        // op: *
+        TraceValue::RefTraceValues(vec![
+            TraceValue::RefTraceName("x".to_string()),
+            TraceValue::RefTraceName("x".to_string()),
+        ]),
         String::from("varZ"),
         TypeInfo::new("logic".to_string(), Vec::new()),
         VariableKind::Ground,
     ));
 
     scopes.get_mut("Bar").unwrap().variables.push(Variable::new(
-        String::from(""),
+        // op: +
+        TraceValue::RefTraceValues(vec![
+            // op: *
+            TraceValue::RefTraceValues(vec![
+                TraceValue::RefTraceName("x".to_string()),
+                TraceValue::RefTraceName("x".to_string()),
+            ]),
+            TraceValue::RefTraceName("x".to_string()),
+        ]),
         String::from("add"),
         TypeInfo::new("logic".to_string(), Vec::new()),
         VariableKind::Ground,

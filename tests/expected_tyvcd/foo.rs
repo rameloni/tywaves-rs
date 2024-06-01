@@ -1,4 +1,4 @@
-use tywaves_rs::tyvcd::trace_pointer::TraceGetter;
+use tywaves_rs::tyvcd::trace_pointer::{ConstValue, TraceGetter, TraceValue};
 
 // External variable that will be captured.
 
@@ -20,7 +20,7 @@ pub fn create_foo_single_no_types() -> TyVcd {
     );
     // inA
     scopes.get_mut("Foo").unwrap().variables.push(Variable::new(
-        String::from("a"),
+        TraceValue::RefTraceName("a".to_string()),
         String::from("inA"),
         // type info na, use the target language one
         TypeInfo::new("logic".to_string(), Vec::new()),
@@ -28,15 +28,16 @@ pub fn create_foo_single_no_types() -> TyVcd {
     ));
     // inB
     scopes.get_mut("Foo").unwrap().variables.push(Variable::new(
-        String::from("b"),
+        TraceValue::RefTraceName("b".to_string()),
         String::from("outB"),
         // type info na, use the target language one
         TypeInfo::new("logic".to_string(), Vec::new()),
         VariableKind::Ground,
     ));
     // var1 => const
+    let var1_val = String::from("00101010");
     scopes.get_mut("Foo").unwrap().variables.push(Variable::new(
-        String::from("00101010"),
+        TraceValue::Constant(ConstValue::FourValue(var1_val.into_bytes(), 8)),
         String::from("var1"),
         // type info na, use the target language one
         TypeInfo::new("logic".to_string(), Vec::new()),
@@ -74,14 +75,14 @@ pub fn create_foo_single() -> TyVcd {
     );
     // inA
     scopes.get_mut("Foo").unwrap().variables.push(Variable::new(
-        String::from("a"),
+        TraceValue::RefTraceName("a".to_string()),
         String::from("inA"),
         TypeInfo::new("SInt<32>".to_string(), Vec::new()),
         VariableKind::Ground,
     ));
     // inB
     scopes.get_mut("Foo").unwrap().variables.push(Variable::new(
-        String::from("b"),
+        TraceValue::RefTraceName("b".to_string()),
         String::from("outB"),
         // type info na, use the target language one
         TypeInfo::new(
@@ -95,8 +96,9 @@ pub fn create_foo_single() -> TyVcd {
         VariableKind::Ground,
     ));
     // var1 => const
+    let var1_val = String::from("00101010");
     scopes.get_mut("Foo").unwrap().variables.push(Variable::new(
-        String::from("00101010"),
+        TraceValue::Constant(ConstValue::FourValue(var1_val.into_bytes(), 8)),
         String::from("var1"),
         // type info na, use the target language one
         TypeInfo::new(
@@ -118,8 +120,9 @@ pub fn create_foo_single() -> TyVcd {
     ));
 
     // var2
+    let var2_val = String::from("00010101");
     scopes.get_mut("Foo").unwrap().variables.push(Variable::new(
-        String::from("00010101"),
+        TraceValue::Constant(ConstValue::FourValue(var2_val.into_bytes(), 8)),
         String::from("var2"),
         // type info na, use the target language one
         TypeInfo::new("logic".to_string(), Vec::new()),
@@ -152,7 +155,7 @@ pub fn create_foo() -> TyVcd {
     for subscope_to_update in &mut foo.scopes.get_mut("Foo").unwrap().subscopes {
         let new_scope = Scope::from_other(
             bar.scopes.get("Bar").unwrap(),
-            subscope_to_update.get_trace_name().clone(),
+            subscope_to_update.get_trace_name().unwrap().clone(),
         );
 
         *subscope_to_update = new_scope;

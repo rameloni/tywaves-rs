@@ -1,3 +1,5 @@
+use tywaves_rs::tyvcd::trace_pointer::TraceValue;
+
 // External variable that will be captured.
 use crate::tyvcd::spec::*;
 
@@ -30,7 +32,7 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         .unwrap()
         .variables
         .push(Variable::new(
-            String::from("clock"),
+            TraceValue::RefTraceName("clock".to_string()),
             String::from("clock"),
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground,
@@ -42,7 +44,7 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         .unwrap()
         .variables
         .push(Variable::new(
-            String::from("reset"),
+            TraceValue::RefTraceName("reset".to_string()),
             String::from("reset"),
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground,
@@ -54,7 +56,43 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         .unwrap()
         .variables
         .push(Variable::new(
-            String::from("io_trace_name"),
+            TraceValue::RefTraceValues(vec![
+                TraceValue::RefTraceName("io_a_0".to_string()),
+                TraceValue::RefTraceValues(vec![
+                    // b.a
+                    TraceValue::RefTraceName("io_b_a_0".to_string()),
+                    // b.b
+                    TraceValue::RefTraceValues(vec![
+                        // b.b.vec
+                        TraceValue::RefTraceValues(vec![
+                            TraceValue::RefTraceName("io_b_b_vec_0_0".to_string()), // b.b.vec[0]
+                            TraceValue::RefTraceName("io_b_b_vec_1_0".to_string()), // b.b.vec[1]
+                        ]),
+                    ]),
+                ]),
+                TraceValue::RefTraceValues(vec![
+                    // vec[0]
+                    TraceValue::RefTraceValues(vec![
+                        // vec[0].x
+                        TraceValue::RefTraceName("io_vec_0_x_0".to_string()),
+                        // vec[0].y
+                        TraceValue::RefTraceValues(vec![
+                            // vec[0].y.z
+                            TraceValue::RefTraceName("io_vec_0_y_z_0".to_string()),
+                        ]),
+                    ]),
+                    // vec[1]
+                    TraceValue::RefTraceValues(vec![
+                        // vec[1].x
+                        TraceValue::RefTraceName("io_vec_1_x_0".to_string()),
+                        // vec[1].y
+                        TraceValue::RefTraceValues(vec![
+                            // vec[1].y.z
+                            TraceValue::RefTraceName("io_vec_1_y_z_0".to_string()),
+                        ]),
+                    ]),
+                ]),
+            ]),
             String::from("io"),
             TypeInfo::new("InterfaceIOBundle".to_string(), Vec::new()),
             VariableKind::Struct {
@@ -69,13 +107,24 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
 fn create_io_fields() -> Vec<Variable> {
     vec![
         Variable::new(
-            String::from("io_a_0"),
+            TraceValue::RefTraceName("io_a_0".to_string()),
             String::from("a"),
             TypeInfo::new("UInt<32>".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
         Variable::new(
-            String::from(""),
+            TraceValue::RefTraceValues(vec![
+                // b.a
+                TraceValue::RefTraceName("io_b_a_0".to_string()),
+                // b.b
+                TraceValue::RefTraceValues(vec![
+                    // b.b.vec
+                    TraceValue::RefTraceValues(vec![
+                        TraceValue::RefTraceName("io_b_b_vec_0_0".to_string()), // b.b.vec[0]
+                        TraceValue::RefTraceName("io_b_b_vec_1_0".to_string()), // b.b.vec[1]
+                    ]),
+                ]),
+            ]),
             String::from("b"),
             TypeInfo::new("SubBundleB".to_string(), Vec::new()),
             VariableKind::Struct {
@@ -83,7 +132,28 @@ fn create_io_fields() -> Vec<Variable> {
             },
         ),
         Variable::new(
-            String::from(""),
+            TraceValue::RefTraceValues(vec![
+                // vec[0]
+                TraceValue::RefTraceValues(vec![
+                    // vec[0].x
+                    TraceValue::RefTraceName("io_vec_0_x_0".to_string()),
+                    // vec[0].y
+                    TraceValue::RefTraceValues(vec![
+                        // vec[0].y.z
+                        TraceValue::RefTraceName("io_vec_0_y_z_0".to_string()),
+                    ]),
+                ]),
+                // vec[1]
+                TraceValue::RefTraceValues(vec![
+                    // vec[1].x
+                    TraceValue::RefTraceName("io_vec_1_x_0".to_string()),
+                    // vec[1].y
+                    TraceValue::RefTraceValues(vec![
+                        // vec[1].y.z
+                        TraceValue::RefTraceName("io_vec_1_y_z_0".to_string()),
+                    ]),
+                ]),
+            ]),
             String::from("vec"),
             TypeInfo::new("VecType".to_string(), Vec::new()),
             VariableKind::Vector {
@@ -97,13 +167,19 @@ fn create_io_fields() -> Vec<Variable> {
 fn create_io_b_fields() -> Vec<Variable> {
     vec![
         Variable::new(
-            String::from("io_b_a_0"),
+            TraceValue::RefTraceName("io_b_a_0".to_string()),
             String::from("a"),
             TypeInfo::new("UInt<32>".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
         Variable::new(
-            String::from(""),
+            TraceValue::RefTraceValues(vec![
+                // b.b.vec
+                TraceValue::RefTraceValues(vec![
+                    TraceValue::RefTraceName("io_b_b_vec_0_0".to_string()), // b.b.vec[0]
+                    TraceValue::RefTraceName("io_b_b_vec_1_0".to_string()), // b.b.vec[1]
+                ]),
+            ]),
             String::from("b"),
             TypeInfo::new("WithBundlesAndVecs_io_b_b".to_string(), Vec::new()),
             VariableKind::Struct {
@@ -117,13 +193,13 @@ fn create_io_b_fields() -> Vec<Variable> {
 fn create_io_b_b_fields() -> Vec<Variable> {
     let fields: Vec<Variable> = vec![
         Variable::new(
-            String::from("io_b_b_vec_0_0"), // todo: check
+            TraceValue::RefTraceName("io_b_b_vec_0_0".to_string()),
             String::from("0"),
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
         Variable::new(
-            String::from("io_b_b_vec_1_0"),
+            TraceValue::RefTraceName("io_b_b_vec_1_0".to_string()),
             String::from("1"),
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground,
@@ -131,7 +207,11 @@ fn create_io_b_b_fields() -> Vec<Variable> {
     ];
 
     vec![Variable::new(
-        String::from(""),
+        // b.b.vec
+        TraceValue::RefTraceValues(vec![
+            TraceValue::RefTraceName("io_b_b_vec_0_0".to_string()), // b.b.vec[0]
+            TraceValue::RefTraceName("io_b_b_vec_1_0".to_string()), // b.b.vec[1]
+        ]),
         String::from("vec"),
         TypeInfo::new("logic".to_string(), Vec::new()),
         VariableKind::Vector { fields: fields },
@@ -142,13 +222,17 @@ fn create_io_b_b_fields() -> Vec<Variable> {
 fn create_io_vec_fields() -> Vec<Variable> {
     let fields = vec![
         Variable::new(
-            String::from("io_vec_0_x_0"),
+            TraceValue::RefTraceName("io_vec_0_x_0".to_string()),
             String::from("x"),
             TypeInfo::new("SInt<32>".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
         Variable::new(
-            String::from(""),
+            // vec[0].y
+            TraceValue::RefTraceValues(vec![
+                // vec[0].y.z
+                TraceValue::RefTraceName("io_vec_0_y_z_0".to_string()),
+            ]),
             String::from("y"),
             TypeInfo::new("AnonymousBundle".to_string(), Vec::new()),
             VariableKind::Struct {
@@ -158,7 +242,15 @@ fn create_io_vec_fields() -> Vec<Variable> {
     ];
 
     vec![Variable::new(
-        String::from(""),
+        TraceValue::RefTraceValues(vec![
+            // vec[0].x
+            TraceValue::RefTraceName("io_vec_0_x_0".to_string()),
+            // vec[0].y
+            TraceValue::RefTraceValues(vec![
+                // vec[0].y.z
+                TraceValue::RefTraceName("io_vec_0_y_z_0".to_string()),
+            ]),
+        ]),
         String::from("0"),
         TypeInfo::new("VecType".to_string(), Vec::new()),
         VariableKind::Struct { fields: fields },
@@ -168,7 +260,7 @@ fn create_io_vec_fields() -> Vec<Variable> {
 // Type of WithBundlesAndVecs_io_vec_y
 fn create_io_vec_y_fields() -> Vec<Variable> {
     vec![Variable::new(
-        String::from("io_vec_0_y_z_0"),
+        TraceValue::RefTraceName("io_vec_0_y_z_0".to_string()),
         String::from("z"),
         TypeInfo::new("SInt<32>".to_string(), Vec::new()),
         VariableKind::Ground,
@@ -179,13 +271,17 @@ fn create_io_vec_y_fields() -> Vec<Variable> {
 fn create_io_vec_0_fields() -> Vec<Variable> {
     let fields = vec![
         Variable::new(
-            String::from("io_vec_1_x_0"),
+            TraceValue::RefTraceName("io_vec_1_x_0".to_string()),
             String::from("x"),
             TypeInfo::new("SInt<32>".to_string(), Vec::new()),
             VariableKind::Ground,
         ),
         Variable::new(
-            String::from(""),
+            // vec[0].y
+            TraceValue::RefTraceValues(vec![
+                // vec[0].y.z
+                TraceValue::RefTraceName("io_vec_1_y_z_0".to_string()),
+            ]),
             String::from("y"),
             TypeInfo::new("AnonymousBundle".to_string(), Vec::new()),
             VariableKind::Struct {
@@ -194,7 +290,15 @@ fn create_io_vec_0_fields() -> Vec<Variable> {
         ),
     ];
     vec![Variable::new(
-        String::from(""),  // TODO: fix this trace name
+        TraceValue::RefTraceValues(vec![
+            // vec[0].x
+            TraceValue::RefTraceName("io_vec_1_x_0".to_string()),
+            // vec[0].y
+            TraceValue::RefTraceValues(vec![
+                // vec[0].y.z
+                TraceValue::RefTraceName("io_vec_1_y_z_0".to_string()),
+            ]),
+        ]),
         String::from("1"), // TODO: fix this name
         TypeInfo::new("VecType".to_string(), Vec::new()),
         VariableKind::Struct { fields: fields },
@@ -204,7 +308,7 @@ fn create_io_vec_0_fields() -> Vec<Variable> {
 // Type of WithBundlesAndVecs_io_vec_0_y
 fn create_io_vec_y_0_fields() -> Vec<Variable> {
     vec![Variable::new(
-        String::from("io_vec_1_y_z_0"),
+        TraceValue::RefTraceName("io_vec_1_y_z_0".to_string()),
         String::from("z"),
         TypeInfo::new("SInt<32>".to_string(), Vec::new()),
         VariableKind::Ground,

@@ -124,6 +124,7 @@ fn test_trace_pointer() {
         *bar_x,
         Variable::new(
             String::from("io_a_0"),
+            TraceValue::RefTraceName("io_a_0".to_string()),
             String::from("a"),
             TypeInfo::new("UInt<32>".to_string(), Vec::new()),
             VariableKind::Ground,

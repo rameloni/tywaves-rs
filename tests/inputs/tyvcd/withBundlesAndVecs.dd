@@ -39,7 +39,7 @@
               1,
               0
             ],
-            "var_name": "vec2"
+            "var_name": "vec"
           }
         ]
       },
@@ -297,7 +297,7 @@
               0
               // TODO: make the example with multi dim vecs
             ],
-            "var_name": "vecjkjk"
+            "var_name": "vec"
           }
         ]
       },

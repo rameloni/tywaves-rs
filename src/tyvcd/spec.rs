@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::trace_pointer::{TraceFinder, TraceGetter};
+use super::trace_pointer::{TraceFinder, TraceGetter, TraceValue};
 
 type ScopeId = String;
 /// Represents the TyVcd format.
@@ -43,8 +43,9 @@ impl TraceFinder for TyVcd {
 /// Represent a scope (i.e. a module instance) in the TyVcd format.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
-    /// The name of the scope in the trace
-    _id_trace_name: String,
+    // /// The name of the scope in the trace
+    // _id_trace_name: String,
+    _id_trace_value: TraceValue,
 
     /// The subscopes of this scope
     pub subscopes: Vec<Scope>,
@@ -61,7 +62,8 @@ impl Scope {
     /// Create a new empty scope without any subscopes or variables.
     pub fn empty(trace_name: String, name: String, high_level_info: TypeInfo) -> Self {
         Self {
-            _id_trace_name: trace_name,
+            // _id_trace_name: trace_name,
+            _id_trace_value: TraceValue::RefTraceName(trace_name),
             subscopes: Vec::new(),
             variables: Vec::new(),
             name,
@@ -73,7 +75,8 @@ impl Scope {
     /// *Pleas use the `clone` method directly for a full copy.*
     pub fn from_other(other: &Scope, trace_name: String) -> Self {
         Self {
-            _id_trace_name: trace_name,
+            // _id_trace_name: trace_name,
+            _id_trace_value: TraceValue::RefTraceName(trace_name),
             subscopes: other.subscopes.clone(),
             variables: other.variables.clone(),
             name: other.name.clone(),
@@ -83,7 +86,13 @@ impl Scope {
 
     /// Find a subscope in the scope.
     fn find_subscope(&self, name: &str) -> Option<&Scope> {
-        self.subscopes.iter().find(|s| s.get_trace_name() == name)
+        self.subscopes.iter().find(|s| {
+            if let Some(trace_name) = s.get_trace_name() {
+                trace_name == name
+            } else {
+                false
+            }
+        })
     }
 
     /// Find a variable in the scope.
@@ -93,13 +102,13 @@ impl Scope {
 }
 
 impl TraceGetter for Scope {
-    fn get_trace_name(&self) -> &String {
-        &self._id_trace_name
-    }
-
     fn get_trace_path(&self) -> Vec<&String> {
         // TODO: implement get_trace_path for Scope
         todo!()
+    }
+
+    fn get_trace_value(&self) -> &TraceValue {
+        &self._id_trace_value
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
@@ -110,8 +119,9 @@ impl TraceGetter for Scope {
 /// Represent a variable in the TyVcd format.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Variable {
-    /// The name of the variable in the trace.
-    _id_trace_name: String,
+    // /// The name of the variable in the trace.
+    // _id_trace_name: String,
+    _trace_value: TraceValue,
 
     /// The name of the variable.
     pub name: String,
@@ -123,48 +133,55 @@ pub struct Variable {
 
 impl Variable {
     pub fn new(
-        trace_name: String,
+        trace_value: TraceValue,
         name: String,
         high_level_info: TypeInfo,
         kind: VariableKind,
     ) -> Self {
         Self {
-            _id_trace_name: trace_name,
+            // _id_trace_name: trace_name,
+            _trace_value: trace_value,
             name,
             high_level_info,
             kind,
         }
     }
 
-    /// Update the trace name of the variable.
-    pub(in crate::tyvcd) fn update_trace_name(&mut self, trace_name: String) {
-        self._id_trace_name = trace_name;
+    // /// Update the trace name of the variable.
+    // pub(in crate::tyvcd) fn update_trace_name(&mut self, trace_name: String) {
+    //     self._id_trace_name = trace_name;
+    // }
+
+    pub(in crate::tyvcd) fn update_trace_value(&mut self, trace_value: TraceValue) {
+        self._trace_value = trace_value;
     }
 
     // Find a variable in the variable tree.
     fn find_var(&self, trace_name: &str) -> Option<&Self> {
-        if trace_name == self._id_trace_name {
-            Some(self)
-        } else {
-            match &self.kind {
-                VariableKind::Struct { fields } | VariableKind::Vector { fields } => {
-                    println!("trace_name: {:?}", trace_name);
-                    fields.iter().find_map(|field| field.find_var(trace_name))
-                }
-                VariableKind::Ground | VariableKind::External => None,
+        if let Some(ref_trace_name) = self.get_trace_name() {
+            if trace_name == ref_trace_name {
+                return Some(self);
             }
+        }
+        match &self.kind {
+            VariableKind::Struct { fields } | VariableKind::Vector { fields } => {
+                fields.iter().find_map(|field| field.find_var(trace_name))
+            }
+            VariableKind::Ground | VariableKind::External => None,
         }
     }
 }
 
 impl TraceGetter for Variable {
-    fn get_trace_name(&self) -> &String {
-        &self._id_trace_name
-    }
     fn get_trace_path(&self) -> Vec<&String> {
         // TODO: implement get_trace_path for Variable
         todo!("Implement get_trace_path for Variable")
     }
+
+    fn get_trace_value(&self) -> &TraceValue {
+        &self._trace_value
+    }
+
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
