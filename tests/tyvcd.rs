@@ -75,7 +75,7 @@ fn test_trace_pointer() {
         .and_then(|trace| trace.as_any().downcast_ref::<Scope>())
         .expect("failed to downcast");
 
-    assert_eq!(foo.get_trace_name(), "Foo");
+    assert_eq!(foo.get_trace_name().unwrap(), "Foo");
     // assert_eq!(foo.get_trace_path(), vec!["Foo"]);
 
     let bar0 = tyvcd_foo
@@ -83,7 +83,7 @@ fn test_trace_pointer() {
         .and_then(|trace| trace.as_any().downcast_ref::<Scope>())
         .expect("failed to downcast");
 
-    assert_eq!(bar0.get_trace_name(), "b0");
+    assert_eq!(bar0.get_trace_name().unwrap(), "b0");
     // assert_eq!(bar.get_trace_path(), vec!["Foo", "b0"]);
 
     let bar1 = tyvcd_foo
@@ -91,7 +91,7 @@ fn test_trace_pointer() {
         .and_then(|trace| trace.as_any().downcast_ref::<Scope>())
         .expect("failed to downcast");
 
-    assert_eq!(bar1.get_trace_name(), "b1");
+    assert_eq!(bar1.get_trace_name().unwrap(), "b1");
 
     let a = tyvcd_foo
         .find_trace(&["Foo".to_string(), "a".to_string()])
@@ -123,11 +123,10 @@ fn test_trace_pointer() {
     assert_eq!(
         *bar_x,
         Variable::new(
-            String::from("io_a_0"),
             TraceValue::RefTraceName("io_a_0".to_string()),
             String::from("a"),
             TypeInfo::new("UInt<32>".to_string(), Vec::new()),
-            VariableKind::Ground,
+            VariableKind::Ground(32),
         )
     );
 }

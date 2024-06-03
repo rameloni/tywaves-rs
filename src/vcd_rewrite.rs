@@ -1,13 +1,14 @@
-use std::{fs::File, io::*, path::Path, str::FromStr};
+use std::{fs::File, io::*, path::Path};
 use vcd::{Command, Header, IdCode, Parser, ReferenceIndex, Value, VarType, Writer};
 
-use crate::symbol_table;
+use crate::tyvcd::spec::{self as tyvcd};
+use crate::tyvcd::trace_pointer::TraceGetter;
 
-// Alias of symbol_table::Scope
-type TyScope = symbol_table::Scope;
-type TyVariable = symbol_table::Variable;
-type TyRealType = symbol_table::RealType;
-type TyHwType = symbol_table::HwType;
+type TyScope = tyvcd::Scope;
+type TyVariable = tyvcd::Variable;
+type TyVarKind = tyvcd::VariableKind;
+
+const RESULT_VCD: &str = "test.vcd";
 
 pub struct VcdRewriter {
     /// The reader of the original VCD file
@@ -31,9 +32,8 @@ impl VcdRewriter {
     pub fn get_final_file(&self) -> &'static str {
         self.output_vcd_name
     }
-    pub fn new(vcd: &Path, tywaves_scopes: Vec<TyScope>) -> Self {
-        let vcd_file = File::open(vcd).unwrap();
-        const RESULT_VCD: &str = "test.vcd";
+    pub fn new(vcd_path: &Path, tywaves_scopes: Vec<TyScope>) -> Self {
+        let vcd_file = File::open(vcd_path).unwrap();
         let output_vcd = File::create(RESULT_VCD).unwrap();
 
         let reader = Parser::new(BufReader::new(vcd_file));
@@ -95,18 +95,22 @@ impl VcdRewriter {
     /// Search for child [TyVariable] and [TyScope]s and add them to the header.
     fn add_scope_to_header(&mut self, scope: &TyScope, path_scope: &[String]) -> Result<()> {
         // Add the scopes to the header
-        self.writer.add_module(&scope.name)?;
+        let scope_name = scope
+            .get_trace_name()
+            .ok_or(Error::new(ErrorKind::Other, "Failed to get scope name"))?;
+
+        self.writer.add_module(scope_name)?;
 
         // The scope of the children of the current scope
-        let child_path_scope = &[path_scope, &[scope.name.clone()]].concat();
+        let child_path_scope = &[path_scope, &[scope_name.clone()]].concat();
 
         // Add the variables to the header
-        for variable in &scope.child_variables {
+        for variable in &scope.variables {
             self.add_variable_to_header(variable, child_path_scope)?;
         }
 
         // Add the child scopes to the header
-        for child_scope in &scope.child_scopes {
+        for child_scope in &scope.subscopes {
             self.add_scope_to_header(child_scope, child_path_scope)?;
         }
 
@@ -122,29 +126,21 @@ impl VcdRewriter {
         path_scope: &[String],
     ) -> Result<()> {
         // Get the information for the variable
-        let var_type = match &ty_variable.hw_type {
-            TyHwType::Reg => VarType::Reg,
-            _ => VarType::Wire,
+        let var_type = VarType::Wire;
+
+        let reference_name = if let Some(trace_name) = ty_variable.get_trace_name() {
+            trace_name
+        } else {
+            &ty_variable.name
         };
-        let reference = match &ty_variable.real_type {
-            TyRealType::Ground {
-                vcd_name: Some(vcd_name),
-                ..
-            }
-            | TyRealType::Bundle {
-                vcd_name: Some(vcd_name),
-                ..
-            } => vcd_name,
-            TyRealType::Ground { vcd_name: None, .. }
-            | TyRealType::Bundle { vcd_name: None, .. } => &ty_variable.name,
-            TyRealType::Vec { .. } => todo!("Vec support"),
-            TyRealType::Unknown => todo!("Unknown type"),
-        };
-        let width = ty_variable.real_type.find_width() as u32;
+
+        let width = ty_variable.kind.find_width() as u32;
         let index = (width > 1).then_some(ReferenceIndex::Range(width as i32 - 1, 0));
 
         // Write the variable to the VCD file
-        let new_id = self.writer.add_var(var_type, width, reference, index)?;
+        let new_id = self
+            .writer
+            .add_var(var_type, width, reference_name, index)?;
 
         // Update the rewrite_variables list
         self.rewrite_variables.push(VcdRewriteVariable::create(
@@ -234,16 +230,12 @@ impl VcdRewriteVariable {
                 source_id_codes,
             };
         }
-        // Collect first existing vcd_names
+        // Collect first existing vcd_names: all the ground variables
         for ty_ground_variable in ty_variable.collect_ground_variables() {
-            match ty_ground_variable {
-                TyRealType::Ground {
-                    vcd_name,
-                    width,
-                    constant: _,
-                } => {
+            match ty_ground_variable.kind {
+                TyVarKind::Ground(width) => {
                     // Get the actual path of the variable
-                    if let Some(vcd_name) = vcd_name {
+                    if let Some(vcd_name) = ty_ground_variable.get_trace_name() {
                         let path = &[scope_path, &[vcd_name.clone()]].concat();
                         // println!("PATH: {:?}", path);
                         // Find the variable in the original VCD file (if it exists)
@@ -254,43 +246,16 @@ impl VcdRewriteVariable {
                                 0,
                                 IdCodeWithShift::create(
                                     vcd_var.code,
-                                    vcd::Vector::filled(Value::X, width.get() as usize),
+                                    vcd::Vector::filled(Value::X, width as usize),
                                 ),
                             );
                         }
                     }
                 }
-                _ => panic!("Not implemented"),
+                _ => unreachable!(),
             }
         }
 
-        for ty_ground_variable in ty_variable.collect_ground_variables() {
-            break;
-            match ty_ground_variable {
-                TyRealType::Ground {
-                    vcd_name: _,
-                    width,
-                    constant,
-                } => {
-                    // Get the actual path of the variable
-                    if let Some(constant_value) = constant {
-                        let id_code: IdCode = if let Some(last) = source_id_codes.first() {
-                            let a = last.id_code.next();
-                            print!("Next id code: {:?}", a.to_string());
-                            a
-                        } else {
-                            let a = IdCode::FIRST;
-                            print!("FIRST: idCode: {:?}", a.to_string());
-                            a
-                        };
-
-                        let value = vcd::Vector::from_str(&constant_value).unwrap();
-                        source_id_codes.insert(0, IdCodeWithShift::create(id_code, value));
-                    }
-                }
-                _ => panic!("Not implemented"),
-            }
-        }
         Self {
             id_code,
             width,
@@ -305,13 +270,8 @@ impl VcdRewriteVariable {
         let mut value: Vec<Value> = vec![Value::V0; self.width as usize];
         let mut start_idx = self.width as usize;
 
-        println!("\tVALUE: {:?}", value.len());
-        println!("\tWIDTH: {:?}", self.width);
-        println!("\tSTART_IDX: {:?}", start_idx);
-
         for id_code_with_shift in &self.source_id_codes {
             start_idx -= id_code_with_shift.get_value().len();
-            println!("\tSTART_IDX: {:?}", start_idx);
             for (i, v) in id_code_with_shift.get_value().iter().enumerate() {
                 let idx = start_idx + i;
                 if idx < value.len() {
@@ -330,7 +290,6 @@ impl VcdRewriteVariable {
             if id_code_with_shift.id_code == *source_id_code {
                 // Update the value
                 id_code_with_shift.update_value(value.clone());
-                println!("UPDATED: {:?}", id_code_with_shift.id_code.to_string());
 
                 return true;
             }
@@ -373,7 +332,7 @@ impl IdCodeWithShift {
     }
 
     pub fn update_value(&mut self, value: vcd::Vector) {
-        assert_eq!(value.len(), self.value.len(), "Failing to update the value. Update value has a different size from the original: new {} original {}", value.len(), self.value.len());
+        assert_eq!(value.len(), self.value.len(), "Failing to update the value. Update value has a different size from the original: new {} original {}.\n New: {}, original {}", value.len(), self.value.len(), value, self.value);
         self.value = value;
     }
 }

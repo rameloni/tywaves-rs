@@ -183,6 +183,21 @@ impl Variable {
             None
         }
     }
+
+    /// Collect all the ground variable subtypes in the variable hierarchy tree.
+    #[deprecated = "Should be removed"]
+    pub(crate) fn collect_ground_variables(&self) -> Vec<&Self> {
+        let mut ground_variables = Vec::new();
+        match &self.kind {
+            VariableKind::Ground(_) | VariableKind::External => ground_variables.push(self),
+            VariableKind::Vector { fields } | VariableKind::Struct { fields } => {
+                for field in fields {
+                    ground_variables.append(&mut field.collect_ground_variables());
+                }
+            }
+        }
+        ground_variables
+    }
 }
 
 impl TraceGetter for Variable {
