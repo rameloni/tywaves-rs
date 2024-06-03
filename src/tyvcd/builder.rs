@@ -136,7 +136,14 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let kind = match &hgldd_var.type_name {
             // If type_name is None, this is an external variable
             None => VariableKind::External,
-            Some(hgldd::TypeName::Logic) | Some(hgldd::TypeName::Bit) => VariableKind::Ground,
+            Some(hgldd::TypeName::Logic) => {
+                if let Some(packed_range) = &hgldd_var.packed_range {
+                    VariableKind::Ground(u128::from(packed_range))
+                } else {
+                    VariableKind::Ground(1) // Default to 1 bit
+                }
+            }
+            Some(hgldd::TypeName::Bit) => VariableKind::Ground(1),
             Some(hgldd::TypeName::Custom(custom_type_name)) => {
                 // Find the custom typeName from the list of objects
                 let obj = objects

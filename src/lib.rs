@@ -2,8 +2,12 @@
 /// This module contains the data structures to read and write HGLDD file
 pub mod hgldd;
 
+#[deprecated = "Use the `tyvcd` module instead. `symbol_table` will be removed."]
 pub mod symbol_table;
+
 pub mod tywaves_state;
+
+#[deprecated = "Use the `tyvcd::trace_pointer` module instead. `variable_finder` will be removed."]
 pub mod variable_finder;
 pub mod vcd_rewrite;
 

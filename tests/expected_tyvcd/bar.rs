@@ -31,7 +31,7 @@ pub fn create_bar_single() -> TyVcd {
         TraceValue::RefTraceName("x".to_string()),
         String::from("inX"),
         TypeInfo::new("logic".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(32),
     ));
     // inB
     scopes.get_mut("Bar").unwrap().variables.push(Variable::new(
@@ -42,7 +42,7 @@ pub fn create_bar_single() -> TyVcd {
         ]),
         String::from("outY"),
         TypeInfo::new("logic".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(32),
     ));
     // var1 => const
     scopes.get_mut("Bar").unwrap().variables.push(Variable::new(
@@ -53,7 +53,7 @@ pub fn create_bar_single() -> TyVcd {
         ]),
         String::from("varZ"),
         TypeInfo::new("logic".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(32),
     ));
 
     scopes.get_mut("Bar").unwrap().variables.push(Variable::new(
@@ -68,7 +68,7 @@ pub fn create_bar_single() -> TyVcd {
         ]),
         String::from("add"),
         TypeInfo::new("logic".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(32),
     ));
 
     TyVcd { scopes }

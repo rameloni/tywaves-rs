@@ -24,7 +24,7 @@ pub fn create_foo_single_no_types() -> TyVcd {
         String::from("inA"),
         // type info na, use the target language one
         TypeInfo::new("logic".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(32),
     ));
     // inB
     scopes.get_mut("Foo").unwrap().variables.push(Variable::new(
@@ -32,7 +32,7 @@ pub fn create_foo_single_no_types() -> TyVcd {
         String::from("outB"),
         // type info na, use the target language one
         TypeInfo::new("logic".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(32),
     ));
     // var1 => const
     let var1_val = String::from("00101010");
@@ -41,7 +41,7 @@ pub fn create_foo_single_no_types() -> TyVcd {
         String::from("var1"),
         // type info na, use the target language one
         TypeInfo::new("logic".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(8),
     ));
 
     // instances
@@ -78,7 +78,7 @@ pub fn create_foo_single() -> TyVcd {
         TraceValue::RefTraceName("a".to_string()),
         String::from("inA"),
         TypeInfo::new("SInt<32>".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(32),
     ));
     // inB
     scopes.get_mut("Foo").unwrap().variables.push(Variable::new(
@@ -93,7 +93,7 @@ pub fn create_foo_single() -> TyVcd {
                 value: Some("32".to_string()),
             }],
         ),
-        VariableKind::Ground,
+        VariableKind::Ground(32),
     ));
     // var1 => const
     let var1_val = String::from("00101010");
@@ -116,7 +116,7 @@ pub fn create_foo_single() -> TyVcd {
                 },
             ],
         ),
-        VariableKind::Ground,
+        VariableKind::Ground(8),
     ));
 
     // var2
@@ -126,7 +126,7 @@ pub fn create_foo_single() -> TyVcd {
         String::from("var2"),
         // type info na, use the target language one
         TypeInfo::new("logic".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(8),
     ));
 
     // instances

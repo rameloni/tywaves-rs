@@ -158,16 +158,29 @@ impl Variable {
 
     // Find a variable in the variable tree.
     fn find_var(&self, trace_name: &str) -> Option<&Self> {
+        // Checkk if the trace name corresponds to the variable at the current hierarchy level
         if let Some(ref_trace_name) = self.get_trace_name() {
             if trace_name == ref_trace_name {
                 return Some(self);
             }
         }
-        match &self.kind {
+        // The variable should be in a struct or vector
+        let subvar_opt = match &self.kind {
             VariableKind::Struct { fields } | VariableKind::Vector { fields } => {
                 fields.iter().find_map(|field| field.find_var(trace_name))
             }
-            VariableKind::Ground | VariableKind::External => None,
+            VariableKind::Ground(_) | VariableKind::External => None,
+        };
+
+        // Check if the variable was found and return it
+        if let Some(result) = subvar_opt {
+            Some(result)
+        } else if trace_name == self.name {
+            // Otherwise check if the variable name corresponds to the current variable
+            // TODO: this is a temporary fix, when vcd_rewrite is called the trace names are created from the variable names if the variable does not have a trace name
+            Some(self)
+        } else {
+            None
         }
     }
 }
@@ -216,12 +229,29 @@ pub struct ConstructorParams {
 /// Represents the kind of a variable in the TyVcd format.
 #[derive(Debug, Clone, PartialEq)]
 pub enum VariableKind {
-    /// A ground type
-    Ground,
+    /// A ground type with a defined range of width
+    Ground(u128),
     /// A struct-like type
     Struct { fields: Vec<Variable> },
     /// A vector-like type
     Vector { fields: Vec<Variable> },
     /// An external type (from another source). Typically when it is not possible to infer the type
     External,
+}
+
+impl VariableKind {
+    pub fn find_width(&self) -> u128 {
+        match self {
+            VariableKind::Ground(width) => *width,
+            VariableKind::Struct { fields } => fields.iter().map(|f| f.kind.find_width()).sum(),
+            VariableKind::Vector { fields } => {
+                if let Some(field) = fields.first() {
+                    fields.len() as u128 * field.kind.find_width()
+                } else {
+                    0
+                }
+            }
+            VariableKind::External => 0,
+        }
+    }
 }

@@ -35,7 +35,7 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
             TraceValue::RefTraceName("clock".to_string()),
             String::from("clock"),
             TypeInfo::new("logic".to_string(), Vec::new()),
-            VariableKind::Ground,
+            VariableKind::Ground(1),
         ));
 
     // reset
@@ -47,7 +47,7 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
             TraceValue::RefTraceName("reset".to_string()),
             String::from("reset"),
             TypeInfo::new("logic".to_string(), Vec::new()),
-            VariableKind::Ground,
+            VariableKind::Ground(1),
         ));
 
     // io => struct
@@ -110,7 +110,7 @@ fn create_io_fields() -> Vec<Variable> {
             TraceValue::RefTraceName("io_a_0".to_string()),
             String::from("a"),
             TypeInfo::new("UInt<32>".to_string(), Vec::new()),
-            VariableKind::Ground,
+            VariableKind::Ground(32),
         ),
         Variable::new(
             TraceValue::RefTraceValues(vec![
@@ -170,7 +170,7 @@ fn create_io_b_fields() -> Vec<Variable> {
             TraceValue::RefTraceName("io_b_a_0".to_string()),
             String::from("a"),
             TypeInfo::new("UInt<32>".to_string(), Vec::new()),
-            VariableKind::Ground,
+            VariableKind::Ground(32),
         ),
         Variable::new(
             TraceValue::RefTraceValues(vec![
@@ -196,13 +196,13 @@ fn create_io_b_b_fields() -> Vec<Variable> {
             TraceValue::RefTraceName("io_b_b_vec_0_0".to_string()),
             String::from("0"),
             TypeInfo::new("logic".to_string(), Vec::new()),
-            VariableKind::Ground,
+            VariableKind::Ground(32),
         ),
         Variable::new(
             TraceValue::RefTraceName("io_b_b_vec_1_0".to_string()),
             String::from("1"),
             TypeInfo::new("logic".to_string(), Vec::new()),
-            VariableKind::Ground,
+            VariableKind::Ground(32),
         ),
     ];
 
@@ -225,7 +225,7 @@ fn create_io_vec_fields() -> Vec<Variable> {
             TraceValue::RefTraceName("io_vec_0_x_0".to_string()),
             String::from("x"),
             TypeInfo::new("SInt<32>".to_string(), Vec::new()),
-            VariableKind::Ground,
+            VariableKind::Ground(32),
         ),
         Variable::new(
             // vec[0].y
@@ -263,7 +263,7 @@ fn create_io_vec_y_fields() -> Vec<Variable> {
         TraceValue::RefTraceName("io_vec_0_y_z_0".to_string()),
         String::from("z"),
         TypeInfo::new("SInt<32>".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(32),
     )]
 }
 
@@ -274,7 +274,7 @@ fn create_io_vec_0_fields() -> Vec<Variable> {
             TraceValue::RefTraceName("io_vec_1_x_0".to_string()),
             String::from("x"),
             TypeInfo::new("SInt<32>".to_string(), Vec::new()),
-            VariableKind::Ground,
+            VariableKind::Ground(32),
         ),
         Variable::new(
             // vec[0].y
@@ -311,6 +311,6 @@ fn create_io_vec_y_0_fields() -> Vec<Variable> {
         TraceValue::RefTraceName("io_vec_1_y_z_0".to_string()),
         String::from("z"),
         TypeInfo::new("SInt<32>".to_string(), Vec::new()),
-        VariableKind::Ground,
+        VariableKind::Ground(32),
     )]
 }

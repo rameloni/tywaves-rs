@@ -170,6 +170,18 @@ pub enum Expression {
 #[serde(rename_all = "snake_case")]
 pub struct PackedRange(pub u32, pub u32);
 
+impl From<&PackedRange> for u32 {
+    fn from(range: &PackedRange) -> Self {
+        range.0 - range.1 + 1
+    }
+}
+
+impl From<&PackedRange> for u128 {
+    fn from(range: &PackedRange) -> Self {
+        u32::from(range).into()
+    }
+}
+
 /// The dimensionality of a variable in the target language (i.e. verilog).
 /// ```verilog
 ///                            // Dimensionality
