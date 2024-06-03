@@ -1,0 +1,112 @@
+{
+  "HGLDD": {
+    "version": "1.0",
+    "file_info": [
+      "../InputBar.scala",
+      "../Bar.sv"
+    ],
+    "hdl_file_index": 2
+  },
+  "objects": [
+    {
+      "kind": "module",
+      "obj_name": "Bar",
+      "module_name": "Bar",
+      "hgl_loc": {
+        "begin_column": 10,
+        "begin_line": 21,
+        "end_column": 10,
+        "end_line": 21,
+        "file": 1
+      },
+      "hdl_loc": {
+        "begin_column": 10,
+        "begin_line": 49,
+        "end_column": 10,
+        "end_line": 49,
+        "file": 2
+      },
+      "source_lang_type_info": {
+        "params": [
+          {
+            "name": "size",
+            "type": "int",
+            "value": "32"
+          },
+          {
+            "name": "other",
+            "type": "bool"
+          }
+        ],
+        "type_name": "BarType"
+      },
+      "port_vars": [
+        {
+          "var_name": "inX",
+          "hgl_loc": {
+            "begin_column": 11,
+            "begin_line": 22,
+            "end_column": 11,
+            "end_line": 22,
+            "file": 1
+          },
+          "value": {"sig_name":"x"},
+          "type_name": "logic",
+          "packed_range": [
+            31,
+            0
+          ]
+        },
+        {
+          "var_name": "outY",
+          "hgl_loc": {
+            "begin_column": 12,
+            "begin_line": 23,
+            "end_column": 12,
+            "end_line": 23,
+            "file": 1
+          },
+          "value": {"opcode":"*","operands":[{"sig_name":"x"},{"sig_name":"x"}]},
+          "type_name": "logic",
+          "packed_range": [
+            31,
+            0
+          ]
+        },
+        {
+          "var_name": "varZ",
+          "hgl_loc": {
+            "begin_column": 15,
+            "begin_line": 25,
+            "end_column": 15,
+            "end_line": 25,
+            "file": 1
+          },
+          "value": {"opcode":"*","operands":[{"sig_name":"x"},{"sig_name":"x"}]},
+          "type_name": "logic",
+          "packed_range": [
+            31,
+            0
+          ]
+        },
+        {
+          "var_name": "add",
+          "hgl_loc": {
+            "begin_column": 15,
+            "begin_line": 25,
+            "end_column": 15,
+            "end_line": 25,
+            "file": 1
+          },
+          "value": {"opcode":"+","operands":[{"opcode":"*","operands":[{"sig_name":"x"},{"sig_name":"x"}]},{"sig_name":"x"}]},
+          "type_name": "logic",
+          "packed_range": [
+            31,
+            0
+          ]
+        }
+      ],
+      "children": []
+    }
+  ]
+}

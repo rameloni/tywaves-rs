@@ -1,0 +1,1442 @@
+{
+  "HGLDD": {
+    "version": "1.0",
+    "file_info": [
+      "/home/raffaele/Documents/master-delft/thesis/_tywaves/circt/test/Target/DebugInfo/emit-hgldd.mlir"
+    ]
+  },
+  "objects": [
+    {
+      "hgl_loc": {
+        "begin_column": 8,
+        "begin_line": 185,
+        "end_column": 8,
+        "end_line": 185,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "Aggregates_topData_data",
+      "port_vars": [
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 179,
+            "end_column": 8,
+            "end_line": 179,
+            "file": 1
+          },
+          "packed_range": [
+            31,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "i32"
+          },
+          "type_name": "logic",
+          "var_name": "a"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 180,
+            "end_column": 8,
+            "end_line": 180,
+            "file": 1
+          },
+          "packed_range": [
+            41,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "i42"
+          },
+          "type_name": "logic",
+          "var_name": "b"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 184,
+            "end_column": 8,
+            "end_line": 184,
+            "file": 1
+          },
+          "packed_range": [
+            16,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "i17[2]"
+          },
+          "type_name": "logic",
+          "unpacked_range": [
+            1,
+            0
+          ],
+          "var_name": "c"
+        }
+      ]
+    },
+    {
+      "hgl_loc": {
+        "begin_column": 8,
+        "begin_line": 185,
+        "end_column": 8,
+        "end_line": 185,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "Aggregates_topData_data2",
+      "port_vars": [
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 179,
+            "end_column": 8,
+            "end_line": 179,
+            "file": 1
+          },
+          "packed_range": [
+            31,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "i32"
+          },
+          "type_name": "logic",
+          "var_name": "a"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 180,
+            "end_column": 8,
+            "end_line": 180,
+            "file": 1
+          },
+          "packed_range": [
+            41,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "i42"
+          },
+          "type_name": "logic",
+          "var_name": "b"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 184,
+            "end_column": 8,
+            "end_line": 184,
+            "file": 1
+          },
+          "packed_range": [
+            16,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "i17[2]"
+          },
+          "type_name": "logic",
+          "unpacked_range": [
+            1,
+            0
+          ],
+          "var_name": "c"
+        }
+      ]
+    },
+    {
+      "hgl_loc": {
+        "begin_column": 8,
+        "begin_line": 187,
+        "end_column": 8,
+        "end_line": 187,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "Aggregates_topData",
+      "port_vars": [
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 186,
+            "end_column": 8,
+            "end_line": 186,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "abc_struct"
+          },
+          "type_name": "Aggregates_topData_data",
+          "var_name": "data"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 186,
+            "end_column": 8,
+            "end_line": 186,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "abc_struct"
+          },
+          "type_name": "Aggregates_topData_data2",
+          "var_name": "data2"
+        }
+      ]
+    },
+    {
+      "hgl_loc": {
+        "begin_column": 8,
+        "begin_line": 205,
+        "end_column": 8,
+        "end_line": 205,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "EmptyAggregates_z",
+      "port_vars": [
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 203,
+            "end_column": 8,
+            "end_line": 203,
+            "file": 1
+          },
+          "type_name": "bit",
+          "var_name": "a"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 204,
+            "end_column": 8,
+            "end_line": 204,
+            "file": 1
+          },
+          "type_name": "bit",
+          "var_name": "b"
+        }
+      ]
+    },
+    {
+      "hgl_loc": {
+        "begin_column": 8,
+        "begin_line": 229,
+        "end_column": 8,
+        "end_line": 229,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "SingleElementAggregates_varBar",
+      "port_vars": [
+        {
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 227,
+            "end_column": 8,
+            "end_line": 227,
+            "file": 1
+          },
+          "type_name": "logic",
+          "var_name": "x"
+        }
+      ]
+    },
+    {
+      "kind": "module",
+      "obj_name": "Aggregates",
+      "module_name": "Aggregates",
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 178,
+        "end_column": 1,
+        "end_line": 178,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "topData",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 188,
+            "end_column": 3,
+            "end_line": 188,
+            "file": 1
+          },
+          "value": {"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"data_a"},{"sig_name":"data_b"},{"opcode":"'{","operands":[{"sig_name":"data_c_0"},{"sig_name":"data_c_1"}]}]},{"opcode":"'{","operands":[{"sig_name":"data_a"},{"sig_name":"data_b"},{"opcode":"'{","operands":[{"sig_name":"data_c_0"},{"sig_name":"data_c_1"}]}]}]},
+          "type_name": "Aggregates_topData",
+          "source_lang_type_info": {
+            "type_name": "topStruct"
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "kind": "module",
+      "obj_name": "EmptyAggregates",
+      "module_name": "EmptyAggregates",
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 202,
+        "end_column": 1,
+        "end_line": 202,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "x",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 206,
+            "end_column": 3,
+            "end_line": 206,
+            "file": 1
+          },
+          "value": {"integer_num":0},
+          "type_name": "bit"
+        },
+        {
+          "var_name": "y",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 207,
+            "end_column": 3,
+            "end_line": 207,
+            "file": 1
+          },
+          "value": {"integer_num":0},
+          "type_name": "bit"
+        },
+        {
+          "var_name": "z",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 208,
+            "end_column": 3,
+            "end_line": 208,
+            "file": 1
+          },
+          "value": {"opcode":"'{","operands":[{"integer_num":0},{"integer_num":0}]},
+          "type_name": "EmptyAggregates_z"
+        }
+      ],
+      "children": []
+    },
+    {
+      "kind": "module",
+      "obj_name": "SingleElementAggregates",
+      "module_name": "SingleElementAggregates",
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 223,
+        "end_column": 1,
+        "end_line": 223,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "varFoo",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 230,
+            "end_column": 3,
+            "end_line": 230,
+            "file": 1
+          },
+          "value": {"opcode":"'{","operands":[{"sig_name":"foo"}]},
+          "type_name": "logic",
+          "unpacked_range": [
+            0,
+            0
+          ]
+        },
+        {
+          "var_name": "varBar",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 231,
+            "end_column": 3,
+            "end_line": 231,
+            "file": 1
+          },
+          "value": {"opcode":"'{","operands":[{"sig_name":"bar"}]},
+          "type_name": "SingleElementAggregates_varBar"
+        }
+      ],
+      "children": []
+    },
+    {
+      "kind": "module",
+      "obj_name": "MultiDimensionalArrays",
+      "module_name": "MultiDimensionalArrays",
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 245,
+        "end_column": 1,
+        "end_line": 245,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "array",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 248,
+            "end_column": 3,
+            "end_line": 248,
+            "file": 1
+          },
+          "value": {"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"a"},{"sig_name":"b"},{"sig_name":"c"},{"sig_name":"d"}]}]},
+          "type_name": "logic",
+          "packed_range": [
+            41,
+            0
+          ],
+          "unpacked_range": [
+            0,
+            0,
+            3,
+            0
+          ]
+        }
+      ],
+      "children": []
+    },
+    {
+      "kind": "module",
+      "obj_name": "Expressions",
+      "module_name": "Expressions",
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 252,
+        "end_column": 1,
+        "end_line": 252,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "blockArg",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 256,
+            "end_column": 3,
+            "end_line": 256,
+            "file": 1
+          },
+          "value": {"sig_name":"a"},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "constA",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 292,
+            "end_column": 3,
+            "end_line": 292,
+            "file": 1
+          },
+          "value": {"bit_vector":"00000010100111001"},
+          "type_name": "logic",
+          "packed_range": [
+            16,
+            0
+          ]
+        },
+        {
+          "var_name": "constB",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 293,
+            "end_column": 3,
+            "end_line": 293,
+            "file": 1
+          },
+          "value": {"bit_vector":"000000000000000000000000000010001100101001"},
+          "type_name": "logic",
+          "packed_range": [
+            41,
+            0
+          ]
+        },
+        {
+          "var_name": "constC",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 294,
+            "end_column": 3,
+            "end_line": 294,
+            "file": 1
+          },
+          "value": {"bit_vector":"0000"},
+          "type_name": "logic",
+          "packed_range": [
+            3,
+            0
+          ]
+        },
+        {
+          "var_name": "constD",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 295,
+            "end_column": 3,
+            "end_line": 295,
+            "file": 1
+          },
+          "value": {"bit_vector":"0"},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "readWire",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 302,
+            "end_column": 3,
+            "end_line": 302,
+            "file": 1
+          },
+          "value": {"sig_name":"svWire"},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "readReg",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 309,
+            "end_column": 3,
+            "end_line": 309,
+            "file": 1
+          },
+          "value": {"sig_name":"svReg"},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "readLogic",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 316,
+            "end_column": 3,
+            "end_line": 316,
+            "file": 1
+          },
+          "value": {"sig_name":"svLogic"},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "myWire",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 322,
+            "end_column": 3,
+            "end_line": 322,
+            "file": 1
+          },
+          "value": {"sig_name":"hwWire"},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "unaryParity",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 328,
+            "end_column": 3,
+            "end_line": 328,
+            "file": 1
+          },
+          "value": {"opcode":"^","operands":[{"sig_name":"a"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "binaryAdd",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 334,
+            "end_column": 3,
+            "end_line": 334,
+            "file": 1
+          },
+          "value": {"opcode":"+","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "binarySub",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 340,
+            "end_column": 3,
+            "end_line": 340,
+            "file": 1
+          },
+          "value": {"opcode":"-","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "binaryMul",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 346,
+            "end_column": 3,
+            "end_line": 346,
+            "file": 1
+          },
+          "value": {"opcode":"*","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "binaryDiv1",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 356,
+            "end_column": 3,
+            "end_line": 356,
+            "file": 1
+          },
+          "value": {"opcode":"/","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "binaryDiv2",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 357,
+            "end_column": 3,
+            "end_line": 357,
+            "file": 1
+          },
+          "value": {"opcode":"/","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "binaryMod1",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 367,
+            "end_column": 3,
+            "end_line": 367,
+            "file": 1
+          },
+          "value": {"opcode":"%","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "binaryMod2",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 368,
+            "end_column": 3,
+            "end_line": 368,
+            "file": 1
+          },
+          "value": {"opcode":"%","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "binaryShl",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 382,
+            "end_column": 3,
+            "end_line": 382,
+            "file": 1
+          },
+          "value": {"opcode":"<<","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "binaryShr1",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 383,
+            "end_column": 3,
+            "end_line": 383,
+            "file": 1
+          },
+          "value": {"opcode":">>","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "binaryShr2",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 384,
+            "end_column": 3,
+            "end_line": 384,
+            "file": 1
+          },
+          "value": {"opcode":">>>","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpEq",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 442,
+            "end_column": 3,
+            "end_line": 442,
+            "file": 1
+          },
+          "value": {"opcode":"==","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpNe",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 443,
+            "end_column": 3,
+            "end_line": 443,
+            "file": 1
+          },
+          "value": {"opcode":"!=","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpCeq",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 444,
+            "end_column": 3,
+            "end_line": 444,
+            "file": 1
+          },
+          "value": {"opcode":"===","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpCne",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 445,
+            "end_column": 3,
+            "end_line": 445,
+            "file": 1
+          },
+          "value": {"opcode":"!==","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpWeq",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 446,
+            "end_column": 3,
+            "end_line": 446,
+            "file": 1
+          },
+          "value": {"opcode":"==?","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpWne",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 447,
+            "end_column": 3,
+            "end_line": 447,
+            "file": 1
+          },
+          "value": {"opcode":"!=?","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpUlt",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 448,
+            "end_column": 3,
+            "end_line": 448,
+            "file": 1
+          },
+          "value": {"opcode":"<","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpSlt",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 449,
+            "end_column": 3,
+            "end_line": 449,
+            "file": 1
+          },
+          "value": {"opcode":"<","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpUgt",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 450,
+            "end_column": 3,
+            "end_line": 450,
+            "file": 1
+          },
+          "value": {"opcode":">","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpSgt",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 451,
+            "end_column": 3,
+            "end_line": 451,
+            "file": 1
+          },
+          "value": {"opcode":">","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpUle",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 452,
+            "end_column": 3,
+            "end_line": 452,
+            "file": 1
+          },
+          "value": {"opcode":"<=","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpSle",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 453,
+            "end_column": 3,
+            "end_line": 453,
+            "file": 1
+          },
+          "value": {"opcode":"<=","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpUge",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 454,
+            "end_column": 3,
+            "end_line": 454,
+            "file": 1
+          },
+          "value": {"opcode":">=","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "cmpSge",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 455,
+            "end_column": 3,
+            "end_line": 455,
+            "file": 1
+          },
+          "value": {"opcode":">=","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "opAnd",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 461,
+            "end_column": 3,
+            "end_line": 461,
+            "file": 1
+          },
+          "value": {"opcode":"&","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "opOr",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 467,
+            "end_column": 3,
+            "end_line": 467,
+            "file": 1
+          },
+          "value": {"opcode":"|","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "opXor",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 473,
+            "end_column": 3,
+            "end_line": 473,
+            "file": 1
+          },
+          "value": {"opcode":"^","operands":[{"sig_name":"a"},{"sig_name":"b"}]},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "concat",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 483,
+            "end_column": 3,
+            "end_line": 483,
+            "file": 1
+          },
+          "value": {"opcode":"{}","operands":[{"sig_name":"a"},{"sig_name":"b"},{"sig_name":"explicitName"}]},
+          "type_name": "logic",
+          "packed_range": [
+            2,
+            0
+          ]
+        },
+        {
+          "var_name": "replicate",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 493,
+            "end_column": 3,
+            "end_line": 493,
+            "file": 1
+          },
+          "value": {"opcode":"R{}","operands":[{"integer_num":3},{"sig_name":"a"}]},
+          "type_name": "logic",
+          "packed_range": [
+            2,
+            0
+          ]
+        },
+        {
+          "var_name": "extract",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 504,
+            "end_column": 3,
+            "end_line": 504,
+            "file": 1
+          },
+          "value": {"opcode":"[]","operands":[{"sig_name":"wideWire"},{"integer_num":19},{"integer_num":12}]},
+          "type_name": "logic",
+          "packed_range": [
+            7,
+            0
+          ]
+        },
+        {
+          "var_name": "mux",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 510,
+            "end_column": 3,
+            "end_line": 510,
+            "file": 1
+          },
+          "value": {"opcode":"?:","operands":[{"sig_name":"a"},{"sig_name":"b"},{"sig_name":"explicitName"}]},
+          "type_name": "logic"
+        }
+      ],
+      "children": []
+    },
+    {
+      "kind": "module",
+      "obj_name": "SingleResult",
+      "module_name": "CustomSingleResult123",
+      "isExtModule": 1,
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 516,
+        "end_column": 1,
+        "end_line": 516,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "outPort",
+          "hgl_loc": {
+            "begin_column": 36,
+            "begin_line": 516,
+            "end_column": 36,
+            "end_line": 516,
+            "file": 1
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "kind": "module",
+      "obj_name": "LegalizedNames",
+      "module_name": "LegalizedNames",
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 527,
+        "end_column": 1,
+        "end_line": 527,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "myWire",
+          "hgl_loc": {
+            "begin_column": 13,
+            "begin_line": 530,
+            "end_column": 13,
+            "end_line": 530,
+            "file": 1
+          },
+          "value": {"sig_name":"wire_1"},
+          "type_name": "logic"
+        }
+      ],
+      "children": [
+        {
+          "name": "myInst",
+          "hdl_obj_name": "reg_0",
+          "obj_name": "Dummy",
+          "module_name": "CustomDummy",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 528,
+            "end_column": 3,
+            "end_line": 528,
+            "file": 1
+          }
+        }
+      ]
+    },
+    {
+      "kind": "module",
+      "obj_name": "Dummy",
+      "module_name": "CustomDummy",
+      "isExtModule": 1,
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 532,
+        "end_column": 1,
+        "end_line": 532,
+        "file": 1
+      },
+      "port_vars": [],
+      "children": []
+    },
+    {
+      "kind": "module",
+      "obj_name": "InlineScopes",
+      "module_name": "InlineScopes",
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 548,
+        "end_column": 1,
+        "end_line": 548,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "x",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 551,
+            "end_column": 3,
+            "end_line": 551,
+            "file": 1
+          },
+          "value": {"sig_name":"a"},
+          "type_name": "logic",
+          "packed_range": [
+            41,
+            0
+          ]
+        }
+      ],
+      "children": [
+        {
+          "name": "child",
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 549,
+            "end_column": 8,
+            "end_line": 549,
+            "file": 1
+          },
+          "port_vars": [
+            {
+              "var_name": "y",
+              "hgl_loc": {
+                "begin_column": 3,
+                "begin_line": 552,
+                "end_column": 3,
+                "end_line": 552,
+                "file": 1
+              },
+              "value": {"sig_name":"a"},
+              "type_name": "logic",
+              "packed_range": [
+                41,
+                0
+              ]
+            }
+          ],
+          "children": [
+            {
+              "name": "more",
+              "hgl_loc": {
+                "begin_column": 8,
+                "begin_line": 550,
+                "end_column": 8,
+                "end_line": 550,
+                "file": 1
+              },
+              "port_vars": [
+                {
+                  "var_name": "z",
+                  "hgl_loc": {
+                    "begin_column": 3,
+                    "begin_line": 553,
+                    "end_column": 3,
+                    "end_line": 553,
+                    "file": 1
+                  },
+                  "value": {"sig_name":"a"},
+                  "type_name": "logic",
+                  "packed_range": [
+                    41,
+                    0
+                  ]
+                }
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "module",
+      "obj_name": "Issue6735_Case1",
+      "module_name": "Issue6735_Case1",
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 558,
+        "end_column": 1,
+        "end_line": 558,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "varA",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 565,
+            "end_column": 3,
+            "end_line": 565,
+            "file": 1
+          },
+          "value": {"sig_name":"wireA"},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "varB",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 574,
+            "end_column": 3,
+            "end_line": 574,
+            "file": 1
+          },
+          "value": {"sig_name":"wireB"},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "varC",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 582,
+            "end_column": 3,
+            "end_line": 582,
+            "file": 1
+          },
+          "value": {"sig_name":"wireC"},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "varD",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 590,
+            "end_column": 3,
+            "end_line": 590,
+            "file": 1
+          },
+          "value": {"sig_name":"wireD"},
+          "type_name": "logic"
+        },
+        {
+          "var_name": "varZ",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 600,
+            "end_column": 3,
+            "end_line": 600,
+            "file": 1
+          },
+          "value": {"sig_name":"someOutput"},
+          "type_name": "logic"
+        }
+      ],
+      "children": [
+        {
+          "name": "instA",
+          "hdl_obj_name": "instAVerilog",
+          "obj_name": "SingleResult",
+          "module_name": "CustomSingleResult123",
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 564,
+            "end_column": 8,
+            "end_line": 564,
+            "file": 1
+          }
+        },
+        {
+          "name": "instB",
+          "obj_name": "SingleResult",
+          "module_name": "CustomSingleResult123",
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 573,
+            "end_column": 8,
+            "end_line": 573,
+            "file": 1
+          }
+        },
+        {
+          "name": "instC",
+          "obj_name": "SingleResult",
+          "module_name": "CustomSingleResult123",
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 581,
+            "end_column": 8,
+            "end_line": 581,
+            "file": 1
+          }
+        },
+        {
+          "name": "instD",
+          "obj_name": "SingleResult",
+          "module_name": "CustomSingleResult123",
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 589,
+            "end_column": 8,
+            "end_line": 589,
+            "file": 1
+          }
+        },
+        {
+          "name": "instZ",
+          "obj_name": "SingleResult",
+          "module_name": "CustomSingleResult123",
+          "hgl_loc": {
+            "begin_column": 8,
+            "begin_line": 599,
+            "end_column": 8,
+            "end_line": 599,
+            "file": 1
+          }
+        }
+      ]
+    },
+    {
+      "kind": "module",
+      "obj_name": "Issue6735_Case2",
+      "module_name": "Issue6735_Case2",
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 605,
+        "end_column": 1,
+        "end_line": 605,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "portA",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 612,
+            "end_column": 3,
+            "end_line": 612,
+            "file": 1
+          },
+          "value": {"sig_name":"x"},
+          "type_name": "logic",
+          "packed_range": [
+            35,
+            0
+          ]
+        },
+        {
+          "var_name": "portB",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 618,
+            "end_column": 3,
+            "end_line": 618,
+            "file": 1
+          },
+          "value": {"sig_name":"verilogY"},
+          "type_name": "logic",
+          "packed_range": [
+            35,
+            0
+          ]
+        }
+      ],
+      "children": [
+        {
+          "name": "bar",
+          "obj_name": "MultipleResults",
+          "module_name": "MultipleResults",
+          "hgl_loc": {
+            "begin_column": 12,
+            "begin_line": 606,
+            "end_column": 12,
+            "end_line": 606,
+            "file": 1
+          }
+        }
+      ]
+    },
+    {
+      "kind": "module",
+      "obj_name": "MultipleResults",
+      "module_name": "MultipleResults",
+      "isExtModule": 1,
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 621,
+        "end_column": 1,
+        "end_line": 621,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "a",
+          "hgl_loc": {
+            "begin_column": 39,
+            "begin_line": 621,
+            "end_column": 39,
+            "end_line": 621,
+            "file": 1
+          }
+        },
+        {
+          "var_name": "b",
+          "hgl_loc": {
+            "begin_column": 52,
+            "begin_line": 621,
+            "end_column": 52,
+            "end_line": 621,
+            "file": 1
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "kind": "module",
+      "obj_name": "Issue6749",
+      "module_name": "Issue6749",
+      "hgl_loc": {
+        "begin_column": 1,
+        "begin_line": 624,
+        "end_column": 1,
+        "end_line": 624,
+        "file": 1
+      },
+      "port_vars": [
+        {
+          "var_name": "_GEN",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 627,
+            "end_column": 3,
+            "end_line": 627,
+            "file": 1
+          },
+          "value": {"sig_name":"a"},
+          "type_name": "logic",
+          "packed_range": [
+            41,
+            0
+          ]
+        },
+        {
+          "var_name": "myVar",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 633,
+            "end_column": 3,
+            "end_line": 633,
+            "file": 1
+          },
+          "value": {"sig_name":"a"},
+          "type_name": "logic",
+          "packed_range": [
+            41,
+            0
+          ]
+        },
+        {
+          "var_name": "myVar_0",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 634,
+            "end_column": 3,
+            "end_line": 634,
+            "file": 1
+          },
+          "value": {"sig_name":"a"},
+          "type_name": "logic",
+          "packed_range": [
+            41,
+            0
+          ]
+        },
+        {
+          "var_name": "signed_0",
+          "hgl_loc": {
+            "begin_column": 3,
+            "begin_line": 639,
+            "end_column": 3,
+            "end_line": 639,
+            "file": 1
+          },
+          "value": {"sig_name":"a"},
+          "type_name": "logic",
+          "packed_range": [
+            41,
+            0
+          ]
+        }
+      ],
+      "children": [
+        {
+          "name": "_GEN_0",
+          "hgl_loc": {
+            "begin_column": 12,
+            "begin_line": 644,
+            "end_column": 12,
+            "end_line": 644,
+            "file": 1
+          },
+          "port_vars": [],
+          "children": []
+        }
+      ]
+    }
+  ]
+}

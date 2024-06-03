@@ -1,0 +1,151 @@
+{
+    "HGLDD": {
+      "version": "1.0",
+      "file_info": [
+        "InputFoo.scala",
+        "Foo.sv",
+        "InputBar.scala"
+      ],
+      "hdl_file_index": 2
+    },
+    "objects": [
+      {
+        "kind": "module",
+        "obj_name": "Foo",
+        "module_name": "Foo",
+        "hgl_loc": {
+          "begin_column": 10,
+          "begin_line": 4,
+          "end_column": 10,
+          "end_line": 4,
+          "file": 1
+        },
+        "hdl_loc": {
+          "begin_column": 10,
+          "begin_line": 42,
+          "end_column": 10,
+          "end_line": 42,
+          "file": 2
+        },
+        "port_vars": [
+          {
+            "var_name": "inA",
+            "hgl_loc": {
+              "begin_column": 11,
+              "begin_line": 5,
+              "end_column": 11,
+              "end_line": 5,
+              "file": 1
+            },
+            "value": {"sig_name":"a"},
+            "type_name": "logic",
+            "packed_range": [
+              31,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "SInt<32>"
+            }
+          },
+          {
+            "var_name": "outB",
+            "hgl_loc": {
+              "begin_column": 12,
+              "begin_line": 6,
+              "end_column": 12,
+              "end_line": 6,
+              "file": 1
+            },
+            "value": {"sig_name":"b"},
+            "type_name": "logic",
+            "packed_range": [
+              31,
+              0
+            ],
+            "source_lang_type_info": {
+              "params": [
+                {
+                  "name": "size",
+                  "type": "uint",
+                  "value": "32"
+                }
+              ]
+            }
+          },
+          {
+            "var_name": "var1",
+            "hgl_loc": {
+              "begin_column": 12,
+              "begin_line": 6,
+              "end_column": 12,
+              "end_line": 6,
+              "file": 1
+            },
+            "value": {"bit_vector":"00101010"},
+            "type_name": "logic",
+            "packed_range": [
+              7,
+              0
+            ],
+            "source_lang_type_info": {
+              "params": [
+                {
+                  "name": "n",
+                  "type": "int",
+                  "value": "42"
+                },
+                {
+                  "name": "a",
+                  "type": "myType"
+                }
+              ],
+              "type_name": "UInt<8>"
+            }
+          },
+          {
+            "var_name": "var2",
+            "hgl_loc": {
+              "begin_column": 12,
+              "begin_line": 6,
+              "end_column": 12,
+              "end_line": 6,
+              "file": 1
+            },
+            "value": {"bit_vector":"00010101"},
+            "type_name": "logic",
+            "packed_range": [
+              7,
+              0
+            ]
+          }
+        ],
+        "children": [
+          {
+            "name": "b0",
+            "obj_name": "Bar",
+            "module_name": "Bar",
+            "hgl_loc": {
+              "begin_column": 5,
+              "begin_line": 8,
+              "end_column": 5,
+              "end_line": 8,
+              "file": 3
+            }
+          },
+          {
+            "name": "b1",
+            "obj_name": "Bar",
+            "module_name": "Bar",
+            "hgl_loc": {
+              "begin_column": 5,
+              "begin_line": 14,
+              "end_column": 5,
+              "end_line": 14,
+              "file": 3
+            }
+          }
+        ]
+      }
+    ]
+  }
+  

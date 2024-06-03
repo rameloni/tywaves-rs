@@ -1,0 +1,373 @@
+{
+    "HGLDD": {
+      "version": "1.0",
+      "file_info": [
+        "Documents/master-delft/thesis/_tywaves/tywaves-chisel-demo/src/test/scala/gcd/GCD.scala",
+        ""
+      ],
+      "hdl_file_index": 2
+    },
+    "objects": [
+      {
+        "hgl_loc": {
+          "begin_column": 14,
+          "begin_line": 75,
+          "end_column": 14,
+          "end_line": 75,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "WithBundlesAndVecs_io_b_b",
+        "source_lang_type_info": {
+          "type_name": "AnonymousBundle"
+        },
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 14,
+              "begin_line": 75,
+              "end_column": 14,
+              "end_line": 75,
+              "file": 1
+            },
+            "packed_range": [
+              31,
+              0
+            ],
+            "type_name": "logic",
+            "unpacked_range": [
+              1,
+              0
+            ],
+            "var_name": "vec"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 14,
+          "begin_line": 75,
+          "end_column": 14,
+          "end_line": 75,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "WithBundlesAndVecs_io_b",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 7,
+              "begin_line": 74,
+              "end_column": 7,
+              "end_line": 74,
+              "file": 1
+            },
+            "packed_range": [
+              31,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "UInt<32>"
+            },
+            "type_name": "logic",
+            "var_name": "a"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 14,
+              "begin_line": 75,
+              "end_column": 14,
+              "end_line": 75,
+              "file": 1
+            },
+            "type_name": "WithBundlesAndVecs_io_b_b",
+            "var_name": "b"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 14,
+          "begin_line": 75,
+          "end_column": 14,
+          "end_line": 75,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "WithBundlesAndVecs_io_vec_y",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 7,
+              "begin_line": 74,
+              "end_column": 7,
+              "end_line": 74,
+              "file": 1
+            },
+            "packed_range": [
+              31,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "ShouldBeIgnored"
+            },
+            "type_name": "logic",
+            "var_name": "z"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 14,
+          "begin_line": 75,
+          "end_column": 14,
+          "end_line": 75,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "WithBundlesAndVecs_io_vec",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 7,
+              "begin_line": 74,
+              "end_column": 7,
+              "end_line": 74,
+              "file": 1
+            },
+            "packed_range": [
+              31,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "SInt<32>"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 14,
+              "begin_line": 75,
+              "end_column": 14,
+              "end_line": 75,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "AnonymousBundle"
+            },
+            "type_name": "WithBundlesAndVecs_io_vec_y",
+            "var_name": "y"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 14,
+          "begin_line": 75,
+          "end_column": 14,
+          "end_line": 75,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "WithBundlesAndVecs_io_vec_y_0",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 7,
+              "begin_line": 74,
+              "end_column": 7,
+              "end_line": 74,
+              "file": 1
+            },
+            "packed_range": [
+              31,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "SInt<32>"
+            },
+            "type_name": "logic",
+            "var_name": "z"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 14,
+          "begin_line": 75,
+          "end_column": 14,
+          "end_line": 75,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "WithBundlesAndVecs_io_vec_0",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 7,
+              "begin_line": 74,
+              "end_column": 7,
+              "end_line": 74,
+              "file": 1
+            },
+            "packed_range": [
+              31,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "SInt<32>"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 14,
+              "begin_line": 75,
+              "end_column": 14,
+              "end_line": 75,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "AnonymousBundle"
+            },
+            "type_name": "WithBundlesAndVecs_io_vec_y_0",
+            "var_name": "y"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 14,
+          "begin_line": 75,
+          "end_column": 14,
+          "end_line": 75,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "WithBundlesAndVecs_io",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 7,
+              "begin_line": 74,
+              "end_column": 7,
+              "end_line": 74,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "UInt<32>"
+            },
+            "packed_range": [
+              31,
+              0
+            ],
+            "type_name": "logic",
+            "var_name": "a"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 14,
+              "begin_line": 75,
+              "end_column": 14,
+              "end_line": 75,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "SubBundleB"
+            },
+            "type_name": "WithBundlesAndVecs_io_b",
+            "var_name": "b"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 14,
+              "begin_line": 75,
+              "end_column": 14,
+              "end_line": 75,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "VecType"
+            },
+            "type_name": "WithBundlesAndVecs_io_vec_0",
+            "unpacked_range": [
+              1,
+              0
+              // TODO: make the example with multi dim vecs
+            ],
+            "var_name": "vec"
+          }
+        ]
+      },
+      {
+        "kind": "module",
+        "obj_name": "WithBundlesAndVecs",
+        "module_name": "WithBundlesAndVecs",
+        "hgl_loc": {
+          "begin_column": 7,
+          "begin_line": 74,
+          "end_column": 7,
+          "end_line": 74,
+          "file": 1
+        },
+        "hdl_loc": {
+          "begin_line": 2,
+          "end_line": 2,
+          "file": 2
+        },
+        "source_lang_type_info": {
+          "params": [
+            {
+              "name": "a_param",
+              "type": "bool"
+            }
+          ],
+          "type_name": "WithBundlesAndVecsModule"
+        },
+        "port_vars": [
+          {
+            "var_name": "clock",
+            "hgl_loc": {
+              "begin_column": 7,
+              "begin_line": 74,
+              "end_column": 7,
+              "end_line": 74,
+              "file": 1
+            },
+            "value": {"sig_name":"clock"},
+            "type_name": "logic"
+          },
+          {
+            "var_name": "reset",
+            "hgl_loc": {
+              "begin_column": 7,
+              "begin_line": 74,
+              "end_column": 7,
+              "end_line": 74,
+              "file": 1
+            },
+            "value": {"sig_name":"reset"},
+            "type_name": "logic"
+          },
+          {
+            "var_name": "io",
+            "hgl_loc": {
+              "begin_column": 14,
+              "begin_line": 75,
+              "end_column": 14,
+              "end_line": 75,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "InterfaceIOBundle"
+            },
+            "value": {"opcode":"'{","operands":[{"sig_name":"io_a_0"},{"opcode":"'{","operands":[{"sig_name":"io_b_a_0"},{"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"io_b_b_vec_0_0"},{"sig_name":"io_b_b_vec_1_0"}]}]}]},{"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"io_vec_0_x_0"},{"opcode":"'{","operands":[{"sig_name":"io_vec_0_y_z_0"}]}]},{"opcode":"'{","operands":[{"sig_name":"io_vec_1_x_0"},{"opcode":"'{","operands":[{"sig_name":"io_vec_1_y_z_0"}]}]}]}]},
+            "type_name": "WithBundlesAndVecs_io"
+          }
+        ],
+        "children": []
+      }
+    ]
+  }
