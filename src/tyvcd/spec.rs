@@ -198,6 +198,53 @@ impl Variable {
         }
         ground_variables
     }
+
+    #[deprecated = "Should be removed. A better version from trace value should be used instead"]
+    pub fn create_val_repr(&self, raw_val_vcd: &str) -> String {
+        let size = self.kind.find_width() as usize;
+
+        if raw_val_vcd.len() < size {
+            return String::from("---");
+        }
+
+        match &self.kind {
+            VariableKind::Ground(width) => {
+                if *width <= 1 {
+                    raw_val_vcd.to_string()
+                } else {
+                    format!(
+                        "{} {}: {raw_val_vcd}",
+                        &self.high_level_info.type_name, &self.name
+                    )
+                }
+            }
+
+            VariableKind::Vector { fields } | VariableKind::Struct { fields } => {
+                // Encode the fields recursively {x, {y, z}} or [x, y, z]
+                let (lb, sep, rb) = match &self.kind {
+                    VariableKind::Vector { .. } => ("[", ", ", ']'),
+                    VariableKind::Struct { .. } => ("{", ", ", '}'),
+                    _ => unreachable!(),
+                };
+
+                let mut value =
+                    format!("{} {}: {}", &self.high_level_info.type_name, &self.name, lb);
+
+                let mut start_idx = 0;
+                for field in fields {
+                    let end_idx = start_idx + field.kind.find_width() as usize;
+                    value.push_str(&field.create_val_repr(&raw_val_vcd[start_idx..end_idx]));
+                    value.push_str(sep);
+                    start_idx = end_idx;
+                }
+                value.pop();
+                value.pop();
+                value.push(rb);
+                value
+            }
+            VariableKind::External => todo!("Unknown type not implemented"),
+        }
+    }
 }
 
 impl TraceGetter for Variable {
