@@ -19,36 +19,39 @@ pub struct TyVcd {
 
 impl TraceFinder for TyVcd {
     /// Return the element pointing to the trace path.
-    fn find_trace(&self, full_path: &[String]) -> Option<Ref<dyn TraceGetter>> {
+    ///
+    /// **Important**: The returned reference is a reference counted with interior mutability.
+    /// This means that preventing to internal changes is left to the user.
+    fn find_trace(&self, full_path: &[String]) -> Option<Rc<RefCell<dyn TraceGetter>>> {
+        fn find_trace_impl(
+            root: &Rc<RefCell<ScopeDef>>,
+            full_path: &[String],
+        ) -> Option<Rc<RefCell<dyn TraceGetter>>> {
+            if full_path.len() == 1 {
+                // Exactly one scope -> the root
+                Some(root.clone())
+            } else {
+                // Initalize the pointer to the root scope
+                let mut guess_scope_ptr = root.clone();
+                // More than one scope specified
+                let mut path = &full_path[1..];
+                while path.len() > 1 {
+                    // Explore the path and search for the actual guessed scope
+                    guess_scope_ptr = ScopeDef::find_subscope2(&guess_scope_ptr, &path[0])?;
+                    path = &path[1..]; // Move to the next scope
+                }
+                if let Some(variable) = guess_scope_ptr.clone().borrow().find_variable(&path[0]) {
+                    Some(Rc::new(RefCell::new(variable.clone())))
+                } else {
+                    let subscope = ScopeDef::find_subscope2(&guess_scope_ptr, &path[0])?;
+                    Some(subscope)
+                }
+            }
+        }
+        // fn find_trace<'a>(&'a self, full_path: &[String]) -> Option<Ref<'a, dyn TraceGetter>> {
         // Get the root scope
         let root = self.scopes.get(full_path.first()?)?;
-
-        if full_path.len() == 1 {
-            // Exactly one scope -> the root
-            Some(root.borrow())
-        } else {
-            // More than one scope specified
-            let mut path = &full_path[1..];
-
-            // Initalize the pointer to the root scope
-            let mut guess_scope_ptr = root.clone();
-            while path.len() > 1 {
-                // Explore the path and search for the actual guessed scope
-                guess_scope_ptr = guess_scope_ptr.clone().borrow().find_subscope(&path[0])?;
-                path = &path[1..]; // Move to the next scope
-            }
-
-            // Return
-            if let Some(variable) = guess_scope_ptr.clone().borrow().find_variable(&path[0]) {
-                // Some(RefCell::new(variable).borrow())
-                None // TODO: Return the actual reference to the variable
-            } else {
-                let subscope = guess_scope_ptr.borrow().find_subscope(&path[0])?;
-                // Some(subscope.borrow())
-                None // TODO: Return the actual reference to the variable
-            }
-            // None
-        }
+        find_trace_impl(root, full_path)
     }
 }
 
@@ -95,7 +98,13 @@ impl Scope {
 
     /// Find a subscope in the scope.
     fn find_subscope(&self, name: &str) -> Option<Rc<RefCell<ScopeDef>>> {
-        Some(self.subscopes.get(name)?.clone())
+        // Some(self.subscopes.get(name)?.clone())
+        self.subscopes.get(name).cloned()
+    }
+
+    fn find_subscope2(parent: &Rc<RefCell<ScopeDef>>, name: &str) -> Option<Rc<RefCell<ScopeDef>>> {
+        // Some(self.subscopes.get(name)?.clone())
+        parent.borrow().subscopes.get(name).cloned()
     }
 
     /// Find a variable in the scope.

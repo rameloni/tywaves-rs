@@ -72,7 +72,16 @@ fn test_trace_pointer() {
 
     let foo = tyvcd_foo
         .find_trace(&["Foo".to_string()])
-        .and_then(|trace| Some(trace.as_any().downcast_ref::<Scope>()?.clone()))
+        .and_then(|trace| {
+            Some(
+                trace
+                    .clone()
+                    .borrow()
+                    .as_any()
+                    .downcast_ref::<Scope>()?
+                    .clone(),
+            )
+        })
         .expect("failed to downcast");
 
     assert_eq!(foo.get_trace_name().unwrap(), "Foo");
@@ -80,7 +89,16 @@ fn test_trace_pointer() {
 
     let bar0 = tyvcd_foo
         .find_trace(&["Foo".to_string(), "b0".to_string()])
-        .and_then(|trace| Some(trace.as_any().downcast_ref::<Scope>()?.clone()))
+        .and_then(|trace| {
+            Some(
+                trace
+                    .clone()
+                    .borrow()
+                    .as_any()
+                    .downcast_ref::<Scope>()?
+                    .clone(),
+            )
+        })
         .expect("failed to downcast");
 
     assert_eq!(bar0.get_trace_name().unwrap(), "b0");
@@ -88,14 +106,32 @@ fn test_trace_pointer() {
 
     let bar1 = tyvcd_foo
         .find_trace(&["Foo".to_string(), "b1".to_string()])
-        .and_then(|trace| Some(trace.as_any().downcast_ref::<Scope>()?.clone()))
+        .and_then(|trace| {
+            Some(
+                trace
+                    .clone()
+                    .borrow()
+                    .as_any()
+                    .downcast_ref::<Scope>()?
+                    .clone(),
+            )
+        })
         .expect("failed to downcast");
 
     assert_eq!(bar1.get_trace_name().unwrap(), "b1");
 
     let a = tyvcd_foo
         .find_trace(&["Foo".to_string(), "a".to_string()])
-        .and_then(|trace| Some(trace.as_any().downcast_ref::<Variable>()?.clone()))
+        .and_then(|trace| {
+            Some(
+                trace
+                    .clone()
+                    .borrow_mut()
+                    .as_any()
+                    .downcast_ref::<Variable>()?
+                    .clone(),
+            )
+        })
         .expect("failed to downcast");
     assert_eq!(a.name, "inA");
 
@@ -109,7 +145,16 @@ fn test_trace_pointer() {
     let tyvcd_foo = foo::create_foo();
     let bar_x = tyvcd_foo
         .find_trace(&["Foo".to_string(), "b0".to_string(), "x".to_string()])
-        .and_then(|trace| Some(trace.as_any().downcast_ref::<Variable>()?.clone()))
+        .and_then(|trace| {
+            Some(
+                trace
+                    .clone()
+                    .borrow()
+                    .as_any()
+                    .downcast_ref::<Variable>()?
+                    .clone(),
+            )
+        })
         .expect("failed to downcast");
 
     assert_eq!(bar_x.name, "inX");
@@ -118,7 +163,16 @@ fn test_trace_pointer() {
     println!("{:#?}", tyvcd_with_bundles_and_vecs);
     let bar_x = tyvcd_with_bundles_and_vecs
         .find_trace(&["WithBundlesAndVecs".to_string(), "io_a_0".to_string()])
-        .and_then(|trace| Some(trace.as_any().downcast_ref::<Variable>()?.clone()))
+        .and_then(|trace| {
+            Some(
+                trace
+                    .clone()
+                    .borrow()
+                    .as_any()
+                    .downcast_ref::<Variable>()?
+                    .clone(),
+            )
+        })
         .expect("failed to downcast");
     assert_eq!(
         bar_x,
