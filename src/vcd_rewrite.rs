@@ -110,8 +110,10 @@ impl VcdRewriter {
         }
 
         // Add the child scopes to the header
-        for child_scope in &scope.subscopes {
-            self.add_scope_to_header(child_scope, child_path_scope)?;
+        for (_, child_scope) in &scope.subscopes {
+            let child_scope = child_scope.borrow();
+
+            self.add_scope_to_header(&child_scope, child_path_scope)?;
         }
 
         self.writer.upscope()?;

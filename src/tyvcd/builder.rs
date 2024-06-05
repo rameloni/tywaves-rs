@@ -1,5 +1,5 @@
-use super::spec::*;
-use std::collections::HashMap;
+use super::{spec::*, trace_pointer::TraceGetter};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use crate::hgldd::spec as hgldd;
 
@@ -21,10 +21,8 @@ pub struct TyVcdBuilder<T> {
 impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
     /// Build a [TyVcd] from a list of [hgldd::Hgldd] objects.
     fn build(&mut self) {
-        type ScopeId = String;
-
         // Store the scopes found in the hgldd objects
-        let mut scopes: HashMap<ScopeId, Scope> = HashMap::new();
+        let mut scopes: HashMap<ScopeId, Rc<RefCell<Scope>>> = HashMap::new();
 
         // Iterates over the hgldd objects
         for hgldd in &self.origin_list {
@@ -39,6 +37,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                         } else {
                             &obj.obj_name
                         };
+
                         let high_level_info =
                             Self::create_type_info_or(obj.source_lang_type_info.as_ref(), || {
                                 obj.obj_name.clone()
@@ -52,7 +51,11 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                         if let Some(children) = &obj.children {
                             for inst in children {
                                 let emptyscope = Self::create_empty_scope_from_instance(inst);
-                                scope.subscopes.push(emptyscope);
+                                // scope.subscopes.push(emptyscope);
+                                scope.subscopes.insert(
+                                    emptyscope.get_trace_name().unwrap().clone(),
+                                    Rc::new(RefCell::new(emptyscope)),
+                                );
                             }
                         }
                         // Check the port vars inside the module
@@ -61,8 +64,11 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                             scope.variables.push(variable);
                         }
 
-                        // Update the found scopes
-                        scopes.insert(trace_name.clone(), scope);
+                        // Update the found scopes, the key is the name trace_name of the scope
+                        scopes.insert(
+                            scope.get_trace_name().unwrap().clone(),
+                            Rc::new(RefCell::new(scope)),
+                        );
                     }
                 }
             }
@@ -96,12 +102,15 @@ impl TyVcdBuilder<hgldd::Hgldd> {
 
     // Create an empty scope from an hgldd instace
     fn create_empty_scope_from_instance(hgldd_inst: &hgldd::Instance) -> Scope {
+        // Identify among the traces
         let trace_name = if let Some(hdl_obj_name) = &hgldd_inst.hdl_obj_name {
-            hdl_obj_name
+            // hdl_obj_name // TODO: this wasn't working, no idea why
+            &hgldd_inst.name
         } else {
             &hgldd_inst.name
         };
 
+        // Identify the definition of the instance
         let name = if let Some(hgl_obj_name) = &hgldd_inst.obj_name {
             hgl_obj_name
         } else {
@@ -274,35 +283,40 @@ impl TyVcdBuilder<hgldd::Hgldd> {
     fn fill_tyvcd_subscopes(&mut self) -> Result<(), &'static str> {
         let tyvcd = self.tyvcd.as_mut().ok_or("TyVcd not initialized")?;
 
-        let copy_scopes = tyvcd.scopes.clone();
+        // Get a copy of the scopes
+        let original_scope_map = tyvcd.scopes.clone();
 
         // For each Scope found in the list
-        for scope_def in tyvcd.scopes.values_mut() {
-            // 1. Check if it has instances (subscopes)
-            for subscope in &mut scope_def.subscopes {
-                // 1.1 if yes, search for module definitions in the same list
-                let subscope_name = &subscope.name;
+        for (_, scope_def) in tyvcd.scopes.iter_mut() {
+            // Get the scope definition
+            let mut scope_def = scope_def.borrow_mut();
 
-                // Get the module definition
-                if let Some(module_def) = copy_scopes.get(subscope_name) {
+            // 1. Check if it has instances (subscopes)
+            for (_, subscope_def) in (*scope_def).subscopes.iter_mut() {
+                let mut subscope_def = subscope_def.borrow_mut();
+                // Get the real module definition from the original list
+                if let Some(module_def) = original_scope_map.get(&subscope_def.name) {
+                    let module_def = module_def.borrow();
                     // SubScope contains the actual trace_name
-                    subscope.high_level_info = module_def.high_level_info.clone();
-                    subscope.name = module_def.name.clone();
-                    subscope.variables = module_def.variables.clone();
-                    subscope.subscopes = module_def.subscopes.clone();
+                    subscope_def.high_level_info = module_def.high_level_info.clone();
+                    subscope_def.name = module_def.name.clone();
+                    subscope_def.variables = module_def.variables.clone();
+                    subscope_def.subscopes = module_def.subscopes.clone();
                 }
             }
         }
 
         // Keep only the top scopes
         let mut top_scopes = HashMap::new();
-        for (name, scope) in &tyvcd.scopes {
-            if !tyvcd
-                .scopes
-                .values()
-                .any(|s| s.subscopes.iter().any(|ss| &ss.name == name))
-            {
-                top_scopes.insert(name.clone(), scope.clone());
+        for (def_name, scope) in &tyvcd.scopes {
+            if !tyvcd.scopes.values().any(|s| {
+                let s = s.borrow();
+                // s.subscopes.get(trace_name).is_some()
+                s.subscopes
+                    .iter()
+                    .any(|(_, ss)| &ss.borrow().name == def_name)
+            }) {
+                top_scopes.insert(def_name.clone(), scope.clone());
             }
         }
         tyvcd.scopes = top_scopes;
@@ -414,5 +428,121 @@ mod helper {
                 value: val.value,
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::tyvcd::builder::hgldd::Hgldd;
+    use crate::tyvcd::builder::GenericBuilder;
+    use crate::tyvcd::trace_pointer::TraceGetter;
+    use crate::{hgldd, tyvcd};
+    #[test]
+    fn test_sub_sub_scopes() {
+        let hgldd_str = r#"
+        { "HGLDD": { "version": "1.0", "file_info": [] },
+            "objects": [{ "kind": "module", "obj_name": "D", "module_name": "D", "source_lang_type_info": { "type_name": "D" },
+                "port_vars": [
+                  { "var_name": "clock", "value": {"sig_name":"clock"}, "type_name": "logic", "source_lang_type_info": { "type_name": "IO[Clock]" }},
+                  { "var_name": "reset", "value": {"sig_name":"reset"}, "type_name": "logic", "source_lang_type_info": { "type_name": "IO[Bool]" }},
+                  { "var_name": "i",     "value": {"sig_name":"i"},     "type_name": "logic", "source_lang_type_info": { "type_name": "IO[Bool]" }}
+                ],
+                "children": [{ "name": "c1", "obj_name": "C", "module_name": "C" }]
+              }]
+        } 
+        { "HGLDD": { "version": "1.0", "file_info": [] },
+            "objects": [{
+                "kind": "module", "obj_name": "C", "module_name": "C", "source_lang_type_info": { "type_name": "C" },
+                "port_vars": [
+                  { "var_name": "clock", "value": {"sig_name":"clock"}, "type_name": "logic", "source_lang_type_info": { "type_name": "IO[Clock]" }},
+                  { "var_name": "reset", "value": {"sig_name":"reset"}, "type_name": "logic", "source_lang_type_info": { "type_name": "IO[Reset]" }},
+                  { "var_name": "i",     "value": {"sig_name":"i"},     "type_name": "logic", "source_lang_type_info": { "type_name": "IO[Bool]" }}
+                ],
+                "children": [
+                  { "name": "B_0", "hdl_obj_name": "B", "obj_name": "B", "module_name": "B" },
+                  { "name": "B_1",                      "obj_name": "B", "module_name": "B" }
+                ]
+            }]
+        }
+        { "HGLDD": { "version": "1.0", "file_info": [] },
+            "objects": [
+              {
+                "kind": "module", "obj_name": "B", "module_name": "B", "source_lang_type_info": { "type_name": "B" },
+                "port_vars": [{ "var_name": "i", "value": {"sig_name":"i"}, "type_name": "logic", "source_lang_type_info": { "type_name": "IO[Bool]" }}],
+                "children": [
+                  { "name": "A_0", "hdl_obj_name": "A", "obj_name": "A", "module_name": "A" },
+                  { "name": "A_1",                      "obj_name": "A", "module_name": "A" }
+                ]
+              }]
+        }
+        { "HGLDD": { "version": "1.0", "file_info": [] },
+            "objects": [
+              { 
+                "kind": "module", "obj_name": "A", "module_name": "A", "source_lang_type_info": { "type_name": "A"},
+                "port_vars": [{ "var_name": "i", "value": {"sig_name":"i"}, "type_name": "logic", "source_lang_type_info": { "type_name": "IO[Bool]" }}],
+                "children": []
+              }
+            ]
+        }
+        "#;
+
+        let hgldds = hgldd::reader::parse_hgldds_pub(hgldd_str);
+        let mut builder = super::TyVcdBuilder::init(hgldds);
+        builder.build();
+        let tyvcd = builder.get_ref();
+
+        // Check it is created
+        assert!(tyvcd.is_some());
+        let tyvcd = tyvcd.unwrap();
+        // tyvcd contain the top scope D
+        assert!(tyvcd.scopes.get("D").is_some());
+        // Check the hierarchy
+        // D
+        // |_ c1: C
+        //   |_ B_0: B
+        //     |_ A_0: A
+        //     |_ A_1: A
+        //   |_ B_1: B
+        //     |_ A_0: A
+        //     |_ A_1: A
+
+        // D has c1 only as subscope
+        let d = tyvcd.scopes.get("D").unwrap().borrow();
+        assert_eq!(d.subscopes.len(), 1);
+        let c1 = d.subscopes.get("c1").unwrap().borrow();
+        assert_eq!(c1.get_trace_name().unwrap(), "c1");
+        // c1 has B_0 and B_1 as subscopes
+        let (b0, b1) = (
+            c1.subscopes.get("B_0").unwrap().borrow(),
+            c1.subscopes.get("B_1").unwrap().borrow(),
+        );
+        assert_eq!(b0.get_trace_name().unwrap(), "B_0");
+        assert_eq!(b1.get_trace_name().unwrap(), "B_1");
+        // B_0 and B_1 have A_0 and A_1 as subscopes
+        let (a0_b0, a1_b0) = (
+            b0.subscopes.get("A_0").unwrap().borrow(),
+            b0.subscopes.get("A_1").unwrap().borrow(),
+        );
+        let (a0_b1, a1_b1) = (
+            b1.subscopes.get("A_0").unwrap().borrow(),
+            b1.subscopes.get("A_1").unwrap().borrow(),
+        );
+        assert_eq!(a0_b0.get_trace_name().unwrap(), "A_0");
+        assert_eq!(a1_b0.get_trace_name().unwrap(), "A_1");
+        assert_eq!(a0_b1.get_trace_name().unwrap(), "A_0");
+        assert_eq!(a1_b1.get_trace_name().unwrap(), "A_1");
+
+        // Check the variables in the hierarchy
+        assert_eq!(d.variables.len(), 3); // i, clock, reset
+        assert_eq!(c1.variables.len(), 3); // i, clock, reset
+        assert_eq!(b0.variables.len(), 1); // i
+        assert_eq!(b1.variables.len(), 1); // i
+        assert_eq!(a0_b0.variables.len(), 1); // i
+        assert_eq!(a1_b0.variables.len(), 1); // i
+        assert_eq!(a0_b1.variables.len(), 1); // i
+        assert_eq!(a1_b1.variables.len(), 1); // i
+
+        // tyvcd contain only D in its definitions
+        assert_eq!(tyvcd.scopes.len(), 1)
     }
 }

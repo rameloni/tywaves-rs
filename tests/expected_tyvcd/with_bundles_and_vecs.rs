@@ -3,7 +3,9 @@ use tywaves_rs::tyvcd::trace_pointer::TraceValue;
 // External variable that will be captured.
 use crate::tyvcd::spec::*;
 
+use std::cell::RefCell;
 use std::collections::HashMap;
+use std::rc::Rc;
 use std::vec;
 
 // Create the TyVcd for the [[tests/inputs/tyvcd/foo/foo.dd]] file.
@@ -12,7 +14,7 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
     // Main scope
     scopes.insert(
         String::from("WithBundlesAndVecs"),
-        Scope::empty(
+        Rc::new(RefCell::new(Scope::empty(
             String::from("WithBundlesAndVecs"),
             String::from("WithBundlesAndVecs"),
             TypeInfo::new(
@@ -23,13 +25,14 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
                     value: None,
                 }],
             ),
-        ),
+        ))),
     );
 
     // clock
     scopes
-        .get_mut("WithBundlesAndVecs")
+        .get("WithBundlesAndVecs")
         .unwrap()
+        .borrow_mut()
         .variables
         .push(Variable::new(
             TraceValue::RefTraceName("clock".to_string()),
@@ -40,8 +43,9 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
 
     // reset
     scopes
-        .get_mut("WithBundlesAndVecs")
+        .get("WithBundlesAndVecs")
         .unwrap()
+        .borrow_mut()
         .variables
         .push(Variable::new(
             TraceValue::RefTraceName("reset".to_string()),
@@ -52,8 +56,9 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
 
     // io => struct
     scopes
-        .get_mut("WithBundlesAndVecs")
+        .get("WithBundlesAndVecs")
         .unwrap()
+        .borrow_mut()
         .variables
         .push(Variable::new(
             TraceValue::RefTraceValues(vec![

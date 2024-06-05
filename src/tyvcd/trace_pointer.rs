@@ -1,3 +1,5 @@
+use std::cell::Ref;
+
 /// Trait with methods to return the name and path of an object in the trace file.
 ///
 /// Any type that implements this trait is able to return a [TraceValue].
@@ -22,7 +24,7 @@ pub trait TraceGetter {
 /// Any type that implements this trait is able to find a [TraceGetter] given a `path`: a sequence of [TraceId].
 pub trait TraceFinder {
     /// Return the element pointin to the trace path.
-    fn find_trace(&self, path: &[String]) -> Option<&dyn TraceGetter>;
+    fn find_trace(&self, path: &[String]) -> Option<Ref<dyn TraceGetter>>;
 }
 
 #[derive(Debug, Clone, PartialEq)]
