@@ -416,3 +416,165 @@ mod helper {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::hgldd;
+    use crate::tyvcd::builder::hgldd::Hgldd;
+    use crate::tyvcd::builder::GenericBuilder;
+    #[test]
+    fn test_sub_sub_scopes() {
+        let hgldd_str = r#"
+        {
+            "HGLDD": { "version": "1.0", "file_info": [] },
+            "objects": [
+              {
+                "kind": "module", "obj_name": "D", "module_name": "D",
+                "source_lang_type_info": { "type_name": "D" },
+                "port_vars": [
+                  {
+                    "var_name": "clock", "value": {"sig_name":"clock"}, "type_name": "logic",
+                    "source_lang_type_info": { "type_name": "IO[Clock]" }
+                  },
+                  {
+                    "var_name": "reset", "value": {"sig_name":"reset"}, "type_name": "logic",
+                    "source_lang_type_info": { "type_name": "IO[Bool]" }
+                  },
+                  {
+                    "var_name": "i", "value": {"sig_name":"i"}, "type_name": "logic",
+                    "source_lang_type_info": { "type_name": "IO[Bool]" }
+                  }
+                ],
+                "children": [{ "name": "c1", "obj_name": "C", "module_name": "C" }]
+              }
+            ]
+          }          
+          {
+            "HGLDD": {
+              "version": "1.0",
+              "file_info": []
+            },
+            "objects": [
+              {
+                "kind": "module", "obj_name": "C", "module_name": "C",
+                "source_lang_type_info": {
+                  "type_name": "C"
+                },
+                "port_vars": [
+                  {
+                    "var_name": "clock", "value": {"sig_name":"clock"}, "type_name": "logic",
+                    "source_lang_type_info": { "type_name": "IO[Clock]"}
+                  },
+                  {
+                    "var_name": "reset", "value": {"sig_name":"reset"}, "type_name": "logic",
+                    "source_lang_type_info": { "type_name": "IO[Reset]"}
+                  },
+                  {
+                    "var_name": "i", "value": {"sig_name":"i"}, "type_name": "logic",
+                    "source_lang_type_info": { "type_name": "IO[Bool]"}
+                  }
+                ],
+                "children": [
+                  { "name": "B_0", "hdl_obj_name": "B", "obj_name": "B", "module_name": "B" },
+                  { "name": "B_1", "obj_name": "B", "module_name": "B" }
+                ]
+              }
+            ]
+          }
+
+          {
+            "HGLDD": {
+              "version": "1.0",
+              "file_info": []
+            },
+            "objects": [
+              {
+                "kind": "module", "obj_name": "B", "module_name": "B", "source_lang_type_info": {
+                  "type_name": "B"
+                },
+                "port_vars": [
+                  {
+                    "var_name": "i", "value": {"sig_name":"i"}, "type_name": "logic",
+                    "source_lang_type_info": { "type_name": "IO[Bool]" }
+                  }
+                ],
+                "children": [
+                  { "name": "A_0", "hdl_obj_name": "A", "obj_name": "A", "module_name": "A" },
+                  { "name": "A_1", "obj_name": "A", "module_name": "A" }
+                ]
+              }
+            ]
+          }
+          
+          {
+            "HGLDD": {
+              "version": "1.0",
+              "file_info": []
+            },
+            "objects": [
+              { 
+                "kind": "module", "obj_name": "A", "module_name": "A",
+                "source_lang_type_info": { "type_name": "A"},
+                "port_vars": [
+                  { "var_name": "i", "value": {"sig_name":"i"}, "type_name": "logic",
+                    "source_lang_type_info": { "type_name": "IO[Bool]" }
+                  }
+                ],
+                "children": []
+              }
+            ]
+          }
+        "#;
+
+        let hgldds = hgldd::reader::parse_hgldds_pub(hgldd_str);
+
+        let mut builder = super::TyVcdBuilder::init(hgldds);
+        builder.build();
+        let tyvcd = builder.get_ref();
+
+        // Check it is created
+        assert!(tyvcd.is_some());
+        let tyvcd = tyvcd.unwrap();
+        // tyvcd contain the top scope D
+        assert!(tyvcd.scopes.get("D").is_some());
+        // Check the hierarchy
+        // D
+        // |_ c1: C
+        //   |_ B_0: B
+        //     |_ A_0: A
+        //     |_ A_1: A
+        //   |_ B_1: B
+        //     |_ A_0: A
+        //     |_ A_1: A
+
+        // D has c1 only as subscope
+        let d = tyvcd.scopes.get("D").unwrap();
+        assert_eq!(d.subscopes.len(), 1);
+        let c1 = &d.subscopes[0];
+        assert_eq!(c1.get_trace_name().unwrap(), "c1");
+        // c1 has B_0 and B_1 as subscopes
+        let (b0, b1) = (&c1.subscopes[0], &c1.subscopes[1]);
+        assert_eq!(b0.get_trace_name().unwrap(), "B_0");
+        assert_eq!(b1.get_trace_name().unwrap(), "B_1");
+        // B_0 and B_1 have A_0 and A_1 as subscopes
+        let (a0_b0, a1_b0) = (&b0.subscopes[0], &b0.subscopes[1]);
+        let (a0_b1, a1_b1) = (&b1.subscopes[0], &b1.subscopes[1]);
+        assert_eq!(a0_b0.get_trace_name().unwrap(), "A_0");
+        assert_eq!(a1_b0.get_trace_name().unwrap(), "A_1");
+        assert_eq!(a0_b1.get_trace_name().unwrap(), "A_0");
+        assert_eq!(a1_b1.get_trace_name().unwrap(), "A_1");
+
+        // Check the variables in the hierarchy
+        assert_eq!(d.variables.len(), 3); // i, clock, reset
+        assert_eq!(c1.variables.len(), 3); // i, clock, reset
+        assert_eq!(b0.variables.len(), 1); // i
+        assert_eq!(b1.variables.len(), 1); // i
+        assert_eq!(a0_b0.variables.len(), 1); // i
+        assert_eq!(a1_b0.variables.len(), 1); // i
+        assert_eq!(a0_b1.variables.len(), 1); // i
+        assert_eq!(a1_b1.variables.len(), 1); // i
+
+        // tyvcd contain only D in its definitions
+        assert_eq!(tyvcd.scopes.len(), 1)
+    }
+}
