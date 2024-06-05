@@ -14,6 +14,11 @@ pub fn drop_comments(hgldd_str: &str) -> String {
         .join("\n")
 }
 
+#[cfg(test)]
+pub(crate) fn parse_hgldds_pub(hgldd_str: &str) -> Vec<Hgldd> {
+    parse_hgldds(hgldd_str)
+}
+
 // Parse an HGLDD string with multiple HGLDDs in it
 #[inline]
 fn parse_hgldds(hgldd_str: &str) -> Vec<Hgldd> {

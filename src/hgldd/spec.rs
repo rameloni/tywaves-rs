@@ -59,6 +59,28 @@ pub struct Object {
     pub source_lang_type_info: Option<SourceLangType>,
 }
 
+impl Object {
+    /// Create a new object with the given name and kind.
+    pub fn new(obj_name: String, kind: ObjectKind) -> Self {
+        Self {
+            kind,
+            obj_name,
+            module_name: None,
+            is_ext_module: None,
+            hgl_loc: None,
+            hdl_loc: None,
+            port_vars: Vec::new(),
+            children: None,
+            source_lang_type_info: None,
+        }
+    }
+
+    pub fn with_children(mut self, children: Vec<Instance>) -> Self {
+        self.children = Some(children);
+        self
+    }
+}
+
 /// Supported HGLDD object kinds.
 #[derive(Serialize, Deserialize, PartialEq, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -138,6 +160,30 @@ pub struct Instance {
     pub port_vars: Option<Vec<Variable>>,
     /// The children instances of the instance
     pub children: Option<Vec<Instance>>,
+}
+
+impl Instance {
+    /// Create a new instance with the given name.
+    pub fn new(
+        hgl_name: String,
+        hdl_obj_name: String,
+        hgl_type_obj_name: String,
+        hdl_type_obj_name: String,
+    ) -> Self {
+        Self {
+            name: hgl_name,
+            hdl_obj_name: Some(hdl_obj_name),
+            obj_name: Some(hgl_type_obj_name),
+            module_name: Some(hdl_type_obj_name),
+            // hdl_obj_name: None,
+            // obj_name: None,
+            // module_name: None,
+            hgl_loc: None,
+            hdl_loc: None,
+            port_vars: None,
+            children: None,
+        }
+    }
 }
 
 /// An emitted expression in HGLDD. An expression can refer to a signal in the target language,
