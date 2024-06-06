@@ -1,7 +1,9 @@
 use super::{spec::*, trace_pointer::TraceGetter};
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
-
 use crate::hgldd::spec as hgldd;
+use std::{
+    collections::HashMap,
+    sync::{Arc, RwLock},
+};
 
 /// Trait for a generic TyVcd builder.
 pub trait GenericBuilder {
@@ -22,7 +24,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
     /// Build a [TyVcd] from a list of [hgldd::Hgldd] objects.
     fn build(&mut self) {
         // Store the scopes found in the hgldd objects
-        let mut scopes: HashMap<ScopeId, Rc<RefCell<Scope>>> = HashMap::new();
+        let mut scopes: HashMap<ScopeId, Arc<RwLock<Scope>>> = HashMap::new();
 
         // Iterates over the hgldd objects
         for hgldd in &self.origin_list {
@@ -54,7 +56,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                                 // scope.subscopes.push(emptyscope);
                                 scope.subscopes.insert(
                                     emptyscope.get_trace_name().unwrap().clone(),
-                                    Rc::new(RefCell::new(emptyscope)),
+                                    Arc::new(RwLock::new(emptyscope)),
                                 );
                             }
                         }
@@ -67,7 +69,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                         // Update the found scopes, the key is the name trace_name of the scope
                         scopes.insert(
                             scope.get_trace_name().unwrap().clone(),
-                            Rc::new(RefCell::new(scope)),
+                            Arc::new(RwLock::new(scope)),
                         );
                     }
                 }
@@ -81,7 +83,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
     }
 
     // Returns the TyVcd object. Hint: call it after the build method
-    fn get_ref(&self) -> Option<&TyVcd> {
+    fn get_ref<'a>(&'a self) -> Option<&'a TyVcd> {
         self.tyvcd.as_ref()
     }
 
@@ -289,14 +291,14 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         // For each Scope found in the list
         for (_, scope_def) in tyvcd.scopes.iter_mut() {
             // Get the scope definition
-            let mut scope_def = scope_def.borrow_mut();
+            let mut scope_def = scope_def.write().unwrap();
 
             // 1. Check if it has instances (subscopes)
             for (_, subscope_def) in (*scope_def).subscopes.iter_mut() {
-                let mut subscope_def = subscope_def.borrow_mut();
+                let mut subscope_def = subscope_def.write().unwrap();
                 // Get the real module definition from the original list
                 if let Some(module_def) = original_scope_map.get(&subscope_def.name) {
-                    let module_def = module_def.borrow();
+                    let module_def = module_def.read().unwrap();
                     // SubScope contains the actual trace_name
                     subscope_def.high_level_info = module_def.high_level_info.clone();
                     subscope_def.name = module_def.name.clone();
@@ -310,11 +312,11 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let mut top_scopes = HashMap::new();
         for (def_name, scope) in &tyvcd.scopes {
             if !tyvcd.scopes.values().any(|s| {
-                let s = s.borrow();
+                let s = s.read().unwrap();
                 // s.subscopes.get(trace_name).is_some()
                 s.subscopes
                     .iter()
-                    .any(|(_, ss)| &ss.borrow().name == def_name)
+                    .any(|(_, ss)| &ss.read().unwrap().name == def_name)
             }) {
                 top_scopes.insert(def_name.clone(), scope.clone());
             }
@@ -379,6 +381,7 @@ mod helper {
                 }
                 // This variable contains an operator, this means it contains the "values" of all its child variables (to be added in kind)
                 hgldd::Expression::Operator { opcode, operands } => {
+                    // TODO: check how to use the opcode here to calculate the right value
                     let mut v = Vec::with_capacity(operands.len());
                     for o in operands {
                         if let Some(x) = get_trace_value_from_expression(Some(o)) {
@@ -433,10 +436,9 @@ mod helper {
 
 #[cfg(test)]
 mod test {
-    use crate::tyvcd::builder::hgldd::Hgldd;
+    use crate::hgldd;
     use crate::tyvcd::builder::GenericBuilder;
     use crate::tyvcd::trace_pointer::TraceGetter;
-    use crate::{hgldd, tyvcd};
     #[test]
     fn test_sub_sub_scopes() {
         let hgldd_str = r#"
@@ -507,25 +509,25 @@ mod test {
         //     |_ A_1: A
 
         // D has c1 only as subscope
-        let d = tyvcd.scopes.get("D").unwrap().borrow();
+        let d = tyvcd.scopes.get("D").unwrap().read().unwrap();
         assert_eq!(d.subscopes.len(), 1);
-        let c1 = d.subscopes.get("c1").unwrap().borrow();
+        let c1 = d.subscopes.get("c1").unwrap().read().unwrap();
         assert_eq!(c1.get_trace_name().unwrap(), "c1");
         // c1 has B_0 and B_1 as subscopes
         let (b0, b1) = (
-            c1.subscopes.get("B_0").unwrap().borrow(),
-            c1.subscopes.get("B_1").unwrap().borrow(),
+            c1.subscopes.get("B_0").unwrap().read().unwrap(),
+            c1.subscopes.get("B_1").unwrap().read().unwrap(),
         );
         assert_eq!(b0.get_trace_name().unwrap(), "B_0");
         assert_eq!(b1.get_trace_name().unwrap(), "B_1");
         // B_0 and B_1 have A_0 and A_1 as subscopes
         let (a0_b0, a1_b0) = (
-            b0.subscopes.get("A_0").unwrap().borrow(),
-            b0.subscopes.get("A_1").unwrap().borrow(),
+            b0.subscopes.get("A_0").unwrap().read().unwrap(),
+            b0.subscopes.get("A_1").unwrap().read().unwrap(),
         );
         let (a0_b1, a1_b1) = (
-            b1.subscopes.get("A_0").unwrap().borrow(),
-            b1.subscopes.get("A_1").unwrap().borrow(),
+            b1.subscopes.get("A_0").unwrap().read().unwrap(),
+            b1.subscopes.get("A_1").unwrap().read().unwrap(),
         );
         assert_eq!(a0_b0.get_trace_name().unwrap(), "A_0");
         assert_eq!(a1_b0.get_trace_name().unwrap(), "A_1");

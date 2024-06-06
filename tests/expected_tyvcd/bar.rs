@@ -1,13 +1,13 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
+use std::sync::Arc;
+use std::sync::RwLock;
 use tywaves_rs::tyvcd::{spec::*, trace_pointer::TraceValue};
 
 pub fn create_bar_single() -> TyVcd {
     let mut scopes = HashMap::new();
     scopes.insert(
         String::from("Bar"),
-        Rc::new(RefCell::new(Scope::empty(
+        Arc::new(RwLock::new(Scope::empty(
             String::from("Bar"),
             String::from("Bar"),
             // TypeInfo::new("BarType".to_string(), Vec::new()),
@@ -32,7 +32,8 @@ pub fn create_bar_single() -> TyVcd {
     scopes
         .get("Bar")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             TraceValue::RefTraceName("x".to_string()),
@@ -44,7 +45,8 @@ pub fn create_bar_single() -> TyVcd {
     scopes
         .get("Bar")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             // op: *
@@ -60,7 +62,8 @@ pub fn create_bar_single() -> TyVcd {
     scopes
         .get("Bar")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             // op: *
@@ -76,7 +79,8 @@ pub fn create_bar_single() -> TyVcd {
     scopes
         .get("Bar")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             // op: +

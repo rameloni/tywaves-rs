@@ -76,7 +76,8 @@ fn test_trace_pointer() {
             Some(
                 trace
                     .clone()
-                    .borrow()
+                    .read()
+                    .unwrap()
                     .as_any()
                     .downcast_ref::<Scope>()?
                     .clone(),
@@ -93,7 +94,8 @@ fn test_trace_pointer() {
             Some(
                 trace
                     .clone()
-                    .borrow()
+                    .read()
+                    .unwrap()
                     .as_any()
                     .downcast_ref::<Scope>()?
                     .clone(),
@@ -110,7 +112,8 @@ fn test_trace_pointer() {
             Some(
                 trace
                     .clone()
-                    .borrow()
+                    .read()
+                    .unwrap()
                     .as_any()
                     .downcast_ref::<Scope>()?
                     .clone(),
@@ -126,7 +129,8 @@ fn test_trace_pointer() {
             Some(
                 trace
                     .clone()
-                    .borrow_mut()
+                    .write()
+                    .unwrap()
                     .as_any()
                     .downcast_ref::<Variable>()?
                     .clone(),
@@ -149,7 +153,8 @@ fn test_trace_pointer() {
             Some(
                 trace
                     .clone()
-                    .borrow()
+                    .read()
+                    .unwrap()
                     .as_any()
                     .downcast_ref::<Variable>()?
                     .clone(),
@@ -167,7 +172,8 @@ fn test_trace_pointer() {
             Some(
                 trace
                     .clone()
-                    .borrow()
+                    .read()
+                    .unwrap()
                     .as_any()
                     .downcast_ref::<Variable>()?
                     .clone(),

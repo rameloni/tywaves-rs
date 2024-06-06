@@ -1,7 +1,4 @@
-use std::{
-    cell::{Ref, RefCell},
-    rc::Rc,
-};
+use std::sync::{Arc, RwLock};
 
 /// Trait with methods to return the name and path of an object in the trace file.
 ///
@@ -31,7 +28,7 @@ pub trait TraceGetter {
 pub trait TraceFinder {
     /// Return the element pointin to the trace path.
     // fn find_trace<'a>(&'a self, path: &[String]) -> Option<Ref<'a, dyn TraceGetter>>;
-    fn find_trace<'a>(&'a self, path: &[String]) -> Option<Rc<RefCell<dyn TraceGetter>>>;
+    fn find_trace<'a>(&'a self, path: &[String]) -> Option<Arc<RwLock<dyn TraceGetter>>>;
 }
 
 #[derive(Debug, Clone, PartialEq)]

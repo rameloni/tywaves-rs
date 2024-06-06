@@ -4,16 +4,15 @@ use tywaves_rs::tyvcd::trace_pointer::{ConstValue, TraceGetter, TraceValue};
 
 use crate::tyvcd::spec::*;
 
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
+use std::sync::{Arc, RwLock};
 
 // Create the TyVcd for the [[tests/inputs/tyvcd/foo/foo_no_types.dd]] file.
 pub fn create_foo_single_no_types() -> TyVcd {
     let mut scopes = HashMap::new();
     scopes.insert(
         String::from("Foo"),
-        Rc::new(RefCell::new(Scope::empty(
+        Arc::new(RwLock::new(Scope::empty(
             String::from("Foo"),
             String::from("Foo"),
             // type info na, use the target language one
@@ -24,7 +23,8 @@ pub fn create_foo_single_no_types() -> TyVcd {
     scopes
         .get("Foo")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             TraceValue::RefTraceName("a".to_string()),
@@ -37,7 +37,8 @@ pub fn create_foo_single_no_types() -> TyVcd {
     scopes
         .get("Foo")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             TraceValue::RefTraceName("b".to_string()),
@@ -51,7 +52,8 @@ pub fn create_foo_single_no_types() -> TyVcd {
     scopes
         .get("Foo")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             TraceValue::Constant(ConstValue::FourValue(var1_val.into_bytes(), 8)),
@@ -62,25 +64,37 @@ pub fn create_foo_single_no_types() -> TyVcd {
         ));
 
     // instances
-    scopes.get("Foo").unwrap().borrow_mut().subscopes.insert(
-        String::from("b0"),
-        Rc::new(RefCell::new(Scope::empty(
+    scopes
+        .get("Foo")
+        .unwrap()
+        .write()
+        .unwrap()
+        .subscopes
+        .insert(
             String::from("b0"),
-            String::from("Bar"),
-            // type info na, use the target language one
-            TypeInfo::new("Bar".to_string(), Vec::new()),
-        ))),
-    );
+            Arc::new(RwLock::new(Scope::empty(
+                String::from("b0"),
+                String::from("Bar"),
+                // type info na, use the target language one
+                TypeInfo::new("Bar".to_string(), Vec::new()),
+            ))),
+        );
 
-    scopes.get("Foo").unwrap().borrow_mut().subscopes.insert(
-        String::from("b1"),
-        Rc::new(RefCell::new(Scope::empty(
+    scopes
+        .get("Foo")
+        .unwrap()
+        .write()
+        .unwrap()
+        .subscopes
+        .insert(
             String::from("b1"),
-            String::from("Bar"),
-            // type info na, use the target language one
-            TypeInfo::new("Bar".to_string(), Vec::new()),
-        ))),
-    );
+            Arc::new(RwLock::new(Scope::empty(
+                String::from("b1"),
+                String::from("Bar"),
+                // type info na, use the target language one
+                TypeInfo::new("Bar".to_string(), Vec::new()),
+            ))),
+        );
 
     TyVcd { scopes }
 }
@@ -90,7 +104,7 @@ pub fn create_foo_single() -> TyVcd {
     let mut scopes = HashMap::new();
     scopes.insert(
         String::from("Foo"),
-        Rc::new(RefCell::new(Scope::empty(
+        Arc::new(RwLock::new(Scope::empty(
             String::from("Foo"),
             String::from("Foo"),
             TypeInfo::new("Foo".to_string(), Vec::new()),
@@ -100,7 +114,8 @@ pub fn create_foo_single() -> TyVcd {
     scopes
         .get("Foo")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             TraceValue::RefTraceName("a".to_string()),
@@ -112,7 +127,8 @@ pub fn create_foo_single() -> TyVcd {
     scopes
         .get("Foo")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             TraceValue::RefTraceName("b".to_string()),
@@ -133,7 +149,8 @@ pub fn create_foo_single() -> TyVcd {
     scopes
         .get("Foo")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             TraceValue::Constant(ConstValue::FourValue(var1_val.into_bytes(), 8)),
@@ -162,7 +179,8 @@ pub fn create_foo_single() -> TyVcd {
     scopes
         .get("Foo")
         .unwrap()
-        .borrow_mut()
+        .write()
+        .unwrap()
         .variables
         .push(Variable::new(
             TraceValue::Constant(ConstValue::FourValue(var2_val.into_bytes(), 8)),
@@ -173,45 +191,58 @@ pub fn create_foo_single() -> TyVcd {
         ));
 
     // instances
-    scopes.get("Foo").unwrap().borrow_mut().subscopes.insert(
-        String::from("b0"),
-        Rc::new(RefCell::new(Scope::empty(
+    scopes
+        .get("Foo")
+        .unwrap()
+        .write()
+        .unwrap()
+        .subscopes
+        .insert(
             String::from("b0"),
-            String::from("Bar"),
-            // type info na, use the target language one
-            TypeInfo::new("Bar".to_string(), Vec::new()),
-        ))),
-    );
+            Arc::new(RwLock::new(Scope::empty(
+                String::from("b0"),
+                String::from("Bar"),
+                // type info na, use the target language one
+                TypeInfo::new("Bar".to_string(), Vec::new()),
+            ))),
+        );
 
-    scopes.get("Foo").unwrap().borrow_mut().subscopes.insert(
-        "b1".to_string(),
-        Rc::new(RefCell::new(Scope::empty(
-            String::from("b1"),
-            String::from("Bar"),
-            // type info na, use the target language one
-            TypeInfo::new("Bar".to_string(), Vec::new()),
-        ))),
-    );
+    scopes
+        .get("Foo")
+        .unwrap()
+        .write()
+        .unwrap()
+        .subscopes
+        .insert(
+            "b1".to_string(),
+            Arc::new(RwLock::new(Scope::empty(
+                String::from("b1"),
+                String::from("Bar"),
+                // type info na, use the target language one
+                TypeInfo::new("Bar".to_string(), Vec::new()),
+            ))),
+        );
 
     TyVcd { scopes }
 }
 
 // Create the TyVcd for the [[tests/inputs/tyvcd/foo]] directory.
 pub fn create_foo() -> TyVcd {
-    let mut foo = create_foo_single();
+    let foo = create_foo_single();
     let bar = super::bar::create_bar_single();
 
-    for (_, subscope_to_update) in &mut foo.scopes.get("Foo").unwrap().borrow_mut().subscopes {
+    for (_, subscope_to_update) in &mut foo.scopes.get("Foo").unwrap().write().unwrap().subscopes {
         let new_scope = Scope::from_other(
-            &bar.scopes.get("Bar").unwrap().borrow().clone(),
+            &bar.scopes.get("Bar").unwrap().read().unwrap().clone(),
             subscope_to_update
-                .borrow()
+                .read()
+                .unwrap()
                 .get_trace_name()
                 .unwrap()
                 .clone(),
         );
 
-        *subscope_to_update = Rc::new(RefCell::new(new_scope));
+        *subscope_to_update = Arc::new(RwLock::new(new_scope));
     }
     foo
 }
