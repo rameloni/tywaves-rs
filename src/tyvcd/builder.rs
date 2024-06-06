@@ -1,7 +1,9 @@
 use super::{spec::*, trace_pointer::TraceGetter};
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
-
 use crate::hgldd::spec as hgldd;
+use std::{
+    collections::HashMap,
+    sync::{Arc, RwLock},
+};
 
 /// Trait for a generic TyVcd builder.
 pub trait GenericBuilder {
@@ -22,7 +24,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
     /// Build a [TyVcd] from a list of [hgldd::Hgldd] objects.
     fn build(&mut self) {
         // Store the scopes found in the hgldd objects
-        let mut scopes: HashMap<ScopeId, Rc<RefCell<Scope>>> = HashMap::new();
+        let mut scopes: HashMap<ScopeId, Arc<RwLock<Scope>>> = HashMap::new();
 
         // Iterates over the hgldd objects
         for hgldd in &self.origin_list {
@@ -54,7 +56,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                                 // scope.subscopes.push(emptyscope);
                                 scope.subscopes.insert(
                                     emptyscope.get_trace_name().unwrap().clone(),
-                                    Rc::new(RefCell::new(emptyscope)),
+                                    Arc::new(RwLock::new(emptyscope)),
                                 );
                             }
                         }
@@ -65,10 +67,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                         }
 
                         // Update the found scopes, the key is the name trace_name of the scope
-                        scopes.insert(
-                            scope.get_trace_name().unwrap().clone(),
-                            Rc::new(RefCell::new(scope)),
-                        );
+                        scopes.insert(scope.name.clone(), Arc::new(RwLock::new(scope)));
                     }
                 }
             }
@@ -81,7 +80,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
     }
 
     // Returns the TyVcd object. Hint: call it after the build method
-    fn get_ref(&self) -> Option<&TyVcd> {
+    fn get_ref<'a>(&'a self) -> Option<&'a TyVcd> {
         self.tyvcd.as_ref()
     }
 
@@ -100,28 +99,44 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         }
     }
 
+    /// Add extra scopes to the TyVcd object.
+    pub fn with_extra_artifact_scopes(
+        self,
+        extra_scopes: Vec<String>,
+        top_module_name: &String,
+    ) -> Self {
+        let mut _self = self;
+        _self.origin_list = crate::hgldd::reader::add_extra_modules(
+            _self.origin_list,
+            extra_scopes,
+            top_module_name,
+        );
+        _self
+    }
+
     // Create an empty scope from an hgldd instace
     fn create_empty_scope_from_instance(hgldd_inst: &hgldd::Instance) -> Scope {
         // Identify among the traces
         let trace_name = if let Some(hdl_obj_name) = &hgldd_inst.hdl_obj_name {
             // hdl_obj_name // TODO: this wasn't working, no idea why
-            &hgldd_inst.name
+            &hgldd_inst.name_id
         } else {
-            &hgldd_inst.name
+            &hgldd_inst.name_id
         };
 
-        // Identify the definition of the instance
-        let name = if let Some(hgl_obj_name) = &hgldd_inst.obj_name {
-            hgl_obj_name
+        // Identify the definition of the instance from HGL
+        let name = if let Some(hgl_module_name) = &hgldd_inst.hgl_module_name {
+            hgl_module_name
         } else {
-            &hgldd_inst.name
+            &hgldd_inst.name_id
         };
 
         // Use the name of the instance here -> it'll be replaced by calling fill_tyvcd_subscopes() (if an actual type is present)
         let high_level_info = Self::create_type_info_or(None, || name.clone());
 
         // Create a new scope from an instance
-        Scope::empty(trace_name.clone(), name.clone(), high_level_info)
+        let s = Scope::empty(trace_name.clone(), name.clone(), high_level_info);
+        s
     }
 
     // Create a variable from an hgldd variable
@@ -289,14 +304,14 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         // For each Scope found in the list
         for (_, scope_def) in tyvcd.scopes.iter_mut() {
             // Get the scope definition
-            let mut scope_def = scope_def.borrow_mut();
+            let mut scope_def = scope_def.write().unwrap();
 
             // 1. Check if it has instances (subscopes)
             for (_, subscope_def) in (*scope_def).subscopes.iter_mut() {
-                let mut subscope_def = subscope_def.borrow_mut();
+                let mut subscope_def = subscope_def.write().unwrap();
                 // Get the real module definition from the original list
                 if let Some(module_def) = original_scope_map.get(&subscope_def.name) {
-                    let module_def = module_def.borrow();
+                    let module_def = module_def.read().unwrap();
                     // SubScope contains the actual trace_name
                     subscope_def.high_level_info = module_def.high_level_info.clone();
                     subscope_def.name = module_def.name.clone();
@@ -310,11 +325,11 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let mut top_scopes = HashMap::new();
         for (def_name, scope) in &tyvcd.scopes {
             if !tyvcd.scopes.values().any(|s| {
-                let s = s.borrow();
+                let s = s.read().unwrap();
                 // s.subscopes.get(trace_name).is_some()
                 s.subscopes
                     .iter()
-                    .any(|(_, ss)| &ss.borrow().name == def_name)
+                    .any(|(_, ss)| &ss.read().unwrap().name == def_name)
             }) {
                 top_scopes.insert(def_name.clone(), scope.clone());
             }
@@ -379,6 +394,7 @@ mod helper {
                 }
                 // This variable contains an operator, this means it contains the "values" of all its child variables (to be added in kind)
                 hgldd::Expression::Operator { opcode, operands } => {
+                    // TODO: check how to use the opcode here to calculate the right value
                     let mut v = Vec::with_capacity(operands.len());
                     for o in operands {
                         if let Some(x) = get_trace_value_from_expression(Some(o)) {
@@ -433,10 +449,9 @@ mod helper {
 
 #[cfg(test)]
 mod test {
-    use crate::tyvcd::builder::hgldd::Hgldd;
+    use crate::hgldd;
     use crate::tyvcd::builder::GenericBuilder;
     use crate::tyvcd::trace_pointer::TraceGetter;
-    use crate::{hgldd, tyvcd};
     #[test]
     fn test_sub_sub_scopes() {
         let hgldd_str = r#"
@@ -507,25 +522,25 @@ mod test {
         //     |_ A_1: A
 
         // D has c1 only as subscope
-        let d = tyvcd.scopes.get("D").unwrap().borrow();
+        let d = tyvcd.scopes.get("D").unwrap().read().unwrap();
         assert_eq!(d.subscopes.len(), 1);
-        let c1 = d.subscopes.get("c1").unwrap().borrow();
+        let c1 = d.subscopes.get("c1").unwrap().read().unwrap();
         assert_eq!(c1.get_trace_name().unwrap(), "c1");
         // c1 has B_0 and B_1 as subscopes
         let (b0, b1) = (
-            c1.subscopes.get("B_0").unwrap().borrow(),
-            c1.subscopes.get("B_1").unwrap().borrow(),
+            c1.subscopes.get("B_0").unwrap().read().unwrap(),
+            c1.subscopes.get("B_1").unwrap().read().unwrap(),
         );
         assert_eq!(b0.get_trace_name().unwrap(), "B_0");
         assert_eq!(b1.get_trace_name().unwrap(), "B_1");
         // B_0 and B_1 have A_0 and A_1 as subscopes
         let (a0_b0, a1_b0) = (
-            b0.subscopes.get("A_0").unwrap().borrow(),
-            b0.subscopes.get("A_1").unwrap().borrow(),
+            b0.subscopes.get("A_0").unwrap().read().unwrap(),
+            b0.subscopes.get("A_1").unwrap().read().unwrap(),
         );
         let (a0_b1, a1_b1) = (
-            b1.subscopes.get("A_0").unwrap().borrow(),
-            b1.subscopes.get("A_1").unwrap().borrow(),
+            b1.subscopes.get("A_0").unwrap().read().unwrap(),
+            b1.subscopes.get("A_1").unwrap().read().unwrap(),
         );
         assert_eq!(a0_b0.get_trace_name().unwrap(), "A_0");
         assert_eq!(a1_b0.get_trace_name().unwrap(), "A_1");
@@ -544,5 +559,45 @@ mod test {
 
         // tyvcd contain only D in its definitions
         assert_eq!(tyvcd.scopes.len(), 1)
+    }
+
+    #[test]
+    fn test_with_extra_artifacts() {
+        let extra_modules = vec!["TOP_TB".to_string(), "dut".to_string()];
+        let top_module_name = "A".to_string();
+        let hgldd = r#"
+        { 
+            "HGLDD": { "version": "1.0", "file_info": [] },
+            "objects": [
+                { 
+                    "kind": "module", "obj_name": "A", "module_name": "A", "source_lang_type_info": { "type_name": "A"},
+                    "port_vars": [{ "var_name": "i", "value": {"sig_name":"i"}, "type_name": "logic", "source_lang_type_info": { "type_name": "IO[Bool]" }}],
+                    "children": []
+                }
+            ]
+        }"#;
+
+        let hgldds = hgldd::reader::parse_hgldds_pub(hgldd);
+        // Add extra modules
+        let mut builder = super::TyVcdBuilder::init(hgldds)
+            .with_extra_artifact_scopes(extra_modules, &top_module_name);
+
+        builder.build();
+
+        let tyvcd = builder.get_ref().unwrap();
+        // Old hierachy was just A
+        // New hierarchy is:
+        // TOP_TB
+        // |_ dut: A
+        assert!(tyvcd.scopes.get("TOP_TB").is_some());
+        let top_tb = tyvcd.scopes.get("TOP_TB").unwrap().read().unwrap();
+        assert_eq!(top_tb.subscopes.len(), 1);
+        let dut = top_tb.subscopes.get("dut").unwrap().read().unwrap();
+        assert_eq!(dut.get_trace_name().unwrap(), "dut");
+        assert_eq!(dut.name, "A");
+        assert_eq!(dut.variables.len(), 1);
+
+        // Check that only there is only one top scope
+        assert_eq!(tyvcd.scopes.len(), 1);
     }
 }

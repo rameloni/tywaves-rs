@@ -1,8 +1,7 @@
 use super::trace_pointer::{TraceFinder, TraceGetter, TraceValue};
 use std::{
-    cell::{Ref, RefCell},
     collections::HashMap,
-    rc::Rc,
+    sync::{Arc, RwLock},
 };
 
 /// The identifier of a scope in the TyVcd format. In the hash map, the key is the scope id.
@@ -11,65 +10,112 @@ pub type ScopeId = String;
 pub type Scope = ScopeDef;
 
 /// Represents the TyVcd format.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct TyVcd {
     /// List of top level scopes in the TyVcd format, stored as a hash map of shared references.
-    pub scopes: HashMap<ScopeId, Rc<RefCell<ScopeDef>>>,
+    pub scopes: HashMap<ScopeId, Arc<RwLock<ScopeDef>>>,
+}
+
+// Implement manually the equality trait for TyVcd (derive not possible due to the RwLock)
+impl PartialEq for TyVcd {
+    fn eq(&self, other: &Self) -> bool {
+        let mut subscopes_check = true;
+        for (this_key, this_value) in &self.scopes {
+            if let Some(other_value) = other.scopes.get(this_key) {
+                subscopes_check = *this_value.read().unwrap() == *other_value.read().unwrap();
+            } else {
+                return false;
+            }
+            // Return immediately
+            if !subscopes_check {
+                return false;
+            }
+        }
+        subscopes_check
+    }
 }
 
 impl TraceFinder for TyVcd {
     /// Return the element pointing to the trace path.
-    fn find_trace(&self, full_path: &[String]) -> Option<Ref<dyn TraceGetter>> {
+    ///
+    /// **Important**: The returned reference is a reference counted with interior mutability.
+    /// This means that preventing to internal changes is left to the user.
+    fn find_trace(&self, full_path: &[String]) -> Option<Arc<RwLock<dyn TraceGetter>>> {
+        fn find_trace_impl(
+            root: &Arc<RwLock<ScopeDef>>,
+            full_path: &[String],
+        ) -> Option<Arc<RwLock<dyn TraceGetter>>> {
+            if full_path.len() == 1 {
+                // Exactly one scope -> the root
+                Some(root.clone())
+            } else {
+                // Initalize the pointer to the root scope
+                let mut guess_scope_ptr = root.clone();
+                // More than one scope specified
+                let mut path = &full_path[1..];
+                while path.len() > 1 {
+                    // Explore the path and search for the actual guessed scope
+                    guess_scope_ptr = ScopeDef::find_subscope(&guess_scope_ptr, &path[0])?;
+                    path = &path[1..]; // Move to the next scope
+                }
+                if let Some(variable) = guess_scope_ptr
+                    .clone()
+                    .read()
+                    .unwrap()
+                    .find_variable(&path[0])
+                {
+                    Some(Arc::new(RwLock::new(variable.clone())))
+                } else {
+                    let subscope = ScopeDef::find_subscope(&guess_scope_ptr, &path[0])?;
+                    Some(subscope)
+                }
+            }
+        }
+        // fn find_trace<'a>(&'a self, full_path: &[String]) -> Option<Ref<'a, dyn TraceGetter>> {
         // Get the root scope
         let root = self.scopes.get(full_path.first()?)?;
-
-        if full_path.len() == 1 {
-            // Exactly one scope -> the root
-            Some(root.borrow())
-        } else {
-            // More than one scope specified
-            let mut path = &full_path[1..];
-
-            // Initalize the pointer to the root scope
-            let mut guess_scope_ptr = root.clone();
-            while path.len() > 1 {
-                // Explore the path and search for the actual guessed scope
-                guess_scope_ptr = guess_scope_ptr.clone().borrow().find_subscope(&path[0])?;
-                path = &path[1..]; // Move to the next scope
-            }
-
-            // Return
-            if let Some(variable) = guess_scope_ptr.clone().borrow().find_variable(&path[0]) {
-                // Some(RefCell::new(variable).borrow())
-                None // TODO: Return the actual reference to the variable
-            } else {
-                let subscope = guess_scope_ptr.borrow().find_subscope(&path[0])?;
-                // Some(subscope.borrow())
-                None // TODO: Return the actual reference to the variable
-            }
-            // None
-        }
+        find_trace_impl(root, full_path)
     }
 }
 
 /// Represent a scope (i.e. a module instance) in the TyVcd format.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct ScopeDef {
     /// The name of the scope in the trace
     _id_trace_value: TraceValue,
 
     /// The subscopes of this scope
-    pub subscopes: HashMap<ScopeId, Rc<RefCell<ScopeDef>>>,
+    pub subscopes: HashMap<ScopeId, Arc<RwLock<ScopeDef>>>,
     /// The variables declared in this scope
     pub variables: Vec<Variable>,
 
-    /// The original name of the scope in the HGLDD file
+    /// The original name of the scope in the HGLDD file. Definition name
     pub name: String,
     /// High level information of the scope
     pub high_level_info: TypeInfo,
 }
 
-impl Scope {
+impl PartialEq for ScopeDef {
+    fn eq(&self, other: &Self) -> bool {
+        for (this_key, this_value) in &self.subscopes {
+            let subscopes_check = if let Some(other_value) = other.subscopes.get(this_key) {
+                *this_value.read().unwrap() == *other_value.read().unwrap()
+            } else {
+                return false;
+            };
+            // Return immediately
+            if !subscopes_check {
+                return false;
+            }
+        }
+        self._id_trace_value == other._id_trace_value
+            && self.variables == other.variables
+            && self.name == other.name
+            && self.high_level_info == other.high_level_info
+    }
+}
+
+impl ScopeDef {
     /// Create a new empty scope without any subscopes or variables.
     pub fn empty(trace_name: String, name: String, high_level_info: TypeInfo) -> Self {
         Self {
@@ -81,9 +127,9 @@ impl Scope {
         }
     }
 
-    /// Create a new scope from another scope with an updated trace name.
+    /// Create a new scope definition from another with an updated trace name.
     /// *Pleas use the `clone` method directly for a full copy.*
-    pub fn from_other(other: &Scope, trace_name: String) -> Self {
+    pub fn from_other(other: &ScopeDef, trace_name: String) -> Self {
         Self {
             _id_trace_value: TraceValue::RefTraceName(trace_name),
             subscopes: other.subscopes.clone(),
@@ -93,20 +139,20 @@ impl Scope {
         }
     }
 
-    /// Find a subscope in the scope.
-    fn find_subscope(&self, name: &str) -> Option<Rc<RefCell<ScopeDef>>> {
-        Some(self.subscopes.get(name)?.clone())
+    // Find a subscope (child) in the scope definition of the current scope.
+    fn find_subscope(parent: &Arc<RwLock<ScopeDef>>, name: &str) -> Option<Arc<RwLock<ScopeDef>>> {
+        parent.read().unwrap().subscopes.get(name).cloned()
     }
 
-    /// Find a variable in the scope.
+    /// Find a variable in the scope definition.
     fn find_variable(&self, name: &str) -> Option<&Variable> {
         self.variables.iter().find_map(|v| v.find_var(name))
     }
 }
 
-impl TraceGetter for Scope {
+impl TraceGetter for ScopeDef {
     fn get_trace_path(&self) -> Vec<&String> {
-        // TODO: implement get_trace_path for Scope
+        // TODO: implement get_trace_path for ScopeDef
         todo!()
     }
 
