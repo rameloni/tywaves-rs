@@ -39,7 +39,7 @@ fn vcd_rewrite_variable() {
 
 #[test]
 #[should_panic]
-fn vec_push_vs_instert() {
+fn vec_push_vs_insert() {
     let mut vec_push = Vec::new();
     let mut vec_insert = Vec::new();
     for i in 0..10 {

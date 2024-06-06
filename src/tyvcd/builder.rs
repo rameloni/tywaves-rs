@@ -67,10 +67,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                         }
 
                         // Update the found scopes, the key is the name trace_name of the scope
-                        scopes.insert(
-                            scope.get_trace_name().unwrap().clone(),
-                            Arc::new(RwLock::new(scope)),
-                        );
+                        scopes.insert(scope.name.clone(), Arc::new(RwLock::new(scope)));
                     }
                 }
             }
@@ -102,28 +99,44 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         }
     }
 
+    /// Add extra scopes to the TyVcd object.
+    pub fn with_extra_artifact_scopes(
+        self,
+        extra_scopes: Vec<String>,
+        top_module_name: &String,
+    ) -> Self {
+        let mut _self = self;
+        _self.origin_list = crate::hgldd::reader::add_extra_modules(
+            _self.origin_list,
+            extra_scopes,
+            top_module_name,
+        );
+        _self
+    }
+
     // Create an empty scope from an hgldd instace
     fn create_empty_scope_from_instance(hgldd_inst: &hgldd::Instance) -> Scope {
         // Identify among the traces
         let trace_name = if let Some(hdl_obj_name) = &hgldd_inst.hdl_obj_name {
             // hdl_obj_name // TODO: this wasn't working, no idea why
-            &hgldd_inst.name
+            &hgldd_inst.name_id
         } else {
-            &hgldd_inst.name
+            &hgldd_inst.name_id
         };
 
-        // Identify the definition of the instance
-        let name = if let Some(hgl_obj_name) = &hgldd_inst.obj_name {
-            hgl_obj_name
+        // Identify the definition of the instance from HGL
+        let name = if let Some(hgl_module_name) = &hgldd_inst.hgl_module_name {
+            hgl_module_name
         } else {
-            &hgldd_inst.name
+            &hgldd_inst.name_id
         };
 
         // Use the name of the instance here -> it'll be replaced by calling fill_tyvcd_subscopes() (if an actual type is present)
         let high_level_info = Self::create_type_info_or(None, || name.clone());
 
         // Create a new scope from an instance
-        Scope::empty(trace_name.clone(), name.clone(), high_level_info)
+        let s = Scope::empty(trace_name.clone(), name.clone(), high_level_info);
+        s
     }
 
     // Create a variable from an hgldd variable
@@ -546,5 +559,45 @@ mod test {
 
         // tyvcd contain only D in its definitions
         assert_eq!(tyvcd.scopes.len(), 1)
+    }
+
+    #[test]
+    fn test_with_extra_artifacts() {
+        let extra_modules = vec!["TOP_TB".to_string(), "dut".to_string()];
+        let top_module_name = "A".to_string();
+        let hgldd = r#"
+        { 
+            "HGLDD": { "version": "1.0", "file_info": [] },
+            "objects": [
+                { 
+                    "kind": "module", "obj_name": "A", "module_name": "A", "source_lang_type_info": { "type_name": "A"},
+                    "port_vars": [{ "var_name": "i", "value": {"sig_name":"i"}, "type_name": "logic", "source_lang_type_info": { "type_name": "IO[Bool]" }}],
+                    "children": []
+                }
+            ]
+        }"#;
+
+        let hgldds = hgldd::reader::parse_hgldds_pub(hgldd);
+        // Add extra modules
+        let mut builder = super::TyVcdBuilder::init(hgldds)
+            .with_extra_artifact_scopes(extra_modules, &top_module_name);
+
+        builder.build();
+
+        let tyvcd = builder.get_ref().unwrap();
+        // Old hierachy was just A
+        // New hierarchy is:
+        // TOP_TB
+        // |_ dut: A
+        assert!(tyvcd.scopes.get("TOP_TB").is_some());
+        let top_tb = tyvcd.scopes.get("TOP_TB").unwrap().read().unwrap();
+        assert_eq!(top_tb.subscopes.len(), 1);
+        let dut = top_tb.subscopes.get("dut").unwrap().read().unwrap();
+        assert_eq!(dut.get_trace_name().unwrap(), "dut");
+        assert_eq!(dut.name, "A");
+        assert_eq!(dut.variables.len(), 1);
+
+        // Check that only there is only one top scope
+        assert_eq!(tyvcd.scopes.len(), 1);
     }
 }

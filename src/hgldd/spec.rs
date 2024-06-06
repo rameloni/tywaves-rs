@@ -144,12 +144,14 @@ pub struct ConstructorParams {
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub struct Instance {
-    /// The name of the instance in the source language (HGL)
-    pub name: String,
+    /// The name of the instance in the source language (HGL). Use it as an identifier.
+    #[serde(rename = "name")]
+    pub name_id: String,
     /// The name of the instance in the target language (HDL if the instance name is different from the source language)
     pub hdl_obj_name: Option<String>,
     /// The name of the module type of this instance in the source language (HGL)
-    pub obj_name: Option<String>,
+    #[serde(rename = "obj_name")]
+    pub hgl_module_name: Option<String>,
     /// The name of the module type of this instance in the target language (HDL)
     pub module_name: Option<String>,
 
@@ -171,9 +173,9 @@ impl Instance {
         hdl_type_obj_name: String,
     ) -> Self {
         Self {
-            name: hgl_name,
+            name_id: hgl_name,
             hdl_obj_name: Some(hdl_obj_name),
-            obj_name: Some(hgl_type_obj_name),
+            hgl_module_name: Some(hgl_type_obj_name),
             module_name: Some(hdl_type_obj_name),
             // hdl_obj_name: None,
             // obj_name: None,

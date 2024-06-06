@@ -89,7 +89,7 @@ pub struct ScopeDef {
     /// The variables declared in this scope
     pub variables: Vec<Variable>,
 
-    /// The original name of the scope in the HGLDD file
+    /// The original name of the scope in the HGLDD file. Definition name
     pub name: String,
     /// High level information of the scope
     pub high_level_info: TypeInfo,
