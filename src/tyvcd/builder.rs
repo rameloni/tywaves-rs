@@ -179,6 +179,14 @@ impl TyVcdBuilder<hgldd::Hgldd> {
 
                 // Build the fields of the struct
                 let mut fields: Vec<Variable> = Vec::with_capacity(obj.port_vars.len());
+
+                // If the struct has an unpacked range, get the sub-sub-expressions
+                let expressions = if hgldd_var.unpacked_range.is_some() {
+                    helper::get_sub_expressions(expressions.first())
+                } else {
+                    expressions
+                };
+
                 #[allow(clippy::needless_range_loop)]
                 for i in 0..obj.port_vars.len() {
                     let mut var = obj.port_vars[i].clone();
@@ -409,6 +417,29 @@ mod helper {
         }
     }
 
+    /// Extract the sub-expressions from an hgldd expression.
+    ///
+    /// # Example
+    /// ```json
+    ///  "value": {
+    //      "opcode": "'{",
+    //      "operands": [
+    //        { "sig_name": "io_a_0" },
+    //        {
+    //          "opcode": "'{",
+    //          "operands": [
+    //                {
+    //                  "opcode": "'{",
+    //                  "operands": [ { "sig_name": "io_b_b_vec_0_0" }, { "sig_name": "io_b_b_vec_1_0" }]
+    //                }
+    //           ]
+    //         }
+    //       ]
+    //   }
+    /// ```
+    /// Its call in sequence will return:
+    /// 1. [io_a_0, {io_b_b_vec_0_0, io_b_b_vec_1_0}]
+    /// 2. [io_b_b_vec_0_0, io_b_b_vec_1_0]
     #[inline]
     pub(in crate::tyvcd) fn get_sub_expressions(
         expression: Option<&hgldd::Expression>,
@@ -420,16 +451,9 @@ mod helper {
                 | hgldd::Expression::BitVector(_)
                 | hgldd::Expression::IntegerNum(_) => std::slice::from_ref(expression),
                 // This variable contains an operator, this means it contains the "values" of all its child variables (to be added in kind)
-                hgldd::Expression::Operator { opcode, operands } => match opcode {
-                    &hgldd::Opcode::Struct => {
-                        // if operands.len() == 1 {
-                        //     get_sub_expressions(&operands.first().cloned())
-                        // } else {
-                        operands.as_slice()
-                        // }
-                    }
-                    _ => operands.as_slice(),
-                },
+                hgldd::Expression::Operator { opcode, operands } => {
+                    operands.as_slice() // TODO: check if the opcode is needed here
+                }
             }
         } else {
             &[]
