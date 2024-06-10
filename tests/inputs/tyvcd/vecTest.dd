@@ -1,0 +1,805 @@
+{
+    "HGLDD": {
+      "version": "1.0",
+      "file_info": []
+    },
+    "objects": [
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 84,
+          "end_column": 16,
+          "end_line": 84,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec1",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 84,
+              "end_column": 16,
+              "end_line": 84,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<1>]"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 84,
+          "end_column": 16,
+          "end_line": 84,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec1_0",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 84,
+              "end_column": 16,
+              "end_line": 84,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<1>]"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 85,
+          "end_column": 16,
+          "end_line": 85,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec2",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 85,
+              "end_column": 16,
+              "end_line": 85,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<1>]"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 85,
+              "end_column": 16,
+              "end_line": 85,
+              "file": 1
+            },
+            "packed_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<2>]"
+            },
+            "type_name": "logic",
+            "var_name": "y"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 85,
+          "end_column": 16,
+          "end_line": 85,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec2_0",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 85,
+              "end_column": 16,
+              "end_line": 85,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<1>]"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 85,
+              "end_column": 16,
+              "end_line": 85,
+              "file": 1
+            },
+            "packed_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<2>]"
+            },
+            "type_name": "logic",
+            "var_name": "y"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 86,
+          "end_column": 16,
+          "end_line": 86,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec3",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 86,
+              "end_column": 16,
+              "end_line": 86,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<1>]"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 86,
+              "end_column": 16,
+              "end_line": 86,
+              "file": 1
+            },
+            "packed_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<2>]"
+            },
+            "type_name": "logic",
+            "var_name": "y"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 86,
+              "end_column": 16,
+              "end_line": 86,
+              "file": 1
+            },
+            "packed_range": [
+              2,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<3>]"
+            },
+            "type_name": "logic",
+            "var_name": "z"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 86,
+          "end_column": 16,
+          "end_line": 86,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec3_0",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 86,
+              "end_column": 16,
+              "end_line": 86,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<1>]"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 86,
+              "end_column": 16,
+              "end_line": 86,
+              "file": 1
+            },
+            "packed_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<2>]"
+            },
+            "type_name": "logic",
+            "var_name": "y"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 86,
+              "end_column": 16,
+              "end_line": 86,
+              "file": 1
+            },
+            "packed_range": [
+              2,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<3>]"
+            },
+            "type_name": "logic",
+            "var_name": "z"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 87,
+          "end_column": 16,
+          "end_line": 87,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec4",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 87,
+              "end_column": 16,
+              "end_line": 87,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<1>]"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 87,
+              "end_column": 16,
+              "end_line": 87,
+              "file": 1
+            },
+            "packed_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<2>]"
+            },
+            "type_name": "logic",
+            "var_name": "y"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 87,
+              "end_column": 16,
+              "end_line": 87,
+              "file": 1
+            },
+            "packed_range": [
+              2,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<3>]"
+            },
+            "type_name": "logic",
+            "var_name": "z"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 87,
+              "end_column": 16,
+              "end_line": 87,
+              "file": 1
+            },
+            "packed_range": [
+              3,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<4>]"
+            },
+            "type_name": "logic",
+            "var_name": "w"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 87,
+          "end_column": 16,
+          "end_line": 87,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec4_0",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 87,
+              "end_column": 16,
+              "end_line": 87,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<1>]"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 87,
+              "end_column": 16,
+              "end_line": 87,
+              "file": 1
+            },
+            "packed_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<2>]"
+            },
+            "type_name": "logic",
+            "var_name": "y"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 87,
+              "end_column": 16,
+              "end_line": 87,
+              "file": 1
+            },
+            "packed_range": [
+              2,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<3>]"
+            },
+            "type_name": "logic",
+            "var_name": "z"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 87,
+              "end_column": 16,
+              "end_line": 87,
+              "file": 1
+            },
+            "packed_range": [
+              3,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<4>]"
+            },
+            "type_name": "logic",
+            "var_name": "w"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 88,
+          "end_column": 16,
+          "end_line": 88,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec5_y",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "packed_range": [
+              31,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<32>]"
+            },
+            "type_name": "logic",
+            "var_name": "a"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "packed_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<2>]"
+            },
+            "type_name": "logic",
+            "var_name": "b"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "packed_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<2>]"
+            },
+            "type_name": "logic",
+            "var_name": "c"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 88,
+          "end_column": 16,
+          "end_line": 88,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec5",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<1>]"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[AnonymousBundle]"
+            },
+            "type_name": "Issue10_vec5_y",
+            "var_name": "y"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 88,
+          "end_column": 16,
+          "end_line": 88,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec5_y_0",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "packed_range": [
+              31,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<32>]"
+            },
+            "type_name": "logic",
+            "var_name": "a"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "packed_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<2>]"
+            },
+            "type_name": "logic",
+            "var_name": "b"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "packed_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<2>]"
+            },
+            "type_name": "logic",
+            "var_name": "c"
+          }
+        ]
+      },
+      {
+        "hgl_loc": {
+          "begin_column": 16,
+          "begin_line": 88,
+          "end_column": 16,
+          "end_line": 88,
+          "file": 1
+        },
+        "kind": "struct",
+        "obj_name": "Issue10_vec5_0",
+        "port_vars": [
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[UInt<1>]"
+            },
+            "type_name": "logic",
+            "var_name": "x"
+          },
+          {
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "source_lang_type_info": {
+              "type_name": "IO[AnonymousBundle]"
+            },
+            "type_name": "Issue10_vec5_y_0",
+            "var_name": "y"
+          }
+        ]
+      },
+      {
+        "kind": "module",
+        "obj_name": "Issue10",
+        "module_name": "Issue10",
+        "hgl_loc": {
+          "begin_column": 7,
+          "begin_line": 83,
+          "end_column": 7,
+          "end_line": 83,
+          "file": 1
+        },
+        "hdl_loc": {
+          "begin_line": 2,
+          "end_line": 2,
+          "file": 2
+        },
+        "source_lang_type_info": {
+          "type_name": "Issue10"
+        },
+        "port_vars": [
+          {
+            "var_name": "clock",
+            "hgl_loc": {
+              "begin_column": 7,
+              "begin_line": 83,
+              "end_column": 7,
+              "end_line": 83,
+              "file": 1
+            },
+            "value": {"sig_name":"clock"},
+            "type_name": "logic",
+            "source_lang_type_info": {
+              "type_name": "IO[Clock]"
+            }
+          },
+          {
+            "var_name": "reset",
+            "hgl_loc": {
+              "begin_column": 7,
+              "begin_line": 83,
+              "end_column": 7,
+              "end_line": 83,
+              "file": 1
+            },
+            "value": {"sig_name":"reset"},
+            "type_name": "logic",
+            "source_lang_type_info": {
+              "type_name": "IO[Bool]"
+            }
+          },
+          {
+            "var_name": "vec1",
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 84,
+              "end_column": 16,
+              "end_line": 84,
+              "file": 1
+            },
+            "value": {"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"vec1_0_x_0"}]},{"opcode":"'{","operands":[{"sig_name":"vec1_1_x_0"}]}]},
+            "type_name": "Issue10_vec1_0",
+            "unpacked_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[VecType1[2]]"
+            }
+          },
+          {
+            "var_name": "vec2",
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 85,
+              "end_column": 16,
+              "end_line": 85,
+              "file": 1
+            },
+            "value": {"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"vec2_0_x_0"},{"sig_name":"vec2_0_y_0"}]},{"opcode":"'{","operands":[{"sig_name":"vec2_1_x_0"},{"sig_name":"vec2_1_y_0"}]}]},
+            "type_name": "Issue10_vec2_0",
+            "unpacked_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[VecType2[2]]"
+            }
+          },
+          {
+            "var_name": "vec3",
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 86,
+              "end_column": 16,
+              "end_line": 86,
+              "file": 1
+            },
+            "value": {"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"vec3_0_x_0"},{"sig_name":"vec3_0_y_0"},{"sig_name":"vec3_0_z_0"}]},{"opcode":"'{","operands":[{"sig_name":"vec3_1_x_0"},{"sig_name":"vec3_1_y_0"},{"sig_name":"vec3_1_z_0"}]}]},
+            "type_name": "Issue10_vec3_0",
+            "unpacked_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[VecType3[2]]"
+            }
+          },
+          {
+            "var_name": "vec4",
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 87,
+              "end_column": 16,
+              "end_line": 87,
+              "file": 1
+            },
+            "value": {"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"vec4_0_x_0"},{"sig_name":"vec4_0_y_0"},{"sig_name":"vec4_0_z_0"},{"sig_name":"vec4_0_w_0"}]},{"opcode":"'{","operands":[{"sig_name":"vec4_1_x_0"},{"sig_name":"vec4_1_y_0"},{"sig_name":"vec4_1_z_0"},{"sig_name":"vec4_1_w_0"}]}]},
+            "type_name": "Issue10_vec4_0",
+            "unpacked_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[VecType4[2]]"
+            }
+          },
+          {
+            "var_name": "vec5",
+            "hgl_loc": {
+              "begin_column": 16,
+              "begin_line": 88,
+              "end_column": 16,
+              "end_line": 88,
+              "file": 1
+            },
+            "value": {"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"vec5_0_x_0"},{"opcode":"'{","operands":[{"sig_name":"vec5_0_y_a_0"},{"sig_name":"vec5_0_y_b_0"},{"sig_name":"vec5_0_y_c_0"}]}]},{"opcode":"'{","operands":[{"sig_name":"vec5_1_x_0"},{"opcode":"'{","operands":[{"sig_name":"vec5_1_y_a_0"},{"sig_name":"vec5_1_y_b_0"},{"sig_name":"vec5_1_y_c_0"}]}]}]},
+            "type_name": "Issue10_vec5_0",
+            "unpacked_range": [
+              1,
+              0
+            ],
+            "source_lang_type_info": {
+              "type_name": "IO[VecType5[2]]"
+            }
+          }
+        ],
+        "children": []
+      }
+    ]
+  }
+  
