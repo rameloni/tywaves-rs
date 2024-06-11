@@ -103,7 +103,7 @@ pub fn add_extra_modules(
 
     // Get the header of the HGLDDs
     let hgldd_header = if let Some(hgldd_header) = hgldds.first() {
-        hgldd_header.hgldd.clone()
+        hgldd_header.header.clone()
     } else {
         return hgldds;
     };
@@ -113,11 +113,11 @@ pub fn add_extra_modules(
 
     for hgldd in hgldds.iter_mut() {
         for object in hgldd.objects.iter_mut() {
-            if object.module_name.as_ref() == Some(top_module_name)
-                || object.obj_name == *top_module_name
+            if object.hdl_module_name.as_ref() == Some(top_module_name)
+                || object.hgl_obj_name == *top_module_name
             {
                 // Replace the top module with the new top module
-                object.module_name = extra_modules.pop();
+                object.hdl_module_name = extra_modules.pop();
                 // Save the top HGLDD and break
                 top_obj = Some(object);
                 break;
@@ -127,11 +127,11 @@ pub fn add_extra_modules(
 
     // 2. For all the remaining extra modules, create a new hierachy
     if let Some(top_obj) = top_obj {
-        let mut inst_name_hgl = top_obj.obj_name.clone(); // HGL
-        let mut inst_name_hdl = if let Some(module_name) = &top_obj.module_name {
+        let mut inst_name_hgl = top_obj.hgl_obj_name.clone(); // HGL
+        let mut inst_name_hdl = if let Some(module_name) = &top_obj.hdl_module_name {
             module_name.clone()
         } else {
-            top_obj.obj_name.clone()
+            top_obj.hgl_obj_name.clone()
         }; // HDL
 
         // Create a new HGLDD for each extra module (in reverse order)
@@ -148,7 +148,7 @@ pub fn add_extra_modules(
                 ]);
 
             let new_hgldd = Hgldd {
-                hgldd: hgldd_header.clone(),
+                header: hgldd_header.clone(),
                 objects: vec![new_obj],
             };
             // Update the instance names
@@ -215,8 +215,11 @@ mod tests {
         let hgldds = parse_hgldds(hgldd_str);
         assert_eq!(hgldds.len(), 1);
         assert_eq!(hgldds[0].objects.len(), 1);
-        assert_eq!(hgldds[0].objects[0].obj_name, "Bar");
-        assert_eq!(hgldds[0].objects[0].module_name, Some("Bar".to_string()));
+        assert_eq!(hgldds[0].objects[0].hgl_obj_name, "Bar");
+        assert_eq!(
+            hgldds[0].objects[0].hdl_module_name,
+            Some("Bar".to_string())
+        );
 
         // Replace Bar with TOP_TB -> b0
         let hgldds = add_extra_modules(
@@ -226,8 +229,8 @@ mod tests {
         );
         assert_eq!(hgldds.len(), 2);
         assert_eq!(hgldds[0].objects.len(), 1);
-        assert_eq!(hgldds[0].objects[0].obj_name, "Bar");
-        assert_eq!(hgldds[0].objects[0].module_name, Some("b0".to_string()));
+        assert_eq!(hgldds[0].objects[0].hgl_obj_name, "Bar");
+        assert_eq!(hgldds[0].objects[0].hdl_module_name, Some("b0".to_string()));
 
         let hgldds_expected = parse_hgldds(hgldd_out);
         assert_json_diff::assert_json_eq!(&hgldds, &hgldds_expected);
