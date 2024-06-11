@@ -88,7 +88,6 @@ pub fn create_vecs() -> TyVcd {
 
 fn create_vec1() -> Variable {
     let vec1_0_x = TraceValue::RefTraceName("vec1_0_x_0".to_string());
-    let vec1_0_x = TraceValue::RefTraceName("vec1_0_x_0".to_string());
     let vec1_0 = TraceValue::RefTraceValues(vec![vec1_0_x.clone()]);
     let vec1_1_x = TraceValue::RefTraceName("vec1_1_x_0".to_string());
     let vec1_1 = TraceValue::RefTraceValues(vec![vec1_1_x.clone()]);

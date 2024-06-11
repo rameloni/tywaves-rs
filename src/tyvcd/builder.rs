@@ -83,7 +83,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
     }
 
     // Returns the TyVcd object. Hint: call it after the build method
-    fn get_ref<'a>(&'a self) -> Option<&'a TyVcd> {
+    fn get_ref(&self) -> Option<&TyVcd> {
         self.tyvcd.as_ref()
     }
 
@@ -138,8 +138,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let high_level_info = Self::create_type_info_or(None, || name.clone());
 
         // Create a new scope from an instance
-        let s = Scope::empty(trace_name.clone(), name.clone(), high_level_info);
-        s
+        Scope::empty(trace_name.clone(), name.clone(), high_level_info)
     }
 
     // Create a variable from an hgldd variable
@@ -318,7 +317,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
             let mut scope_def = scope_def.write().unwrap();
 
             // 1. Check if it has instances (subscopes)
-            for (_, subscope_def) in (*scope_def).subscopes.iter_mut() {
+            for (_, subscope_def) in scope_def.subscopes.iter_mut() {
                 let mut subscope_def = subscope_def.write().unwrap();
                 // Get the real module definition from the original list
                 if let Some(module_def) = original_scope_map.get(&subscope_def.name) {

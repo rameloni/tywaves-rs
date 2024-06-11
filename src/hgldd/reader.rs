@@ -69,24 +69,22 @@ pub fn parse_hgldd_dir(hgldd_dir_path: &Path) -> Vec<Hgldd> {
 /// ```
 /// use tywaves_rs::hgldd::reader::{parse_hgldds, add_extra_modules};
 ///
-/// fn main() {
-///     let hgldd_str = r#"
-///         {
-///             "HGLDD": { "file_info": [], "version": "0.1.0" },
-///             "objects": [
-///                 {
-///                     "obj_name": "Bar",
-///                     "module_name": "Bar",
-///                     "kind": "module",
-///                     "children": [{ "name": "HGLme", "hdl_obj_name": "HDL", "obj_name": "HGLme", "module_name": "HDL" }],
-///                     "port_vars": []
-///                 }
-///             ]
-///         }"#;
-///     let hgldds = parse_hgldds(hgldd_str);
-///     let hgldds = add_extra_modules(hgldds, vec!["TOP_TB".to_string(), "DUT".to_string()], &"TOP_MODULE".to_string());
-///     println!("{}", serde_json::to_string_pretty(&hgldds).unwrap());
-/// }
+/// let hgldd_str = r#"
+///     {
+///         "HGLDD": { "file_info": [], "version": "0.1.0" },
+///         "objects": [
+///             {
+///                 "obj_name": "Bar",
+///                 "module_name": "Bar",
+///                 "kind": "module",
+///                 "children": [{ "name": "HGLme", "hdl_obj_name": "HDL", "obj_name": "HGLme", "module_name": "HDL" }],
+///                 "port_vars": []
+///             }
+///         ]
+///     }"#;
+/// let hgldds = parse_hgldds(hgldd_str);
+/// let hgldds = add_extra_modules(hgldds, vec!["TOP_TB".to_string(), "DUT".to_string()], &"TOP_MODULE".to_string());
+/// println!("{}", serde_json::to_string_pretty(&hgldds).unwrap());
 /// ```
 /// It will:
 /// - Update the [Hgldd] with `module_name` as "TOP_MODULE" with the `module_name` as "DUT".
