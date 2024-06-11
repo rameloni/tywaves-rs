@@ -63,7 +63,12 @@ pub fn parse_hgldd_dir(hgldd_dir_path: &Path) -> HglddResult {
             }
         }
     }
-    Ok(hgldds)
+
+    if hgldds.is_empty() {
+        Err("No HGLDD files found in the directory".into())
+    } else {
+        Ok(hgldds)
+    }
 }
 
 /// Add extra modules to the HGLDDs.

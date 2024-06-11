@@ -2,12 +2,14 @@ use super::{spec::*, trace_pointer::TraceGetter};
 use crate::hgldd::spec as hgldd;
 use std::{
     collections::HashMap,
+    error::Error,
     sync::{Arc, RwLock},
 };
 
+type Result<T> = std::result::Result<T, Box<dyn Error>>;
 /// Trait for a generic TyVcd builder.
 pub trait GenericBuilder {
-    fn build(&mut self);
+    fn build(&mut self) -> Result<()>;
     fn get_ref(&self) -> Option<&TyVcd>;
     fn get_copy(&self) -> Option<TyVcd>;
 }
@@ -22,15 +24,15 @@ pub struct TyVcdBuilder<T> {
 
 impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
     /// Build a [TyVcd] from a list of [hgldd::Hgldd] objects.
-    fn build(&mut self) {
+    fn build(&mut self) -> Result<()> {
         // Store the scopes found in the hgldd objects
         let mut scopes: HashMap<ScopeId, Arc<RwLock<Scope>>> = HashMap::new();
 
-        // Iterates over the hgldd objects
+        // Iterates over the hgldd objects and build the scopes
         for hgldd in &self.origin_list {
             for obj in &hgldd.objects {
                 match obj.kind {
-                    // Ignore the struct
+                    // Ignore the struct definitions
                     hgldd::ObjectKind::Struct => {}
                     hgldd::ObjectKind::Module => {
                         // Retrieve the information of the scope
@@ -45,7 +47,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                                 obj.hgl_obj_name.clone()
                             });
 
-                        // Create a scope from the module
+                        // Create an empty scope from the module definition
                         let mut scope = Scope::empty(
                             trace_name.clone(),
                             obj.hgl_obj_name.clone(),
@@ -58,14 +60,14 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                                 let emptyscope = Self::create_empty_scope_from_instance(inst);
                                 // scope.subscopes.push(emptyscope);
                                 scope.subscopes.insert(
-                                    emptyscope.get_trace_name().unwrap().clone(),
+                                    emptyscope.get_trace_name().unwrap().clone(), // safe to unwrap for an empty scope
                                     Arc::new(RwLock::new(emptyscope)),
                                 );
                             }
                         }
                         // Check the port vars inside the module
                         for var in &obj.port_vars {
-                            let variable = Self::create_variable(var, &hgldd.objects);
+                            let variable = Self::create_variable(var, &hgldd.objects)?;
                             scope.variables.push(variable);
                         }
 
@@ -79,7 +81,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
         // Create the TyVcd object
         self.tyvcd = Some(TyVcd { scopes });
 
-        let _ = self.fill_tyvcd_subscopes();
+        self.fill_tyvcd_subscopes()
     }
 
     // Returns the TyVcd object. Hint: call it after the build method
@@ -142,9 +144,17 @@ impl TyVcdBuilder<hgldd::Hgldd> {
     }
 
     // Create a variable from an hgldd variable
-    fn create_variable(hgldd_var: &hgldd::Variable, objects: &Vec<hgldd::Object>) -> Variable {
-        let trace_value =
-            helper::get_trace_value_from_expression(hgldd_var.value_expr.as_ref()).unwrap(); // TODO: check this unwrap()
+    fn create_variable(
+        hgldd_var: &hgldd::Variable,
+        objects: &Vec<hgldd::Object>,
+    ) -> Result<Variable> {
+        let trace_value = helper::get_trace_value_from_expression(hgldd_var.value_expr.as_ref())
+            .ok_or_else(|| {
+                format!(
+                    "Value expression not found for [{}] at loc: {:?}",
+                    hgldd_var.var_name, hgldd_var.hgl_loc
+                )
+            })?;
 
         let name = &hgldd_var.var_name;
         let high_level_info = Self::create_type_info_or(
@@ -177,7 +187,12 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                     .find(|o| {
                         o.kind == hgldd::ObjectKind::Struct && &o.hgl_obj_name == custom_type_name
                     })
-                    .unwrap();
+                    .ok_or_else(|| {
+                        format!(
+                            "Custom type {} not found among the struct defintions in the hgldd file",
+                            custom_type_name
+                        )
+                    })?;
 
                 // Build the fields of the struct
                 let mut fields: Vec<Variable> = Vec::with_capacity(obj.port_vars.len());
@@ -193,7 +208,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                 for i in 0..obj.port_vars.len() {
                     let mut var = obj.port_vars[i].clone();
                     var.value_expr = Some(expressions[i].clone());
-                    fields.push(Self::create_variable(&var, objects));
+                    fields.push(Self::create_variable(&var, objects)?);
                 }
 
                 VariableKind::Struct { fields }
@@ -204,13 +219,14 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let final_kind: VariableKind =
             if let Some(hgldd::UnpackedRange(dims)) = &hgldd_var.unpacked_range {
                 VariableKind::Vector {
-                    fields: Self::create_vector_fields(&kind, expressions, dims, &high_level_info),
+                    fields: Self::create_vector_fields(&kind, expressions, dims, &high_level_info)?,
                 }
             } else {
                 kind
             };
 
-        Variable::new(trace_value, name.clone(), high_level_info, final_kind)
+        let var = Variable::new(trace_value, name.clone(), high_level_info, final_kind);
+        Ok(var)
     }
 
     // Build the fields of a vector variable.
@@ -219,10 +235,11 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         expressions: &[hgldd::Expression],
         dims: &[u32],
         high_level_info: &TypeInfo,
-    ) -> Vec<Variable> {
+    ) -> Result<Vec<Variable>> {
+        static EXACT_DIMS: usize = 2;
         // No fields: empty vector
-        if dims.len() < 2 {
-            return Vec::new();
+        if dims.len() < EXACT_DIMS {
+            return Ok(Vec::new());
         }
 
         // Get the range of the current dimension [a:b]
@@ -236,41 +253,38 @@ impl TyVcdBuilder<hgldd::Hgldd> {
             // let expr = expressions.get(i);
             let expr = Some(expr);
             let subexpressions = helper::get_sub_expressions(expr);
-            let trace_value = helper::get_trace_value_from_expression(expr).unwrap(); // TODO: check this unwrap()
+            let trace_value = helper::get_trace_value_from_expression(expr).ok_or_else(|| {
+                format!(
+                    "Subexpressions not found in {:?} for [{}]",
+                    expressions, high_level_info.type_name
+                )
+            })?;
 
             // Adjust the trace name of this kind
             let mut kind = kind.clone(); // TODO: remove this clone
             Self::update_fields_trace_name(&mut kind, subexpressions);
 
-            let kind = if dims.len() > 2 {
+            let kind = if dims.len() > EXACT_DIMS {
                 // If there are more dimensions, this is a vector of vectors
                 VariableKind::Vector {
                     fields: Self::create_vector_fields(
                         &kind,
                         subexpressions,
-                        &dims[2..],
+                        &dims[EXACT_DIMS..],
                         high_level_info,
-                    ),
+                    )?,
                 }
             } else {
                 kind
             };
 
             // Build the var
-            let var = Variable::new(
-                trace_value,
-                idx.to_string(),
-                high_level_info.clone(),
-                // TypeInfo::new("type_name".to_string(), Vec::new()),
-                kind,
-            );
+            let var = Variable::new(trace_value, idx.to_string(), high_level_info.clone(), kind);
 
-            // let mut var = hgldd_var.clone();
-            // var.value = Some(expressions[j].clone());
             fields.push(var);
         }
 
-        fields
+        Ok(fields)
     }
 
     // Recursively update the trace names of the fields of a vector or struct variable.
@@ -303,10 +317,11 @@ impl TyVcdBuilder<hgldd::Hgldd> {
     /// applies the correct definitions to the respective subscopes.
     /// Indeed, after the first parsing all the `subscopes` do not contain their
     /// actual definitions (i.e. the variables and subscopes they contain)
-    /// if there are scopes in
-    /// `tyvcd` that should be instead subscopes of other scopes.
-    fn fill_tyvcd_subscopes(&mut self) -> Result<(), &'static str> {
-        let tyvcd = self.tyvcd.as_mut().ok_or("TyVcd not initialized")?;
+    /// if there are scopes in `tyvcd` that should be instead subscopes of other scopes.
+    fn fill_tyvcd_subscopes(&mut self) -> Result<()> {
+        let tyvcd = self.tyvcd.as_mut().ok_or(
+            "TyVcd not initialized. This may be due to failed build or build not executed yet.",
+        )?;
 
         // Get a copy of the scopes
         let original_scope_map = tyvcd.scopes.clone();
@@ -348,7 +363,9 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         Ok(())
     }
 
-    /// Create type info from source language type in hgldd
+    /// Create type info from source language type in hgldd.
+    ///
+    /// If the source language type is not present, it will use the value returned by `default_type_name()`.
     fn create_type_info_or<F: Fn() -> String>(
         src_lang_tp: Option<&hgldd::SourceLangType>,
         default_type_name: F,
@@ -420,6 +437,8 @@ mod helper {
     }
 
     /// Extract the sub-expressions from an hgldd expression.
+    /// If the expression is not compound, it will return the expression itself.
+    /// Instead, if the expression is empty or does not contain any sub-expressions, it will return an empty slice.
     ///
     /// # Example
     /// ```json
@@ -530,7 +549,7 @@ mod test {
         let hgldds =
             hgldd::reader::parse_hgldds_pub(hgldd_str).expect("error while paring the input HGLDD");
         let mut builder = super::TyVcdBuilder::init(hgldds);
-        builder.build();
+        builder.build().expect("build failed");
         let tyvcd = builder.get_ref();
 
         // Check it is created
@@ -610,7 +629,7 @@ mod test {
         let mut builder = super::TyVcdBuilder::init(hgldds)
             .with_extra_artifact_scopes(extra_modules, &top_module_name);
 
-        builder.build();
+        builder.build().expect("build failed");
 
         let tyvcd = builder.get_ref().unwrap();
         // Old hierachy was just A
