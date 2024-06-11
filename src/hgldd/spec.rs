@@ -338,7 +338,7 @@ impl fmt::Display for TypeName {
 
 /// The location of an object in a file.
 #[skip_serializing_none]
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Location {
     /// The index of the file in the [Header::file_info] of the HGLDD file
     #[serde(rename = "file")]

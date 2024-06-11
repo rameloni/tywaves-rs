@@ -358,10 +358,10 @@ impl VariableKind {
                 if let Some(field) = fields.first() {
                     fields.len() as u128 * field.kind.find_width()
                 } else {
-                    0
+                    0 // Empty vector
                 }
             }
-            VariableKind::External => 0,
+            VariableKind::External => 0, // TODO: for now return 0, but should be handled differently
         }
     }
 }

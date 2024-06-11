@@ -29,12 +29,13 @@ fn test_hgldd_tyvcd_builder_success(file_path: &str, exp_hgldd_len: usize) {
         hgldd::reader::parse_hgldd_dir(hgldd_file)
     } else {
         hgldd::reader::parse_hgldd_file(hgldd_file)
-    };
+    }
+    .expect("error parsing hgldd");
 
     assert_eq!(hgldd.len(), exp_hgldd_len);
 
     let mut builder = tyvcd::builder::TyVcdBuilder::init(hgldd);
-    builder.build();
+    builder.build().expect("build failed");
 }
 
 #[test_case("tests/inputs/tyvcd/foo_no_types.dd", foo::create_foo_single_no_types; "Test foo_no_types.dd")]
@@ -57,8 +58,8 @@ fn test_tyvcd_single_file_assertions(
         hgldd::reader::parse_hgldd_file(hgldd_file)
     };
 
-    let mut builder = tyvcd::builder::TyVcdBuilder::init(hgldd);
-    builder.build();
+    let mut builder = tyvcd::builder::TyVcdBuilder::init(hgldd.expect("error parsing hgldd"));
+    builder.build().expect("build failed");
     let tyvcd = builder.get_copy().unwrap();
 
     let expected_tyvcd = create_expected_output();
