@@ -1,4 +1,4 @@
-use std::{fs::File, io::*, path::Path};
+use std::{error::Error, fs::File, io::*, path::Path};
 use vcd::{Command, Header, IdCode, Parser, ReferenceIndex, Value, VarType, Writer};
 
 use crate::tyvcd::spec::{self as tyvcd};
@@ -9,6 +9,8 @@ type TyVariable = tyvcd::Variable;
 type TyVarKind = tyvcd::VariableKind;
 
 const RESULT_VCD: &str = "test.vcd";
+
+type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 pub struct VcdRewriter {
     /// The reader of the original VCD file
@@ -32,23 +34,24 @@ impl VcdRewriter {
     pub fn get_final_file(&self) -> &'static str {
         self.output_vcd_name
     }
-    pub fn new(vcd_path: &Path, tywaves_scopes: Vec<TyScope>) -> Self {
-        let vcd_file = File::open(vcd_path).unwrap();
-        let output_vcd = File::create(RESULT_VCD).unwrap();
+    pub fn new(vcd_path: &Path, tywaves_scopes: Vec<TyScope>) -> Result<Self> {
+        let vcd_file = File::open(vcd_path)?;
+        let output_vcd = File::create(RESULT_VCD)?;
 
         let reader = Parser::new(BufReader::new(vcd_file));
 
         // Extract the information from the reader
         let writer = Writer::new(BufWriter::new(output_vcd));
 
-        Self {
+        let vcd_rw = Self {
             reader,
             writer,
             output_vcd_name: RESULT_VCD,
             tywaves_scopes,
             vcd_header: Header::default(),
             rewrite_variables: vec![],
-        }
+        };
+        Ok(vcd_rw)
     }
 
     /// Rewrite the VCD file
@@ -97,7 +100,7 @@ impl VcdRewriter {
         // Add the scopes to the header
         let scope_name = scope
             .get_trace_name()
-            .ok_or(Error::new(ErrorKind::Other, "Failed to get scope name"))?;
+            .ok_or_else(|| format!("Failed to get scope from {}", scope.name))?;
 
         self.writer.add_module(scope_name)?;
 
@@ -110,12 +113,12 @@ impl VcdRewriter {
         }
 
         // Add the child scopes to the header
-        for (_, child_scope) in &scope.subscopes {
+        for child_scope in scope.subscopes.values() {
             let child_scope = child_scope.read().unwrap();
-
             self.add_scope_to_header(&child_scope, child_path_scope)?;
         }
 
+        // Close the scope
         self.writer.upscope()?;
 
         Ok(())
@@ -128,7 +131,7 @@ impl VcdRewriter {
         path_scope: &[String],
     ) -> Result<()> {
         // Get the information for the variable
-        let var_type = VarType::Wire;
+        static VAR_TYPE: VarType = VarType::Wire;
 
         let reference_name = if let Some(trace_name) = ty_variable.get_trace_name() {
             trace_name
@@ -142,7 +145,7 @@ impl VcdRewriter {
         // Write the variable to the VCD file
         let new_id = self
             .writer
-            .add_var(var_type, width, reference_name, index)?;
+            .add_var(VAR_TYPE, width, reference_name, index)?;
 
         // Update the rewrite_variables list
         self.rewrite_variables.push(VcdRewriteVariable::create(
@@ -172,18 +175,20 @@ impl VcdRewriter {
             Ok(())
         };
 
-        while let Some(command) = self.reader.next().transpose().unwrap() {
-            match command {
-                Command::ChangeScalar(original_id, value) => update_var(
-                    &mut self.writer,
-                    &original_id,
-                    vcd::Vector::from(vec![value]),
-                )?,
+        while let Some(command) = self.reader.next() {
+            match command? {
+                Command::ChangeScalar(original_id, value) => {
+                    update_var(&mut self.writer, &original_id, vcd::Vector::from([value]))?
+                }
                 Command::ChangeVector(original_id, value) => {
                     update_var(&mut self.writer, &original_id, value)?
                 }
                 Command::Timestamp(ts) => self.writer.timestamp(ts)?,
-                _ => {}
+                Command::ChangeString(_original_id, _value) => { /* TODO: implement ChangeString update */
+                }
+                Command::ChangeReal(_original_id, _value) => { /* TODO: implement ChangeReal update */
+                }
+                _ => {} // ignore the other commands
             }
         }
 
@@ -224,14 +229,14 @@ impl VcdRewriteVariable {
         scope_path: &[String],
         vcd_header: &Header,
     ) -> Self {
-        let mut source_id_codes = vec![];
         if vcd_header.find_scope(scope_path).is_none() {
             return Self {
                 id_code,
                 width,
-                source_id_codes,
+                source_id_codes: Vec::new(),
             };
         }
+        let mut source_id_codes = Vec::with_capacity(ty_variable.kind.find_width() as usize);
         // Collect first existing vcd_names: all the ground variables
         for ty_ground_variable in ty_variable.collect_ground_variables() {
             match ty_ground_variable.kind {
@@ -239,10 +244,8 @@ impl VcdRewriteVariable {
                     // Get the actual path of the variable
                     if let Some(vcd_name) = ty_ground_variable.get_trace_name() {
                         let path = &[scope_path, &[vcd_name.clone()]].concat();
-                        // println!("PATH: {:?}", path);
                         // Find the variable in the original VCD file (if it exists)
                         if let Some(vcd_var) = vcd_header.find_var(path) {
-                            // println!("FOUND: {:?}", vcd_var.reference);
                             // Prepend it
                             source_id_codes.insert(
                                 0,
@@ -291,8 +294,14 @@ impl VcdRewriteVariable {
         for id_code_with_shift in &mut self.source_id_codes {
             if id_code_with_shift.id_code == *source_id_code {
                 // Update the value
-                id_code_with_shift.update_value(value.clone());
-
+                id_code_with_shift
+                    .update_value(value.clone())
+                    .unwrap_or_else(|e| {
+                        eprintln!(
+                            "{e} Failed to update the value of the variable with id code {}",
+                            source_id_code
+                        )
+                    });
                 return true;
             }
         }
@@ -300,10 +309,11 @@ impl VcdRewriteVariable {
     }
 
     /// Return the id code of this variable
+    #[inline]
     pub fn get_id_code(&self) -> IdCode {
         self.id_code
     }
-
+    #[inline]
     pub fn get_width(&self) -> u32 {
         self.width
     }
@@ -333,8 +343,19 @@ impl IdCodeWithShift {
         &self.value
     }
 
-    pub fn update_value(&mut self, value: vcd::Vector) {
-        assert_eq!(value.len(), self.value.len(), "Failing to update the value. Update value has a different size from the original: new {} original {}.\n New: {}, original {}", value.len(), self.value.len(), value, self.value);
+    pub fn update_value(&mut self, value: vcd::Vector) -> Result<()> {
+        if value.len() != self.value.len() {
+            return Err(format!(
+                "Failing to update the value. Update value has a different size from the original: new {} original {}.\n New: {}, original {}",
+                value.len(),
+                self.value.len(),
+                value,
+                self.value
+            )
+            .into());
+        }
         self.value = value;
+
+        Ok(())
     }
 }

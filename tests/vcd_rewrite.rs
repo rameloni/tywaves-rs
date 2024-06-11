@@ -2,20 +2,21 @@ use std::str::FromStr;
 use tywaves_rs::vcd_rewrite::{IdCodeWithShift, VcdRewriteVariable};
 
 #[test]
+#[rustfmt::skip]
 fn vcd_rewrite_variable() {
     let id_code = vcd::IdCode::FIRST;
     let id_code_a = id_code.next();
     let id_code_b = id_code_a.next();
     let id_code_c = id_code_b.next();
 
-    let width: usize = 10;
+    let width: usize = 12;
     let mut input_sum = VcdRewriteVariable::new(
         id_code,
         width as u32,
         vec![
-            IdCodeWithShift::new(id_code_a, vcd::Vector::from_str("000").unwrap()), // 0b00000001
-            IdCodeWithShift::new(id_code_b, vcd::Vector::from_str("10001").unwrap()), // 0b00001000
-            IdCodeWithShift::new(id_code_c, vcd::Vector::from_str("0").unwrap()),   // 0b00100000
+            IdCodeWithShift::new(id_code_a, vcd::Vector::from_str("000").unwrap()),   // 0b00000000
+            IdCodeWithShift::new(id_code_b, vcd::Vector::from_str("10001").unwrap()), // 0b00010001
+            IdCodeWithShift::new(id_code_c, vcd::Vector::from_str("0").unwrap()),     // 0b00000000
         ],
     );
 
