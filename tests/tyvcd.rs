@@ -20,6 +20,7 @@ use pretty_assertions::assert_eq;
 #[test_case("tests/inputs/hgldd/global.dd", 1; "Test global.dd")]
 #[test_case("tests/inputs/hgldd", 7; "Test directory project")]
 #[test_case("tests/inputs/tyvcd/vecTest.dd", 1; "Test Index out of bounds in builder.rs")]
+#[test_case("tests/inputs/tyvcd/vecMultiDimTest.dd", 1; "Test vecs multidim")]
 fn test_hgldd_tyvcd_builder_success(file_path: &str, exp_hgldd_len: usize) {
     // Read the hgldd file
     let hgldd_file = Path::new(file_path);
@@ -44,6 +45,7 @@ fn test_hgldd_tyvcd_builder_success(file_path: &str, exp_hgldd_len: usize) {
 #[test_case("tests/inputs/tyvcd/foo", foo::create_foo; "Test directory foo")]
 #[test_case("tests/inputs/tyvcd/withBundlesAndVecs.dd", with_bundles_and_vecs::create_with_bundles_and_vecs; "Test with bundles and vecs")]
 #[test_case("tests/inputs/tyvcd/vecTest.dd", vec_test::create_vecs; "Test Index out of bounds in builder.rs")]
+#[test_case("tests/inputs/tyvcd/vecMultiDimTest.dd", vec_multi_dim_test::create_vecs_multi_dim; "Test vecs multidim")]
 fn test_tyvcd_single_file_assertions(
     file_path: &str,
     create_expected_output: fn() -> tyvcd::spec::TyVcd,

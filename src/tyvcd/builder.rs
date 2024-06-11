@@ -204,11 +204,18 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                 // Build the fields of the struct
                 let mut fields: Vec<Variable> = Vec::with_capacity(obj.port_vars.len());
 
-                // If the struct has an unpacked range, get the sub-sub-expressions
-                let expressions = if hgldd_var.unpacked_range.is_some() {
-                    helper::get_sub_expressions(expressions.first())
-                } else {
-                    expressions
+                let expressions = match &hgldd_var.unpacked_range {
+                    // If the struct has an unpacked range, call get_sub_expressions recursively
+                    Some(hgldd::UnpackedRange(unpacked_dims)) => {
+                        // Get the sub-expressions for each couple of dimensions [a:b]
+                        let mut subexpr = expressions;
+                        for _ in 0..unpacked_dims.len() / 2 {
+                            // Call get_sub_expressions
+                            subexpr = helper::get_sub_expressions(subexpr.first())
+                        }
+                        subexpr
+                    }
+                    _ => expressions,
                 };
 
                 #[allow(clippy::needless_range_loop)]
