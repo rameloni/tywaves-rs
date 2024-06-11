@@ -1,6 +1,6 @@
 [package]
 name = "tywaves-rs"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Raffaele Meloni <raffaele.meloni99@gmail.com>"]
 description = "Library for reading and elaborating typed waveform files in Rust."
