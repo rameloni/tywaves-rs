@@ -34,20 +34,23 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                     hgldd::ObjectKind::Struct => {}
                     hgldd::ObjectKind::Module => {
                         // Retrieve the information of the scope
-                        let trace_name = if let Some(module_name) = &obj.module_name {
+                        let trace_name = if let Some(module_name) = &obj.hdl_module_name {
                             module_name
                         } else {
-                            &obj.obj_name
+                            &obj.hgl_obj_name
                         };
 
                         let high_level_info =
                             Self::create_type_info_or(obj.source_lang_type_info.as_ref(), || {
-                                obj.obj_name.clone()
+                                obj.hgl_obj_name.clone()
                             });
 
                         // Create a scope from the module
-                        let mut scope =
-                            Scope::empty(trace_name.clone(), obj.obj_name.clone(), high_level_info);
+                        let mut scope = Scope::empty(
+                            trace_name.clone(),
+                            obj.hgl_obj_name.clone(),
+                            high_level_info,
+                        );
 
                         // Check the children of this scope
                         if let Some(children) = &obj.children {
@@ -80,7 +83,7 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
     }
 
     // Returns the TyVcd object. Hint: call it after the build method
-    fn get_ref<'a>(&'a self) -> Option<&'a TyVcd> {
+    fn get_ref(&self) -> Option<&TyVcd> {
         self.tyvcd.as_ref()
     }
 
@@ -135,14 +138,13 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let high_level_info = Self::create_type_info_or(None, || name.clone());
 
         // Create a new scope from an instance
-        let s = Scope::empty(trace_name.clone(), name.clone(), high_level_info);
-        s
+        Scope::empty(trace_name.clone(), name.clone(), high_level_info)
     }
 
     // Create a variable from an hgldd variable
     fn create_variable(hgldd_var: &hgldd::Variable, objects: &Vec<hgldd::Object>) -> Variable {
         let trace_value =
-            helper::get_trace_value_from_expression(hgldd_var.value.as_ref()).unwrap(); // TODO: check this unwrap()
+            helper::get_trace_value_from_expression(hgldd_var.value_expr.as_ref()).unwrap(); // TODO: check this unwrap()
 
         let name = &hgldd_var.var_name;
         let high_level_info = Self::create_type_info_or(
@@ -154,7 +156,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         );
 
         // Get the expressions of this variable
-        let expressions = helper::get_sub_expressions(hgldd_var.value.as_ref());
+        let expressions = helper::get_sub_expressions(hgldd_var.value_expr.as_ref());
 
         // Build the kind of this type
         let kind = match &hgldd_var.type_name {
@@ -173,7 +175,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                 let obj = objects
                     .iter()
                     .find(|o| {
-                        o.kind == hgldd::ObjectKind::Struct && &o.obj_name == custom_type_name
+                        o.kind == hgldd::ObjectKind::Struct && &o.hgl_obj_name == custom_type_name
                     })
                     .unwrap();
 
@@ -190,7 +192,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                 #[allow(clippy::needless_range_loop)]
                 for i in 0..obj.port_vars.len() {
                     let mut var = obj.port_vars[i].clone();
-                    var.value = Some(expressions[i].clone());
+                    var.value_expr = Some(expressions[i].clone());
                     fields.push(Self::create_variable(&var, objects));
                 }
 
@@ -315,7 +317,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
             let mut scope_def = scope_def.write().unwrap();
 
             // 1. Check if it has instances (subscopes)
-            for (_, subscope_def) in (*scope_def).subscopes.iter_mut() {
+            for (_, subscope_def) in scope_def.subscopes.iter_mut() {
                 let mut subscope_def = subscope_def.write().unwrap();
                 // Get the real module definition from the original list
                 if let Some(module_def) = original_scope_map.get(&subscope_def.name) {

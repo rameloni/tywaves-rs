@@ -5,15 +5,15 @@ use tywaves_rs::hgldd::{self};
 
 #[test]
 fn random_hgldd_file() {
-    let hgldd = hgldd::spec::Header {
+    let header = hgldd::spec::Header {
         version: String::from("1.0"),
         file_info: Vec::new(),
         hdl_file_index: None,
     };
     let object = hgldd::spec::Object {
         kind: hgldd::spec::ObjectKind::Module,
-        obj_name: String::from("top"),
-        module_name: Some(String::from("top")),
+        hgl_obj_name: String::from("top"),
+        hdl_module_name: Some(String::from("top")),
         is_ext_module: None,
         hgl_loc: None,
         hdl_loc: None,
@@ -24,7 +24,7 @@ fn random_hgldd_file() {
     println!(
         "{}",
         serde_json::to_string_pretty(&hgldd::spec::Hgldd {
-            hgldd,
+            header,
             objects: vec![object]
         })
         .unwrap()
