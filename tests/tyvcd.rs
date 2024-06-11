@@ -29,7 +29,8 @@ fn test_hgldd_tyvcd_builder_success(file_path: &str, exp_hgldd_len: usize) {
         hgldd::reader::parse_hgldd_dir(hgldd_file)
     } else {
         hgldd::reader::parse_hgldd_file(hgldd_file)
-    };
+    }
+    .expect("error parsing hgldd");
 
     assert_eq!(hgldd.len(), exp_hgldd_len);
 
@@ -57,7 +58,7 @@ fn test_tyvcd_single_file_assertions(
         hgldd::reader::parse_hgldd_file(hgldd_file)
     };
 
-    let mut builder = tyvcd::builder::TyVcdBuilder::init(hgldd);
+    let mut builder = tyvcd::builder::TyVcdBuilder::init(hgldd.expect("error parsing hgldd"));
     builder.build();
     let tyvcd = builder.get_copy().unwrap();
 

@@ -34,7 +34,7 @@ fn random_hgldd_file() {
 #[test]
 fn test_parser() {
     let hgldd_file = Path::new("tests/inputs/hgldd/foo.dd");
-    hgldd::reader::parse_hgldd_file(hgldd_file);
+    let _ = hgldd::reader::parse_hgldd_file(hgldd_file);
 }
 #[test_case("tests/inputs/hgldd/foo.dd"; "Test foo.dd")]
 #[test_case("tests/inputs/hgldd/bar.dd"; "Test bar.dd")]
@@ -45,7 +45,7 @@ fn test_parser() {
 fn test_hgldd_parser(file_path: &str) {
     let hgldd_file = Path::new(file_path);
 
-    let hgldd = hgldd::reader::parse_hgldd_file(hgldd_file);
+    let hgldd = hgldd::reader::parse_hgldd_file(hgldd_file).expect("error parsing hgldd");
     assert_eq!(hgldd.len(), 1);
     let hgldd = hgldd.first();
 
@@ -65,7 +65,7 @@ fn test_hgldd_parser(file_path: &str) {
 fn test_hgldd_parser_with_comments() {
     let hgldd_file = Path::new("tests/inputs/hgldd/foo_with_comments.dd");
 
-    let hgldd = hgldd::reader::parse_hgldd_file(hgldd_file);
+    let hgldd = hgldd::reader::parse_hgldd_file(hgldd_file).expect("error parsing hgldd");
     assert!(hgldd.len() == 1);
     let hgldd = hgldd.first();
 
@@ -85,21 +85,30 @@ fn test_hgldd_parser_with_comments() {
 #[test]
 fn test_multi_hgldd_parser() {
     let hgldd_file = Path::new("tests/inputs/3_hgldds_in_single_file.dd");
-    let hgldds = hgldd::reader::parse_hgldd_file(hgldd_file);
+    let hgldds = hgldd::reader::parse_hgldd_file(hgldd_file).expect("error parsing hgldd file");
     assert_eq!(hgldds.len(), 3);
 }
 
 #[test]
 fn test_hgldd_parser_dir() {
     let hgldd_dir = Path::new("tests/inputs/hgldd");
-    let hgldds = hgldd::reader::parse_hgldd_dir(hgldd_dir);
+    let files_to_skip = vec!["file_with_wrong_ext.ddd", "file_without_ext"];
+    let hgldds = hgldd::reader::parse_hgldd_dir(hgldd_dir).expect("error parsing hgldd dir");
     assert_eq!(hgldds.len(), 7);
 
     // Collect the file names from the dir
     let reference_files: Vec<String> = std::fs::read_dir(hgldd_dir)
         .unwrap()
-        .map(|x| x.unwrap().file_name().into_string().unwrap())
+        .filter_map(|x| {
+            let file_name = x.unwrap().file_name().into_string().unwrap();
+            if files_to_skip.contains(&file_name.as_str()) {
+                None
+            } else {
+                Some(file_name)
+            }
+        })
         .collect();
+
     // Check
     // Zip file_names and hgldds
     for (reference_file, hgldd) in reference_files.iter().zip(hgldds.iter()) {

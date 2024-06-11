@@ -527,7 +527,8 @@ mod test {
         }
         "#;
 
-        let hgldds = hgldd::reader::parse_hgldds_pub(hgldd_str);
+        let hgldds =
+            hgldd::reader::parse_hgldds_pub(hgldd_str).expect("error while paring the input HGLDD");
         let mut builder = super::TyVcdBuilder::init(hgldds);
         builder.build();
         let tyvcd = builder.get_ref();
@@ -603,7 +604,8 @@ mod test {
             ]
         }"#;
 
-        let hgldds = hgldd::reader::parse_hgldds_pub(hgldd);
+        let hgldds =
+            hgldd::reader::parse_hgldds_pub(hgldd).expect("error while paring the input HGLDD");
         // Add extra modules
         let mut builder = super::TyVcdBuilder::init(hgldds)
             .with_extra_artifact_scopes(extra_modules, &top_module_name);
