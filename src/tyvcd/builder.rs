@@ -2,11 +2,23 @@ use super::{spec::*, trace_pointer::TraceGetter};
 use crate::hgldd::spec as hgldd;
 use std::{
     collections::HashMap,
-    error::Error,
     sync::{Arc, RwLock},
 };
 
-type Result<T> = std::result::Result<T, Box<dyn Error>>;
+type Result<T> = std::result::Result<T, BuilderError>;
+
+#[derive(Debug)]
+pub enum BuilderError {
+    /// Error when trying to get a [super::trace_pointer::TraceValue]
+    MissingTraceValue(String),
+    /// Error when trying to get a [super::trace_pointer::TraceValue] when it is required
+    MissingTraceValueRequired(String),
+    /// Error when trying to create a [Variable] from an hgldd variable with message
+    FailedToBuildVariable(String),
+    /// Generic failure of the builder
+    GenericFailure(&'static str),
+}
+
 /// Trait for a generic TyVcd builder.
 pub trait GenericBuilder {
     fn build(&mut self) -> Result<()>;
@@ -42,10 +54,10 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                             &obj.hgl_obj_name
                         };
 
-                        let high_level_info =
-                            Self::create_type_info_or(obj.source_lang_type_info.as_ref(), || {
-                                obj.hgl_obj_name.clone()
-                            });
+                        let high_level_info = Self::create_type_info_or_default(
+                            obj.source_lang_type_info.as_ref(),
+                            || obj.hgl_obj_name.clone(),
+                        );
 
                         // Create an empty scope from the module definition
                         let mut scope = Scope::empty(
@@ -137,7 +149,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         };
 
         // Use the name of the instance here -> it'll be replaced by calling fill_tyvcd_subscopes() (if an actual type is present)
-        let high_level_info = Self::create_type_info_or(None, || name.clone());
+        let high_level_info = Self::create_type_info_or_default(None, || name.clone());
 
         // Create a new scope from an instance
         Scope::empty(trace_name.clone(), name.clone(), high_level_info)
@@ -150,20 +162,20 @@ impl TyVcdBuilder<hgldd::Hgldd> {
     ) -> Result<Variable> {
         let trace_value = helper::get_trace_value_from_expression(hgldd_var.value_expr.as_ref())
             .ok_or_else(|| {
-                format!(
+                BuilderError::MissingTraceValue(format!(
                     "Value expression not found for [{}] at loc: {:?}",
                     hgldd_var.var_name, hgldd_var.hgl_loc
-                )
+                ))
             })?;
 
         let name = &hgldd_var.var_name;
-        let high_level_info = Self::create_type_info_or(
-            hgldd_var.source_lang_type_info.as_ref(),
-            || match &hgldd_var.type_name {
-                None => "na".to_string(), // TODO: ensure this na is fine
-                Some(e) => e.to_string(),
-            },
-        );
+        let high_level_info =
+            Self::create_type_info_or_default(hgldd_var.source_lang_type_info.as_ref(), || {
+                match &hgldd_var.type_name {
+                    None => "na".to_string(), // TODO: ensure this na is fine
+                    Some(e) => e.to_string(),
+                }
+            });
 
         // Get the expressions of this variable
         let expressions = helper::get_sub_expressions(hgldd_var.value_expr.as_ref());
@@ -187,12 +199,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                     .find(|o| {
                         o.kind == hgldd::ObjectKind::Struct && &o.hgl_obj_name == custom_type_name
                     })
-                    .ok_or_else(|| {
-                        format!(
-                            "Custom type {} not found among the struct defintions in the hgldd file",
-                            custom_type_name
-                        )
-                    })?;
+                    .ok_or_else(|| BuilderError::FailedToBuildVariable(custom_type_name.clone()))?;
 
                 // Build the fields of the struct
                 let mut fields: Vec<Variable> = Vec::with_capacity(obj.port_vars.len());
@@ -254,10 +261,10 @@ impl TyVcdBuilder<hgldd::Hgldd> {
             let expr = Some(expr);
             let subexpressions = helper::get_sub_expressions(expr);
             let trace_value = helper::get_trace_value_from_expression(expr).ok_or_else(|| {
-                format!(
+                BuilderError::MissingTraceValueRequired(format!(
                     "Subexpressions not found in {:?} for [{}]",
                     expressions, high_level_info.type_name
-                )
+                ))
             })?;
 
             // Adjust the trace name of this kind
@@ -319,9 +326,9 @@ impl TyVcdBuilder<hgldd::Hgldd> {
     /// actual definitions (i.e. the variables and subscopes they contain)
     /// if there are scopes in `tyvcd` that should be instead subscopes of other scopes.
     fn fill_tyvcd_subscopes(&mut self) -> Result<()> {
-        let tyvcd = self.tyvcd.as_mut().ok_or(
+        let tyvcd = self.tyvcd.as_mut().ok_or(BuilderError::GenericFailure(
             "TyVcd not initialized. This may be due to failed build or build not executed yet.",
-        )?;
+        ))?;
 
         // Get a copy of the scopes
         let original_scope_map = tyvcd.scopes.clone();
@@ -366,7 +373,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
     /// Create type info from source language type in hgldd.
     ///
     /// If the source language type is not present, it will use the value returned by `default_type_name()`.
-    fn create_type_info_or<F: Fn() -> String>(
+    fn create_type_info_or_default<F: Fn() -> String>(
         src_lang_tp: Option<&hgldd::SourceLangType>,
         default_type_name: F,
     ) -> TypeInfo {

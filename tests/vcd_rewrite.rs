@@ -25,18 +25,21 @@ fn vcd_rewrite_variable() {
         vcd::Vector::from_str(&format!("{:0>width$}", "10001000", width = width)).unwrap()
     );
 
-    input_sum.update_value(&id_code_a, &vcd::Vector::from_str("001").unwrap());
+    let _ = input_sum.update_value(&id_code_a, &vcd::Vector::from_str("001").unwrap());
     assert_eq!(
         input_sum.get_value(),
         vcd::Vector::from_str(&format!("{:0>width$}", "10001001", width = width)).unwrap()
     );
 
-    input_sum.update_value(&id_code_b, &vcd::Vector::from_str("00000").unwrap());
+    let _ = input_sum.update_value(&id_code_b, &vcd::Vector::from_str("00000").unwrap());
     assert_eq!(
         input_sum.get_value(),
         vcd::Vector::from_str(&format!("{:0>width$}", "00000001", width = width)).unwrap()
     );
 }
+
+#[test]
+fn vcd_rewrite_failure() {}
 
 #[test]
 #[should_panic]

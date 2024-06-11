@@ -1,12 +1,31 @@
 use crate::hgldd::spec::{Hgldd, Instance, Object, ObjectKind};
-use std::error::Error;
 use std::path::Path;
 
 /// The extension used for HGLDD files.
 const HGLDD_EXTENSION: &str = "dd";
 
 // Type alias for the return result of the parsing functions
-type HglddResult = Result<Vec<Hgldd>, Box<dyn Error>>;
+type HglddResult = Result<Vec<Hgldd>, HglddReaderError>;
+
+#[derive(Debug)]
+pub enum HglddReaderError {
+    /// The parser failed due to an IO error.
+    IoError(std::io::Error),
+    /// The parser failed due to a Serde error.
+    SerdeError(serde_json::Error),
+}
+
+impl From<std::io::Error> for HglddReaderError {
+    fn from(err: std::io::Error) -> Self {
+        HglddReaderError::IoError(err)
+    }
+}
+
+impl From<serde_json::Error> for HglddReaderError {
+    fn from(err: serde_json::Error) -> Self {
+        HglddReaderError::SerdeError(err)
+    }
+}
 
 /// Remove comments (if any) from the HGLDD content.
 #[inline]
@@ -31,11 +50,9 @@ pub fn parse_hgldds(hgldd_str: &str) -> HglddResult {
     let hgldd_str = drop_comments(hgldd_str);
     let deserializer = serde_json::Deserializer::from_reader(hgldd_str.as_bytes());
     let iterator = deserializer.into_iter::<serde_json::Value>();
-    let result: Result<Vec<Hgldd>, Box<dyn Error>> = iterator
-        .map(|x| serde_json::from_value(x?).map_err(|e| Box::new(e) as Box<dyn Error>))
-        .collect();
-
-    result
+    iterator
+        .map(|x| serde_json::from_value(x?).map_err(|e| e.into()))
+        .collect()
 }
 
 /// Parse single HGLDD file.
@@ -65,7 +82,10 @@ pub fn parse_hgldd_dir(hgldd_dir_path: &Path) -> HglddResult {
     }
 
     if hgldds.is_empty() {
-        Err("No HGLDD files found in the directory".into())
+        Err(HglddReaderError::IoError(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "No HGLDD files found in the directory",
+        )))
     } else {
         Ok(hgldds)
     }
