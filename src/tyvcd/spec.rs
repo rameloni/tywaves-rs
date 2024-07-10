@@ -1,3 +1,5 @@
+use crate::hgldd::spec::EnumValMap;
+
 use super::trace_pointer::{TraceFinder, TraceGetter, TraceValue};
 use std::{
     collections::HashMap,
@@ -166,10 +168,11 @@ impl TraceGetter for ScopeDef {
 }
 
 /// Represent a variable in the TyVcd format.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Variable {
     /// The value of the variable in the trace.
     _trace_value: TraceValue,
+    _is_top: bool,
 
     /// The name of the variable.
     pub name: String,
@@ -177,6 +180,30 @@ pub struct Variable {
     pub high_level_info: TypeInfo,
     /// The kind of the variable.
     pub kind: VariableKind,
+    /// The reference enum type if any.
+    pub enum_val_map: Option<Arc<RwLock<EnumValMap>>>,
+}
+
+impl PartialEq for Variable {
+    fn eq(&self, other: &Self) -> bool {
+        if self.name != other.name
+            || self.high_level_info != other.high_level_info
+            || self.kind != other.kind
+            || self._trace_value != other._trace_value
+        {
+            return false;
+        }
+
+        if let Some(enum_val_map) = &self.enum_val_map {
+            if let Some(other_enum_val_map) = &other.enum_val_map {
+                *enum_val_map.read().unwrap() == *other_enum_val_map.read().unwrap()
+            } else {
+                false
+            }
+        } else {
+            self.enum_val_map.is_none() && other.enum_val_map.is_none()
+        }
+    }
 }
 
 impl Variable {
@@ -192,7 +219,21 @@ impl Variable {
             name,
             high_level_info,
             kind,
+            enum_val_map: None,
+            _is_top: false,
         }
+    }
+
+    pub fn with_enum_val_map(mut self, enum_val_map: EnumValMap) -> Self {
+        if !enum_val_map.is_empty() {
+            self.enum_val_map = Some(Arc::new(RwLock::new(enum_val_map)));
+        }
+        self
+    }
+
+    pub fn as_top(mut self) -> Self {
+        self._is_top = true;
+        self
     }
 
     // /// Update the trace name of the variable.
@@ -223,8 +264,15 @@ impl Variable {
         // Check if the variable was found and return it
         if let Some(result) = subvar_opt {
             Some(result)
-        } else if trace_name == self.name {
+        } else if trace_name == self.name && self._is_top {
             // Otherwise check if the variable name corresponds to the current variable
+            // ONLY WHEN THE VARIABLE IS A top
+            // This avoids conflicts when for example there is a subfield `io.x` and a top var `x`
+            //    - io {x: int, y: int}
+            //    - x: float
+            // The VCD should result in `io_x`, `io_y` and `x` but also `io` and `x` is valid.
+            // In this case aggregates are grouped and names of variables are used, when `x` is
+            // selected from the VCD only the top `x` needs to be compared
             // TODO: this is a temporary fix, when vcd_rewrite is called the trace names are created from the variable names if the variable does not have a trace name
             Some(self)
         } else {
@@ -258,9 +306,25 @@ impl Variable {
         //     return String::from("---");
         // }
 
-        match &self.kind {
+        let render_result = match &self.kind {
             // If the variable is a ground type: use the raw value directly
-            VariableKind::Ground(width) => render_fn(*width as u64, raw_val_vcd),
+            VariableKind::Ground(width) => {
+                let mut render_result = None;
+                if let Some(enum_val_map) = &self.enum_val_map {
+                    let enum_val_map = enum_val_map.read().unwrap();
+                    if let Ok(intval) = i64::from_str_radix(raw_val_vcd, 2) {
+                        let render = enum_val_map.get(&intval);
+                        if let Some(render) = render {
+                            render_result = Some(render.clone());
+                        }
+                    }
+                }
+                if let Some(r) = render_result {
+                    r
+                } else {
+                    render_fn(*width as u64, raw_val_vcd)
+                }
+            }
             // Otherwise, encode the fields recursively {x, {y, z}} or [x, y, z]
             VariableKind::Vector { fields } | VariableKind::Struct { fields } => {
                 // Encode the fields recursively {x, {y, z}} or [x, y, z]
@@ -292,6 +356,12 @@ impl Variable {
                 value
             }
             VariableKind::External => todo!("Unknown type not implemented"),
+        };
+
+        if self._is_top {
+            format!("{} {}", self.high_level_info.type_name, render_result)
+        } else {
+            render_result
         }
     }
 }

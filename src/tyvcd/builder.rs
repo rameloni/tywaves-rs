@@ -1,5 +1,5 @@
 use super::{spec::*, trace_pointer::TraceGetter};
-use crate::hgldd::spec as hgldd;
+use crate::hgldd::spec::{self as hgldd, EnumDefMap};
 use std::{
     collections::HashMap,
     sync::{Arc, RwLock},
@@ -32,6 +32,9 @@ pub struct TyVcdBuilder<T> {
     origin_list: Vec<T>,
     // The target TyVcd object
     tyvcd: Option<TyVcd>,
+
+    // Cache the enum definition
+    enum_def_map: EnumDefMap,
 }
 
 impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
@@ -77,9 +80,18 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                                 );
                             }
                         }
+                        // Push all the definitions in the module
+                        if let Some(enum_defs) = &obj.enum_defs {
+                            for (key, enum_def_map) in enum_defs {
+                                self.enum_def_map.insert(key.clone(), enum_def_map.clone());
+                            }
+                        }
+
                         // Check the port vars inside the module
                         for var in &obj.port_vars {
-                            let variable = Self::create_variable(var, &hgldd.objects)?;
+                            let variable = self.create_variable(var, &hgldd.objects)?;
+                            // Define the variable as top variable (declared in the module)
+                            let variable = variable.as_top();
                             scope.variables.push(variable);
                         }
 
@@ -113,6 +125,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         Self {
             origin_list: hgldd_list,
             tyvcd: None,
+            enum_def_map: EnumDefMap::new(),
         }
     }
 
@@ -157,6 +170,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
 
     // Create a variable from an hgldd variable
     fn create_variable(
+        &self,
         hgldd_var: &hgldd::Variable,
         objects: &Vec<hgldd::Object>,
     ) -> Result<Variable> {
@@ -177,6 +191,16 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                 }
             });
 
+        // Search for a possible enum_def in the enum_def_map
+        let enum_val_map = if let Some(id) = &hgldd_var.enum_def_ref_id {
+            if let Some(enum_val_map) = self.enum_def_map.get(id) {
+                enum_val_map.clone()
+            } else {
+                HashMap::new()
+            }
+        } else {
+            HashMap::new()
+        };
         // Get the expressions of this variable
         let expressions = helper::get_sub_expressions(hgldd_var.value_expr.as_ref());
 
@@ -222,7 +246,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                 for i in 0..obj.port_vars.len() {
                     let mut var = obj.port_vars[i].clone();
                     var.value_expr = Some(expressions[i].clone());
-                    fields.push(Self::create_variable(&var, objects)?);
+                    fields.push(self.create_variable(&var, objects)?);
                 }
 
                 VariableKind::Struct { fields }
@@ -233,13 +257,20 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let final_kind: VariableKind =
             if let Some(hgldd::UnpackedRange(dims)) = &hgldd_var.unpacked_range {
                 VariableKind::Vector {
-                    fields: Self::create_vector_fields(&kind, expressions, dims, &high_level_info)?,
+                    fields: Self::create_vector_fields(
+                        &kind,
+                        expressions,
+                        dims,
+                        &high_level_info,
+                        &enum_val_map,
+                    )?,
                 }
             } else {
                 kind
             };
 
         let var = Variable::new(trace_value, name.clone(), high_level_info, final_kind);
+        let var = var.with_enum_val_map(enum_val_map);
         Ok(var)
     }
 
@@ -249,6 +280,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         expressions: &[hgldd::Expression],
         dims: &[u32],
         high_level_info: &TypeInfo,
+        enum_val_map: &HashMap<i64, String>,
     ) -> Result<Vec<Variable>> {
         static EXACT_DIMS: usize = 2;
         // No fields: empty vector
@@ -286,6 +318,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                         subexpressions,
                         &dims[EXACT_DIMS..],
                         high_level_info,
+                        enum_val_map,
                     )?,
                 }
             } else {
@@ -294,6 +327,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
 
             // Build the var
             let var = Variable::new(trace_value, idx.to_string(), high_level_info.clone(), kind);
+            let var = var.with_enum_val_map(enum_val_map.clone());
 
             fields.push(var);
         }

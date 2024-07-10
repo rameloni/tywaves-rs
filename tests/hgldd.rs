@@ -20,6 +20,7 @@ fn random_hgldd_file() {
         port_vars: Vec::new(),
         children: Some(Vec::new()),
         source_lang_type_info: None,
+        enum_defs: None,
     };
     println!(
         "{}",
@@ -94,7 +95,7 @@ fn test_hgldd_parser_dir() {
     let hgldd_dir = Path::new("tests/inputs/hgldd");
     let files_to_skip = vec!["file_with_wrong_ext.ddd", "file_without_ext"];
     let hgldds = hgldd::reader::parse_hgldd_dir(hgldd_dir).expect("error parsing hgldd dir");
-    assert_eq!(hgldds.len(), 7);
+    assert_eq!(hgldds.len(), 8);
 
     // Collect the file names from the dir
     let reference_files: Vec<String> = std::fs::read_dir(hgldd_dir)
