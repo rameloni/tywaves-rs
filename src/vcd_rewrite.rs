@@ -26,6 +26,8 @@ pub enum VcdRewriteError {
     },
     /// Another kind of error occurred. For example, while writing
     Other(String),
+    /// The specified file name is not a valid vcd
+    InvalidFileExtension(String),
 }
 
 impl From<std::io::Error> for VcdRewriteError {
@@ -40,7 +42,7 @@ pub struct VcdRewriter {
     /// The writer of the rewritten VCD file
     writer: Writer<BufWriter<File>>,
     /// The name of the rewritten VCD file
-    output_vcd_name: &'static str,
+    output_vcd_name: String,
     /// The header of the original VCD file
     vcd_header: Header,
 
@@ -53,12 +55,23 @@ pub struct VcdRewriter {
 
 impl VcdRewriter {
     /// Get the full path of the rewritten VCD file
-    pub fn get_final_file(&self) -> &'static str {
-        self.output_vcd_name
+    pub fn get_final_file(&self) -> &String {
+        &self.output_vcd_name
     }
-    pub fn new(vcd_path: &Path, tywaves_scopes: Vec<TyScope>) -> Result<Self> {
+    pub fn new(
+        vcd_path: &Path,
+        tywaves_scopes: Vec<TyScope>,
+        out_vcd_name: String,
+    ) -> Result<Self> {
         let vcd_file = File::open(vcd_path)?;
-        let output_vcd = File::create(RESULT_VCD)?;
+
+        // Raise an error if out_vcd_name does not end with `.vcd`
+        if let Some(ext) = Path::new(&out_vcd_name).extension() {
+            if ext != "vcd" {
+                return Err(VcdRewriteError::InvalidFileExtension(out_vcd_name));
+            }
+        }
+        let output_vcd = File::create(&out_vcd_name)?;
 
         let reader = Parser::new(BufReader::new(vcd_file));
 
@@ -68,7 +81,7 @@ impl VcdRewriter {
         let vcd_rw = Self {
             reader,
             writer,
-            output_vcd_name: RESULT_VCD,
+            output_vcd_name: out_vcd_name,
             tywaves_scopes,
             vcd_header: Header::default(),
             rewrite_variables: vec![],
