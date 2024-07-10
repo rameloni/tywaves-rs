@@ -8,8 +8,6 @@ type TyScope = tyvcd::Scope;
 type TyVariable = tyvcd::Variable;
 type TyVarKind = tyvcd::VariableKind;
 
-const RESULT_VCD: &str = "test.vcd";
-
 type Result<T> = std::result::Result<T, VcdRewriteError>;
 
 #[derive(Debug)]
