@@ -1,0 +1,776 @@
+// ----- 8< ----- FILE ".dd" ----- 8< -----
+
+{
+  "HGLDD": {
+    "version": "1.0",
+    "file_info": [
+      "src/test/scala/circtTests/tywavesTests/TywavesAnnotationCircuits.scala",
+      ""
+    ],
+    "hdl_file_index": 2
+  },
+  "objects": [
+    {
+      "hgl_loc": {
+        "begin_column": 18,
+        "begin_line": 334,
+        "end_column": 18,
+        "end_line": 334,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "TopCircuitChiselEnum_io",
+      "port_vars": [
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 18,
+            "begin_line": 334,
+            "end_column": 18,
+            "end_line": 334,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "IO[MyEnum]"
+          },
+          "type_name": "logic",
+          "var_name": "a"
+        },
+        {
+          "enum_def_ref": 1,
+          "hgl_loc": {
+            "begin_column": 18,
+            "begin_line": 334,
+            "end_column": 18,
+            "end_line": 334,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "IO[MyEnum2]"
+          },
+          "type_name": "logic",
+          "var_name": "b"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 18,
+            "begin_line": 334,
+            "end_column": 18,
+            "end_line": 334,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "IO[Bool]"
+          },
+          "type_name": "logic",
+          "var_name": "c"
+        }
+      ]
+    },
+    {
+      "hgl_loc": {
+        "begin_column": 17,
+        "begin_line": 341,
+        "end_column": 17,
+        "end_line": 341,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "TopCircuitChiselEnum_i_b_inner_b",
+      "port_vars": [
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "IO[MyEnum]"
+          },
+          "type_name": "logic",
+          "var_name": "inner_inner_e"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "IO[Bool]"
+          },
+          "type_name": "logic",
+          "var_name": "inner_NOENUM"
+        },
+        {
+          "enum_def_ref": 1,
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "IO[MyEnum2]"
+          },
+          "type_name": "logic",
+          "var_name": "inner_ee"
+        }
+      ]
+    },
+    {
+      "hgl_loc": {
+        "begin_column": 17,
+        "begin_line": 341,
+        "end_column": 17,
+        "end_line": 341,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "TopCircuitChiselEnum_i_b",
+      "port_vars": [
+        {
+          "enum_def_ref": 2,
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "IO[MyEnum2]"
+          },
+          "type_name": "logic",
+          "var_name": "inner_e"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "IO[Bool]"
+          },
+          "type_name": "logic",
+          "var_name": "NOENUM"
+        },
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "IO[MyEnum]"
+          },
+          "type_name": "logic",
+          "var_name": "inner_ee"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "IO[AnonymousBundle]"
+          },
+          "type_name": "TopCircuitChiselEnum_i_b_inner_b",
+          "var_name": "inner_b"
+        },
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "params": [
+              {
+                "name": "gen",
+                "type": "=> T"
+              },
+              {
+                "name": "length",
+                "type": "Int",
+                "value": "3"
+              }
+            ],
+            "type_name": "IO[MyEnum[3]]"
+          },
+          "type_name": "logic",
+          "unpacked_range": [
+            2,
+            0
+          ],
+          "var_name": "v"
+        }
+      ]
+    },
+    {
+      "hgl_loc": {
+        "begin_column": 17,
+        "begin_line": 341,
+        "end_column": 17,
+        "end_line": 341,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "TopCircuitChiselEnum_i",
+      "port_vars": [
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "IO[MyEnum]"
+          },
+          "type_name": "logic",
+          "var_name": "e"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "IO[AnonymousBundle]"
+          },
+          "type_name": "TopCircuitChiselEnum_i_b",
+          "var_name": "b"
+        },
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "params": [
+              {
+                "name": "gen",
+                "type": "=> T"
+              },
+              {
+                "name": "length",
+                "type": "Int",
+                "value": "3"
+              }
+            ],
+            "type_name": "IO[MyEnum[3]]"
+          },
+          "type_name": "logic",
+          "unpacked_range": [
+            2,
+            0
+          ],
+          "var_name": "v"
+        }
+      ]
+    },
+    {
+      "hgl_loc": {
+        "begin_column": 28,
+        "begin_line": 357,
+        "end_column": 28,
+        "end_line": 357,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "TopCircuitChiselEnum_vBundle_b_inner_b",
+      "port_vars": [
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "Wire[MyEnum]"
+          },
+          "type_name": "logic",
+          "var_name": "inner_inner_e"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "Wire[Bool]"
+          },
+          "type_name": "logic",
+          "var_name": "inner_NOENUM"
+        },
+        {
+          "enum_def_ref": 1,
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "Wire[MyEnum2]"
+          },
+          "type_name": "logic",
+          "var_name": "inner_ee"
+        }
+      ]
+    },
+    {
+      "hgl_loc": {
+        "begin_column": 28,
+        "begin_line": 357,
+        "end_column": 28,
+        "end_line": 357,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "TopCircuitChiselEnum_vBundle_b",
+      "port_vars": [
+        {
+          "enum_def_ref": 2,
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "Wire[MyEnum2]"
+          },
+          "type_name": "logic",
+          "var_name": "inner_e"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "Wire[Bool]"
+          },
+          "type_name": "logic",
+          "var_name": "NOENUM"
+        },
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "Wire[MyEnum]"
+          },
+          "type_name": "logic",
+          "var_name": "inner_ee"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "Wire[AnonymousBundle]"
+          },
+          "type_name": "TopCircuitChiselEnum_vBundle_b_inner_b",
+          "var_name": "inner_b"
+        },
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "params": [
+              {
+                "name": "gen",
+                "type": "=> T"
+              },
+              {
+                "name": "length",
+                "type": "Int",
+                "value": "3"
+              }
+            ],
+            "type_name": "Wire[MyEnum[3]]"
+          },
+          "type_name": "logic",
+          "unpacked_range": [
+            2,
+            0
+          ],
+          "var_name": "v"
+        }
+      ]
+    },
+    {
+      "hgl_loc": {
+        "begin_column": 28,
+        "begin_line": 357,
+        "end_column": 28,
+        "end_line": 357,
+        "file": 1
+      },
+      "kind": "struct",
+      "obj_name": "TopCircuitChiselEnum_vBundle",
+      "port_vars": [
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "Wire[MyEnum]"
+          },
+          "type_name": "logic",
+          "var_name": "e"
+        },
+        {
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "source_lang_type_info": {
+            "type_name": "Wire[AnonymousBundle]"
+          },
+          "type_name": "TopCircuitChiselEnum_vBundle_b",
+          "var_name": "b"
+        },
+        {
+          "enum_def_ref": 0,
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "params": [
+              {
+                "name": "gen",
+                "type": "=> T"
+              },
+              {
+                "name": "length",
+                "type": "Int",
+                "value": "3"
+              }
+            ],
+            "type_name": "Wire[MyEnum[3]]"
+          },
+          "type_name": "logic",
+          "unpacked_range": [
+            2,
+            0
+          ],
+          "var_name": "v"
+        }
+      ]
+    },
+    {
+      "kind": "module",
+      "obj_name": "TopCircuitChiselEnum",
+      "module_name": "TopCircuitChiselEnum",
+      "hgl_loc": {
+        "begin_column": 11,
+        "begin_line": 317,
+        "end_column": 11,
+        "end_line": 317,
+        "file": 1
+      },
+      "hdl_loc": {
+        "begin_line": 2,
+        "end_line": 2,
+        "file": 2
+      },
+      "source_lang_type_info": {
+        "type_name": "TopCircuitChiselEnum"
+      },
+      "enum_defs": {
+        "0": {
+          "10": "A",
+          "18": "B",
+          "2": "C"
+        },
+        "1": {
+          "1": "E",
+          "2": "F",
+          "20": "D"
+        },
+        "2": {
+          "0": "D",
+          "13": "E"
+        }
+      },
+      "port_vars": [
+        {
+          "var_name": "inputEnum",
+          "hgl_loc": {
+            "begin_column": 25,
+            "begin_line": 332,
+            "end_column": 25,
+            "end_line": 332,
+            "file": 1
+          },
+          "value": {"sig_name":"inputEnum"},
+          "type_name": "logic",
+          "packed_range": [
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "type_name": "IO[MyEnum]"
+          },
+          "enum_def_ref": 0
+        },
+        {
+          "var_name": "io",
+          "hgl_loc": {
+            "begin_column": 18,
+            "begin_line": 334,
+            "end_column": 18,
+            "end_line": 334,
+            "file": 1
+          },
+          "value": {"opcode":"'{","operands":[{"sig_name":"io_a"},{"sig_name":"io_b"},{"sig_name":"io_c"}]},
+          "type_name": "TopCircuitChiselEnum_io",
+          "source_lang_type_info": {
+            "type_name": "IO[AnonymousBundle]"
+          }
+        },
+        {
+          "var_name": "i",
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 341,
+            "end_column": 17,
+            "end_line": 341,
+            "file": 1
+          },
+          "value": {"opcode":"'{","operands":[{"sig_name":"i_e"},{"opcode":"'{","operands":[{"sig_name":"i_b_inner_e"},{"sig_name":"i_b_NOENUM"},{"sig_name":"i_b_inner_ee"},{"opcode":"'{","operands":[{"sig_name":"i_b_inner_b_inner_inner_e"},{"sig_name":"i_b_inner_b_inner_NOENUM"},{"sig_name":"i_b_inner_b_inner_ee"}]},{"opcode":"'{","operands":[{"sig_name":"i_b_v_0"},{"sig_name":"i_b_v_1"},{"sig_name":"i_b_v_2"}]}]},{"opcode":"'{","operands":[{"sig_name":"i_v_0"},{"sig_name":"i_v_1"},{"sig_name":"i_v_2"}]}]},
+          "type_name": "TopCircuitChiselEnum_i",
+          "source_lang_type_info": {
+            "type_name": "IO[AnonymousBundle]"
+          }
+        },
+        {
+          "var_name": "v",
+          "hgl_loc": {
+            "begin_column": 17,
+            "begin_line": 358,
+            "end_column": 17,
+            "end_line": 358,
+            "file": 1
+          },
+          "value": {"opcode":"'{","operands":[{"sig_name":"v_0"},{"sig_name":"v_1"},{"sig_name":"v_2"}]},
+          "type_name": "logic",
+          "packed_range": [
+            1,
+            0
+          ],
+          "unpacked_range": [
+            2,
+            0
+          ],
+          "source_lang_type_info": {
+            "params": [
+              {
+                "name": "gen",
+                "type": "=> T"
+              },
+              {
+                "name": "length",
+                "type": "Int",
+                "value": "3"
+              }
+            ],
+            "type_name": "IO[MyEnum[3]]"
+          }
+        },
+        {
+          "var_name": "vv",
+          "hgl_loc": {
+            "begin_column": 18,
+            "begin_line": 359,
+            "end_column": 18,
+            "end_line": 359,
+            "file": 1
+          },
+          "value": {"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"vv_0_0"},{"sig_name":"vv_0_1"}]},{"opcode":"'{","operands":[{"sig_name":"vv_1_0"},{"sig_name":"vv_1_1"}]}]},
+          "type_name": "logic",
+          "packed_range": [
+            1,
+            0
+          ],
+          "unpacked_range": [
+            1,
+            0,
+            1,
+            0
+          ],
+          "source_lang_type_info": {
+            "params": [
+              {
+                "name": "gen",
+                "type": "=> T"
+              },
+              {
+                "name": "length",
+                "type": "Int",
+                "value": "2"
+              }
+            ],
+            "type_name": "IO[MyEnum[2][2]]"
+          }
+        },
+        {
+          "var_name": "vBundle",
+          "hgl_loc": {
+            "begin_column": 28,
+            "begin_line": 357,
+            "end_column": 28,
+            "end_line": 357,
+            "file": 1
+          },
+          "value": {"opcode":"'{","operands":[{"opcode":"'{","operands":[{"sig_name":"i_e"},{"opcode":"'{","operands":[{"sig_name":"i_b_inner_e"},{"sig_name":"i_b_NOENUM"},{"sig_name":"i_b_inner_ee"},{"opcode":"'{","operands":[{"sig_name":"i_b_inner_b_inner_inner_e"},{"sig_name":"i_b_inner_b_inner_NOENUM"},{"sig_name":"i_b_inner_b_inner_ee"}]},{"opcode":"'{","operands":[{"sig_name":"i_b_v_0"},{"sig_name":"i_b_v_1"},{"sig_name":"i_b_v_2"}]}]},{"opcode":"'{","operands":[{"sig_name":"i_v_0"},{"sig_name":"i_v_1"},{"sig_name":"i_v_2"}]}]}]},
+          "type_name": "TopCircuitChiselEnum_vBundle",
+          "unpacked_range": [
+            0,
+            0
+          ],
+          "source_lang_type_info": {
+            "params": [
+              {
+                "name": "gen",
+                "type": "=> T"
+              },
+              {
+                "name": "length",
+                "type": "Int",
+                "value": "1"
+              }
+            ],
+            "type_name": "Wire[AnonymousBundle[1]]"
+          }
+        }
+      ],
+      "children": []
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+use crate::hgldd::spec::EnumValMap;
+
 use super::trace_pointer::{TraceFinder, TraceGetter, TraceValue};
 use std::{
     collections::HashMap,
@@ -166,7 +168,7 @@ impl TraceGetter for ScopeDef {
 }
 
 /// Represent a variable in the TyVcd format.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Variable {
     /// The value of the variable in the trace.
     _trace_value: TraceValue,
@@ -177,6 +179,30 @@ pub struct Variable {
     pub high_level_info: TypeInfo,
     /// The kind of the variable.
     pub kind: VariableKind,
+    /// The reference enum type if any.
+    pub enum_val_map: Option<Arc<RwLock<EnumValMap>>>,
+}
+
+impl PartialEq for Variable {
+    fn eq(&self, other: &Self) -> bool {
+        if self.name != other.name
+            || self.high_level_info != other.high_level_info
+            || self.kind != other.kind
+            || self._trace_value != other._trace_value
+        {
+            return false;
+        }
+
+        if let Some(enum_val_map) = &self.enum_val_map {
+            if let Some(other_enum_val_map) = &other.enum_val_map {
+                *enum_val_map.read().unwrap() == *other_enum_val_map.read().unwrap()
+            } else {
+                false
+            }
+        } else {
+            self.enum_val_map.is_none() && other.enum_val_map.is_none()
+        }
+    }
 }
 
 impl Variable {
@@ -192,7 +218,15 @@ impl Variable {
             name,
             high_level_info,
             kind,
+            enum_val_map: None,
         }
+    }
+
+    pub fn with_enum_val_map(mut self, enum_val_map: EnumValMap) -> Self {
+        if !enum_val_map.is_empty() {
+            self.enum_val_map = Some(Arc::new(RwLock::new(enum_val_map)));
+        }
+        self
     }
 
     // /// Update the trace name of the variable.
@@ -260,7 +294,18 @@ impl Variable {
 
         match &self.kind {
             // If the variable is a ground type: use the raw value directly
-            VariableKind::Ground(width) => render_fn(*width as u64, raw_val_vcd),
+            VariableKind::Ground(width) => {
+                if let Some(enum_val_map) = &self.enum_val_map {
+                    let enum_val_map = enum_val_map.read().unwrap();
+                    if let Ok(intval) = i64::from_str_radix(raw_val_vcd, 2) {
+                        let render = enum_val_map.get(&intval);
+                        if let Some(render) = render {
+                            return render.clone();
+                        }
+                    }
+                }
+                render_fn(*width as u64, raw_val_vcd)
+            }
             // Otherwise, encode the fields recursively {x, {y, z}} or [x, y, z]
             VariableKind::Vector { fields } | VariableKind::Struct { fields } => {
                 // Encode the fields recursively {x, {y, z}} or [x, y, z]

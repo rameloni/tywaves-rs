@@ -1,7 +1,12 @@
 use core::fmt;
+use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
+
+pub type EnumDefId = u16;
+pub type EnumValMap = HashMap<i64, String>;
+pub type EnumDefMap = HashMap<EnumDefId, EnumValMap>;
 
 /// The HGLDD file root struct.
 #[derive(Serialize, Deserialize, Clone)]
@@ -69,6 +74,16 @@ pub struct Object {
     /// Optional source language type information for the object
     #[serde(rename = "source_lang_type_info")]
     pub source_lang_type_info: Option<SourceLangType>,
+
+    /// Optional enum type definitions, this includes an ID of the enum and the map of the values.
+    /// ```json
+    /// {
+    ///     "0" : { "0" : "name1", "1" :  "name1" },
+    ///     "1" : { "1" : "name2" }
+    /// }
+    /// ```
+    #[serde(rename = "enum_defs")]
+    pub enum_defs: Option<EnumDefMap>,
 }
 
 impl Object {
@@ -84,6 +99,7 @@ impl Object {
             port_vars: Vec::new(),
             children: None,
             source_lang_type_info: None,
+            enum_defs: None,
         }
     }
 
@@ -132,6 +148,10 @@ pub struct Variable {
     /// The source lang type information
     #[serde(rename = "source_lang_type_info")]
     pub source_lang_type_info: Option<SourceLangType>,
+
+    /// Optional reference to an enum type definition
+    #[serde(rename = "enum_def_ref")]
+    pub enum_def_ref_id: Option<EnumDefId>,
 }
 
 /// The source language type information.
