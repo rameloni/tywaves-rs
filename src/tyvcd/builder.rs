@@ -90,6 +90,8 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                         // Check the port vars inside the module
                         for var in &obj.port_vars {
                             let variable = self.create_variable(var, &hgldd.objects)?;
+                            // Define the variable as top variable (declared in the module)
+                            let variable = variable.as_top();
                             scope.variables.push(variable);
                         }
 
@@ -255,7 +257,13 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let final_kind: VariableKind =
             if let Some(hgldd::UnpackedRange(dims)) = &hgldd_var.unpacked_range {
                 VariableKind::Vector {
-                    fields: Self::create_vector_fields(&kind, expressions, dims, &high_level_info, &enum_val_map)?,
+                    fields: Self::create_vector_fields(
+                        &kind,
+                        expressions,
+                        dims,
+                        &high_level_info,
+                        &enum_val_map,
+                    )?,
                 }
             } else {
                 kind
@@ -310,7 +318,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                         subexpressions,
                         &dims[EXACT_DIMS..],
                         high_level_info,
-                        enum_val_map
+                        enum_val_map,
                     )?,
                 }
             } else {
