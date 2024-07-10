@@ -255,7 +255,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let final_kind: VariableKind =
             if let Some(hgldd::UnpackedRange(dims)) = &hgldd_var.unpacked_range {
                 VariableKind::Vector {
-                    fields: Self::create_vector_fields(&kind, expressions, dims, &high_level_info)?,
+                    fields: Self::create_vector_fields(&kind, expressions, dims, &high_level_info, &enum_val_map)?,
                 }
             } else {
                 kind
@@ -272,6 +272,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         expressions: &[hgldd::Expression],
         dims: &[u32],
         high_level_info: &TypeInfo,
+        enum_val_map: &HashMap<i64, String>,
     ) -> Result<Vec<Variable>> {
         static EXACT_DIMS: usize = 2;
         // No fields: empty vector
@@ -309,6 +310,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                         subexpressions,
                         &dims[EXACT_DIMS..],
                         high_level_info,
+                        enum_val_map
                     )?,
                 }
             } else {
@@ -317,6 +319,7 @@ impl TyVcdBuilder<hgldd::Hgldd> {
 
             // Build the var
             let var = Variable::new(trace_value, idx.to_string(), high_level_info.clone(), kind);
+            let var = var.with_enum_val_map(enum_val_map.clone());
 
             fields.push(var);
         }
