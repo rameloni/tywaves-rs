@@ -324,11 +324,25 @@ impl Variable {
         // if raw_val_vcd.len() < size {
         //     return String::from("---");
         // }
-
+        let raw_val_vcd = match &self._trace_value {
+            TraceValue::RefTraceName(_) | TraceValue::RefTraceValues(_) => raw_val_vcd.to_string(),
+            TraceValue::Constant(c) => match c {
+                super::trace_pointer::ConstValue::Binary(bv, _width)
+                | super::trace_pointer::ConstValue::FourValue(bv, _width) => {
+                    std::str::from_utf8(bv).unwrap().to_string()
+                }
+                super::trace_pointer::ConstValue::String(s) => s.clone(),
+                super::trace_pointer::ConstValue::Real(float_value) => {
+                    format!("{:b}", float_value.to_bits())
+                }
+            },
+        };
+        let raw_val_vcd = raw_val_vcd.as_str();
         let render_result = match &self.kind {
             // If the variable is a ground type: use the raw value directly
             VariableKind::Ground(width) => {
                 let mut render_result = None;
+
                 if let Some(enum_val_map) = &self.enum_val_map {
                     let enum_val_map = enum_val_map.read().unwrap();
                     if let Ok(intval) = i64::from_str_radix(raw_val_vcd, 2) {

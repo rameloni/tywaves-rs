@@ -14,9 +14,9 @@ fn vcd_rewrite_variable() {
         id_code,
         width as u32,
         vec![
-            IdCodeWithShift::new(id_code_a, vcd::Vector::from_str("000").unwrap()),   // 0b00000000
-            IdCodeWithShift::new(id_code_b, vcd::Vector::from_str("10001").unwrap()), // 0b00010001
-            IdCodeWithShift::new(id_code_c, vcd::Vector::from_str("0").unwrap()),     // 0b00000000
+            IdCodeWithShift::create(id_code_a, vcd::Vector::from_str("000").unwrap(), false),   // 0b00000000
+            IdCodeWithShift::create(id_code_b, vcd::Vector::from_str("10001").unwrap(), false), // 0b00010001
+            IdCodeWithShift::create(id_code_c, vcd::Vector::from_str("0").unwrap(), false),     // 0b00000000
         ],
     );
 
