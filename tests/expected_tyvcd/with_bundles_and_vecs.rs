@@ -24,6 +24,7 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
                     value: None,
                 }],
             ),
+            &vec![],
         ))),
     );
 
@@ -34,12 +35,15 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(Variable::new(
-            TraceValue::RefTraceName("clock".to_string()),
-            String::from("clock"),
-            TypeInfo::new("logic".to_string(), Vec::new()),
-            VariableKind::Ground(1),
-        ));
+        .push(
+            Variable::new(
+                TraceValue::RefTraceName("clock".to_string()),
+                String::from("clock"),
+                TypeInfo::new("logic".to_string(), Vec::new()),
+                VariableKind::Ground(1),
+            )
+            .as_top(),
+        );
 
     // reset
     scopes
@@ -48,12 +52,15 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(Variable::new(
-            TraceValue::RefTraceName("reset".to_string()),
-            String::from("reset"),
-            TypeInfo::new("logic".to_string(), Vec::new()),
-            VariableKind::Ground(1),
-        ));
+        .push(
+            Variable::new(
+                TraceValue::RefTraceName("reset".to_string()),
+                String::from("reset"),
+                TypeInfo::new("logic".to_string(), Vec::new()),
+                VariableKind::Ground(1),
+            )
+            .as_top(),
+        );
 
     // io => struct
     scopes
@@ -62,50 +69,53 @@ pub fn create_with_bundles_and_vecs() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(Variable::new(
-            TraceValue::RefTraceValues(vec![
-                TraceValue::RefTraceName("io_a_0".to_string()),
+        .push(
+            Variable::new(
                 TraceValue::RefTraceValues(vec![
-                    // b.a
-                    TraceValue::RefTraceName("io_b_a_0".to_string()),
-                    // b.b
+                    TraceValue::RefTraceName("io_a_0".to_string()),
                     TraceValue::RefTraceValues(vec![
-                        // b.b.vec
+                        // b.a
+                        TraceValue::RefTraceName("io_b_a_0".to_string()),
+                        // b.b
                         TraceValue::RefTraceValues(vec![
-                            TraceValue::RefTraceName("io_b_b_vec_0_0".to_string()), // b.b.vec[0]
-                            TraceValue::RefTraceName("io_b_b_vec_1_0".to_string()), // b.b.vec[1]
+                            // b.b.vec
+                            TraceValue::RefTraceValues(vec![
+                                TraceValue::RefTraceName("io_b_b_vec_0_0".to_string()), // b.b.vec[0]
+                                TraceValue::RefTraceName("io_b_b_vec_1_0".to_string()), // b.b.vec[1]
+                            ]),
+                        ]),
+                    ]),
+                    TraceValue::RefTraceValues(vec![
+                        // vec[0]
+                        TraceValue::RefTraceValues(vec![
+                            // vec[0].x
+                            TraceValue::RefTraceName("io_vec_0_x_0".to_string()),
+                            // vec[0].y
+                            TraceValue::RefTraceValues(vec![
+                                // vec[0].y.z
+                                TraceValue::RefTraceName("io_vec_0_y_z_0".to_string()),
+                            ]),
+                        ]),
+                        // vec[1]
+                        TraceValue::RefTraceValues(vec![
+                            // vec[1].x
+                            TraceValue::RefTraceName("io_vec_1_x_0".to_string()),
+                            // vec[1].y
+                            TraceValue::RefTraceValues(vec![
+                                // vec[1].y.z
+                                TraceValue::RefTraceName("io_vec_1_y_z_0".to_string()),
+                            ]),
                         ]),
                     ]),
                 ]),
-                TraceValue::RefTraceValues(vec![
-                    // vec[0]
-                    TraceValue::RefTraceValues(vec![
-                        // vec[0].x
-                        TraceValue::RefTraceName("io_vec_0_x_0".to_string()),
-                        // vec[0].y
-                        TraceValue::RefTraceValues(vec![
-                            // vec[0].y.z
-                            TraceValue::RefTraceName("io_vec_0_y_z_0".to_string()),
-                        ]),
-                    ]),
-                    // vec[1]
-                    TraceValue::RefTraceValues(vec![
-                        // vec[1].x
-                        TraceValue::RefTraceName("io_vec_1_x_0".to_string()),
-                        // vec[1].y
-                        TraceValue::RefTraceValues(vec![
-                            // vec[1].y.z
-                            TraceValue::RefTraceName("io_vec_1_y_z_0".to_string()),
-                        ]),
-                    ]),
-                ]),
-            ]),
-            String::from("io"),
-            TypeInfo::new("InterfaceIOBundle".to_string(), Vec::new()),
-            VariableKind::Struct {
-                fields: create_io_fields(),
-            },
-        ));
+                String::from("io"),
+                TypeInfo::new("InterfaceIOBundle".to_string(), Vec::new()),
+                VariableKind::Struct {
+                    fields: create_io_fields(),
+                },
+            )
+            .as_top(),
+        );
 
     TyVcd { scopes }
 }

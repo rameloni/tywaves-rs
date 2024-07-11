@@ -17,51 +17,43 @@ pub fn create_foo_single_no_types() -> TyVcd {
             String::from("Foo"),
             // type info na, use the target language one
             TypeInfo::new("Foo".to_string(), Vec::new()),
+            &vec![],
         ))),
     );
     // inA
-    scopes
-        .get("Foo")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Foo").unwrap().write().unwrap().variables.push(
+        Variable::new(
             TraceValue::RefTraceName("a".to_string()),
             String::from("inA"),
             // type info na, use the target language one
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground(32),
-        ));
+        )
+        .as_top(),
+    );
     // inB
-    scopes
-        .get("Foo")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Foo").unwrap().write().unwrap().variables.push(
+        Variable::new(
             TraceValue::RefTraceName("b".to_string()),
             String::from("outB"),
             // type info na, use the target language one
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground(32),
-        ));
+        )
+        .as_top(),
+    );
     // var1 => const
     let var1_val = String::from("00101010");
-    scopes
-        .get("Foo")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Foo").unwrap().write().unwrap().variables.push(
+        Variable::new(
             TraceValue::Constant(ConstValue::FourValue(var1_val.into_bytes(), 8)),
             String::from("var1"),
             // type info na, use the target language one
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground(8),
-        ));
+        )
+        .as_top(),
+    );
 
     // instances
     scopes
@@ -77,6 +69,7 @@ pub fn create_foo_single_no_types() -> TyVcd {
                 String::from("Bar"),
                 // type info na, use the target language one
                 TypeInfo::new("Bar".to_string(), Vec::new()),
+                &vec!["Foo".to_string()],
             ))),
         );
 
@@ -93,6 +86,7 @@ pub fn create_foo_single_no_types() -> TyVcd {
                 String::from("Bar"),
                 // type info na, use the target language one
                 TypeInfo::new("Bar".to_string(), Vec::new()),
+                &vec!["Foo".to_string()],
             ))),
         );
 
@@ -108,29 +102,22 @@ pub fn create_foo_single() -> TyVcd {
             String::from("Foo"),
             String::from("Foo"),
             TypeInfo::new("Foo".to_string(), Vec::new()),
+            &vec![],
         ))),
     );
     // inA
-    scopes
-        .get("Foo")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Foo").unwrap().write().unwrap().variables.push(
+        Variable::new(
             TraceValue::RefTraceName("a".to_string()),
             String::from("inA"),
             TypeInfo::new("SInt<32>".to_string(), Vec::new()),
             VariableKind::Ground(32),
-        ));
+        )
+        .as_top(),
+    );
     // inB
-    scopes
-        .get("Foo")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Foo").unwrap().write().unwrap().variables.push(
+        Variable::new(
             TraceValue::RefTraceName("b".to_string()),
             String::from("outB"),
             // type info na, use the target language one
@@ -143,16 +130,13 @@ pub fn create_foo_single() -> TyVcd {
                 }],
             ),
             VariableKind::Ground(32),
-        ));
+        )
+        .as_top(),
+    );
     // var1 => const
     let var1_val = String::from("00101010");
-    scopes
-        .get("Foo")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Foo").unwrap().write().unwrap().variables.push(
+        Variable::new(
             TraceValue::Constant(ConstValue::FourValue(var1_val.into_bytes(), 8)),
             String::from("var1"),
             // type info na, use the target language one
@@ -172,23 +156,22 @@ pub fn create_foo_single() -> TyVcd {
                 ],
             ),
             VariableKind::Ground(8),
-        ));
+        )
+        .as_top(),
+    );
 
     // var2
     let var2_val = String::from("00010101");
-    scopes
-        .get("Foo")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Foo").unwrap().write().unwrap().variables.push(
+        Variable::new(
             TraceValue::Constant(ConstValue::FourValue(var2_val.into_bytes(), 8)),
             String::from("var2"),
             // type info na, use the target language one
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground(8),
-        ));
+        )
+        .as_top(),
+    );
 
     // instances
     scopes
@@ -204,6 +187,7 @@ pub fn create_foo_single() -> TyVcd {
                 String::from("Bar"),
                 // type info na, use the target language one
                 TypeInfo::new("Bar".to_string(), Vec::new()),
+                &vec!["Foo".to_string()],
             ))),
         );
 
@@ -220,6 +204,7 @@ pub fn create_foo_single() -> TyVcd {
                 String::from("Bar"),
                 // type info na, use the target language one
                 TypeInfo::new("Bar".to_string(), Vec::new()),
+                &vec!["Foo".to_string()],
             ))),
         );
 
@@ -240,7 +225,8 @@ pub fn create_foo() -> TyVcd {
                 .get_trace_name()
                 .unwrap()
                 .clone(),
-        );
+        )
+        .prepend_parent_scopes(vec!["Foo".to_string()]);
 
         *subscope_to_update = Arc::new(RwLock::new(new_scope));
     }

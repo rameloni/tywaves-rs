@@ -67,12 +67,16 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                             trace_name.clone(),
                             obj.hgl_obj_name.clone(),
                             high_level_info,
+                            &[],
                         );
 
                         // Check the children of this scope
                         if let Some(children) = &obj.children {
                             for inst in children {
-                                let emptyscope = Self::create_empty_scope_from_instance(inst);
+                                let emptyscope = Self::create_empty_scope_from_instance(
+                                    inst,
+                                    scope.get_trace_path(),
+                                );
                                 // scope.subscopes.push(emptyscope);
                                 scope.subscopes.insert(
                                     emptyscope.get_trace_name().unwrap().clone(), // safe to unwrap for an empty scope
@@ -83,13 +87,19 @@ impl GenericBuilder for TyVcdBuilder<hgldd::Hgldd> {
                         // Push all the definitions in the module
                         if let Some(enum_defs) = &obj.enum_defs {
                             for (key, enum_def_map) in enum_defs {
-                                self.enum_def_map.insert(key.clone(), enum_def_map.clone());
+                                self.enum_def_map.insert(*key, enum_def_map.clone());
                             }
                         }
 
                         // Check the port vars inside the module
                         for var in &obj.port_vars {
-                            let variable = self.create_variable(var, &hgldd.objects)?;
+                            let variable = match self.create_variable(var, &hgldd.objects) {
+                                Ok(variable) => variable,
+                                Err(e) => match e {
+                                    BuilderError::MissingTraceValue(_) => continue,
+                                    _ => Err(e),
+                                }?,
+                            };
                             // Define the variable as top variable (declared in the module)
                             let variable = variable.as_top();
                             scope.variables.push(variable);
@@ -145,7 +155,10 @@ impl TyVcdBuilder<hgldd::Hgldd> {
     }
 
     // Create an empty scope from an hgldd instace
-    fn create_empty_scope_from_instance(hgldd_inst: &hgldd::Instance) -> Scope {
+    fn create_empty_scope_from_instance(
+        hgldd_inst: &hgldd::Instance,
+        parent_scope: &[String],
+    ) -> Scope {
         // Identify among the traces
         let trace_name = if let Some(hdl_obj_name) = &hgldd_inst.hdl_obj_name {
             // hdl_obj_name // TODO: this wasn't working, no idea why
@@ -165,7 +178,12 @@ impl TyVcdBuilder<hgldd::Hgldd> {
         let high_level_info = Self::create_type_info_or_default(None, || name.clone());
 
         // Create a new scope from an instance
-        Scope::empty(trace_name.clone(), name.clone(), high_level_info)
+        Scope::empty(
+            trace_name.clone(),
+            name.clone(),
+            high_level_info,
+            parent_scope,
+        )
     }
 
     // Create a variable from an hgldd variable
@@ -387,9 +405,9 @@ impl TyVcdBuilder<hgldd::Hgldd> {
                     let module_def = module_def.read().unwrap();
                     // SubScope contains the actual trace_name
                     subscope_def.high_level_info = module_def.high_level_info.clone();
-                    subscope_def.name = module_def.name.clone();
-                    subscope_def.variables = module_def.variables.clone();
-                    subscope_def.subscopes = module_def.subscopes.clone();
+                    subscope_def.name.clone_from(&module_def.name);
+                    subscope_def.variables.clone_from(&module_def.variables);
+                    subscope_def.subscopes.clone_from(&module_def.subscopes);
                 }
             }
         }
@@ -480,7 +498,8 @@ mod helper {
                 }
             }
         } else {
-            Some(TraceValue::RefTraceName("todo: no expression".to_string())) // TODO: check this default
+            None
+            // Some(TraceValue::RefTraceName("todo_no_expression".to_string())) // TODO: check this default
         }
     }
 

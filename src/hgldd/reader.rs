@@ -181,7 +181,7 @@ pub fn add_extra_modules(
                 objects: vec![new_obj],
             };
             // Update the instance names
-            inst_name_hgl = extra_module_name.clone();
+            inst_name_hgl.clone_from(&extra_module_name);
             inst_name_hdl = extra_module_name;
 
             // Update the HGLDDs

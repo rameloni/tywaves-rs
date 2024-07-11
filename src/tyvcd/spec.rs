@@ -95,6 +95,8 @@ pub struct ScopeDef {
     pub name: String,
     /// High level information of the scope
     pub high_level_info: TypeInfo,
+    /// The path of this scope
+    _scope_path: Vec<String>,
 }
 
 impl PartialEq for ScopeDef {
@@ -114,31 +116,48 @@ impl PartialEq for ScopeDef {
             && self.variables == other.variables
             && self.name == other.name
             && self.high_level_info == other.high_level_info
+            && self._scope_path == other._scope_path
     }
 }
 
 impl ScopeDef {
     /// Create a new empty scope without any subscopes or variables.
-    pub fn empty(trace_name: String, name: String, high_level_info: TypeInfo) -> Self {
+    pub fn empty(
+        trace_name: String,
+        name: String,
+        high_level_info: TypeInfo,
+        parent_path: &[String],
+    ) -> Self {
+        let mut _scope_path = parent_path.to_vec();
+        _scope_path.push(trace_name.clone());
         Self {
             _id_trace_value: TraceValue::RefTraceName(trace_name),
             subscopes: HashMap::new(),
             variables: Vec::new(),
             name,
             high_level_info,
+            _scope_path,
         }
     }
 
     /// Create a new scope definition from another with an updated trace name.
     /// *Pleas use the `clone` method directly for a full copy.*
     pub fn from_other(other: &ScopeDef, trace_name: String) -> Self {
+        let mut _scope_path = other._scope_path[..other._scope_path.len() - 1].to_vec();
+        _scope_path.push(trace_name.clone());
         Self {
             _id_trace_value: TraceValue::RefTraceName(trace_name),
             subscopes: other.subscopes.clone(),
             variables: other.variables.clone(),
             name: other.name.clone(),
             high_level_info: other.high_level_info.clone(),
+            _scope_path,
         }
+    }
+    pub fn prepend_parent_scopes(mut self, mut prepend_path: Vec<String>) -> Self {
+        prepend_path.append(&mut self._scope_path);
+        self._scope_path.append(&mut prepend_path);
+        self
     }
 
     // Find a subscope (child) in the scope definition of the current scope.
@@ -153,9 +172,8 @@ impl ScopeDef {
 }
 
 impl TraceGetter for ScopeDef {
-    fn get_trace_path(&self) -> Vec<&String> {
-        // TODO: implement get_trace_path for ScopeDef
-        todo!()
+    fn get_trace_path(&self) -> &Vec<String> {
+        &self._scope_path
     }
 
     fn get_trace_value(&self) -> &TraceValue {
@@ -190,6 +208,7 @@ impl PartialEq for Variable {
             || self.high_level_info != other.high_level_info
             || self.kind != other.kind
             || self._trace_value != other._trace_value
+            || self._is_top != other._is_top
         {
             return false;
         }
@@ -367,7 +386,7 @@ impl Variable {
 }
 
 impl TraceGetter for Variable {
-    fn get_trace_path(&self) -> Vec<&String> {
+    fn get_trace_path(&self) -> &Vec<String> {
         // TODO: implement get_trace_path for Variable
         todo!("Implement get_trace_path for Variable")
     }

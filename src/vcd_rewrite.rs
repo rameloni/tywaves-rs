@@ -1,3 +1,4 @@
+use std::collections::vec_deque;
 use std::{fs::File, io::*, path::Path};
 use vcd::{Command, Header, IdCode, Parser, ReferenceIndex, Value, VarType, Writer};
 
@@ -141,9 +142,43 @@ impl VcdRewriter {
         let child_path_scope = &[path_scope, &[scope_name.clone()]].concat();
 
         // Add the variables to the header
+        let mut created_vars = vec_deque::VecDeque::new();
         for variable in &scope.variables {
             self.add_variable_to_header(variable, child_path_scope)?;
+            created_vars.push_back(variable.name.clone());
         }
+
+        // Add uncovered variables
+        // let _scope_path: Vec<&str> = scope.get_trace_path().iter().map(|s| s.as_str()).collect();
+        // let mut new_vars = vec_deque::VecDeque::new();
+        // if let Some(original_scope) = self.vcd_header.find_scope(_scope_path.as_slice()) {
+        //     for item in &original_scope.items {
+        //         match item {
+        //             vcd::ScopeItem::Var(var) => {
+        //                 // Create a variable if this var is not present in the scope.variables
+        //                 let start_size = created_vars.len();
+        //                 created_vars.retain(|v| v != &var.reference);
+        //                 if start_size == created_vars.len() {
+        //                     // The var was not created originally
+        //                     let new_var = TyVariable::new(
+        //                         TraceValue::RefTraceName(var.reference.clone()),
+        //                         var.reference.clone(),
+        //                         TypeInfo::new(var.var_type.to_string(), vec![]),
+        //                         TyVarKind::Ground(var.size as u128),
+        //                     );
+        //                     new_vars.push_back(new_var);
+        //                 }
+        //             }
+        //             _ => {}
+        //         }
+        //     }
+        // }
+        // for var in &new_vars {
+        //     // Adding variable to header:
+        //     println!("Adding additional to VCD header {:?}", var);
+        //     self.add_variable_to_header(var, child_path_scope)?;
+        // }
+        // drop(new_vars);
 
         // Add the child scopes to the header
         for child_scope in scope.subscopes.values() {
@@ -273,6 +308,9 @@ impl VcdRewriteVariable {
         for ty_ground_variable in ty_variable.collect_ground_variables() {
             match ty_ground_variable.kind {
                 TyVarKind::Ground(width) => {
+                    if width < 1 {
+                        continue;
+                    }
                     // Get the actual path of the variable
                     if let Some(vcd_name) = ty_ground_variable.get_trace_name() {
                         let path = &[scope_path, &[vcd_name.clone()]].concat();
@@ -289,7 +327,11 @@ impl VcdRewriteVariable {
                         }
                     }
                 }
-                _ => unreachable!(),
+                TyVarKind::External => {} // Ignore external variables
+                _ => unreachable!(
+                    "Var \"{}\" Should be unreachable. Kind: {:?}",
+                    ty_ground_variable.name, ty_ground_variable.kind
+                ),
             }
         }
 

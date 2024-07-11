@@ -12,6 +12,7 @@ pub fn create_vecs_multi_dim() -> TyVcd {
             String::from("Issue16"),
             String::from("Issue16"),
             TypeInfo::new("Issue16".to_string(), vec![]),
+            &vec![],
         ))),
     );
 
@@ -22,12 +23,15 @@ pub fn create_vecs_multi_dim() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(Variable::new(
-            TraceValue::RefTraceName("clock".to_string()),
-            String::from("clock"),
-            TypeInfo::new("IO[Clock]".to_string(), Vec::new()),
-            VariableKind::Ground(1),
-        ));
+        .push(
+            Variable::new(
+                TraceValue::RefTraceName("clock".to_string()),
+                String::from("clock"),
+                TypeInfo::new("IO[Clock]".to_string(), Vec::new()),
+                VariableKind::Ground(1),
+            )
+            .as_top(),
+        );
 
     // reset
     scopes
@@ -36,12 +40,15 @@ pub fn create_vecs_multi_dim() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(Variable::new(
-            TraceValue::RefTraceName("reset".to_string()),
-            String::from("reset"),
-            TypeInfo::new("IO[Bool]".to_string(), Vec::new()),
-            VariableKind::Ground(1),
-        ));
+        .push(
+            Variable::new(
+                TraceValue::RefTraceName("reset".to_string()),
+                String::from("reset"),
+                TypeInfo::new("IO[Bool]".to_string(), Vec::new()),
+                VariableKind::Ground(1),
+            )
+            .as_top(),
+        );
 
     // vec1d
     scopes
@@ -50,7 +57,7 @@ pub fn create_vecs_multi_dim() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(create_vec1d());
+        .push(create_vec1d().as_top());
     // vec2d
     scopes
         .get("Issue16")
@@ -58,7 +65,7 @@ pub fn create_vecs_multi_dim() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(create_vec2d());
+        .push(create_vec2d().as_top());
     // vec4
     scopes
         .get("Issue16")
@@ -66,7 +73,7 @@ pub fn create_vecs_multi_dim() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(create_vec4());
+        .push(create_vec4().as_top());
 
     TyVcd { scopes }
 }
