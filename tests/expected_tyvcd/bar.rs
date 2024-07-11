@@ -26,29 +26,22 @@ pub fn create_bar_single() -> TyVcd {
                     },
                 ],
             ),
+            &vec![],
         ))),
     );
     // inA
-    scopes
-        .get("Bar")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Bar").unwrap().write().unwrap().variables.push(
+        Variable::new(
             TraceValue::RefTraceName("x".to_string()),
             String::from("inX"),
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground(32),
-        ));
+        )
+        .as_top(),
+    );
     // inB
-    scopes
-        .get("Bar")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Bar").unwrap().write().unwrap().variables.push(
+        Variable::new(
             // op: *
             TraceValue::RefTraceValues(vec![
                 TraceValue::RefTraceName("x".to_string()),
@@ -57,15 +50,12 @@ pub fn create_bar_single() -> TyVcd {
             String::from("outY"),
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground(32),
-        ));
+        )
+        .as_top(),
+    );
     // var1 => const
-    scopes
-        .get("Bar")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Bar").unwrap().write().unwrap().variables.push(
+        Variable::new(
             // op: *
             TraceValue::RefTraceValues(vec![
                 TraceValue::RefTraceName("x".to_string()),
@@ -74,15 +64,12 @@ pub fn create_bar_single() -> TyVcd {
             String::from("varZ"),
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground(32),
-        ));
+        )
+        .as_top(),
+    );
 
-    scopes
-        .get("Bar")
-        .unwrap()
-        .write()
-        .unwrap()
-        .variables
-        .push(Variable::new(
+    scopes.get("Bar").unwrap().write().unwrap().variables.push(
+        Variable::new(
             // op: +
             TraceValue::RefTraceValues(vec![
                 // op: *
@@ -95,7 +82,9 @@ pub fn create_bar_single() -> TyVcd {
             String::from("add"),
             TypeInfo::new("logic".to_string(), Vec::new()),
             VariableKind::Ground(32),
-        ));
+        )
+        .as_top(),
+    );
 
     TyVcd { scopes }
 }

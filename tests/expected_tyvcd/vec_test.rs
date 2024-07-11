@@ -12,6 +12,7 @@ pub fn create_vecs() -> TyVcd {
             String::from("Issue10"),
             String::from("Issue10"),
             TypeInfo::new("Issue10".to_string(), vec![]),
+            &vec![],
         ))),
     );
 
@@ -22,12 +23,15 @@ pub fn create_vecs() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(Variable::new(
-            TraceValue::RefTraceName("clock".to_string()),
-            String::from("clock"),
-            TypeInfo::new("IO[Clock]".to_string(), Vec::new()),
-            VariableKind::Ground(1),
-        ));
+        .push(
+            Variable::new(
+                TraceValue::RefTraceName("clock".to_string()),
+                String::from("clock"),
+                TypeInfo::new("IO[Clock]".to_string(), Vec::new()),
+                VariableKind::Ground(1),
+            )
+            .as_top(),
+        );
 
     // reset
     scopes
@@ -36,12 +40,15 @@ pub fn create_vecs() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(Variable::new(
-            TraceValue::RefTraceName("reset".to_string()),
-            String::from("reset"),
-            TypeInfo::new("IO[Bool]".to_string(), Vec::new()),
-            VariableKind::Ground(1),
-        ));
+        .push(
+            Variable::new(
+                TraceValue::RefTraceName("reset".to_string()),
+                String::from("reset"),
+                TypeInfo::new("IO[Bool]".to_string(), Vec::new()),
+                VariableKind::Ground(1),
+            )
+            .as_top(),
+        );
 
     // vec1
     scopes
@@ -50,7 +57,7 @@ pub fn create_vecs() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(create_vec1());
+        .push(create_vec1().as_top());
     // vec2
     scopes
         .get("Issue10")
@@ -58,7 +65,7 @@ pub fn create_vecs() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(create_vec2());
+        .push(create_vec2().as_top());
     // vec3
     scopes
         .get("Issue10")
@@ -66,7 +73,7 @@ pub fn create_vecs() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(create_vec3());
+        .push(create_vec3().as_top());
     // vec4
     scopes
         .get("Issue10")
@@ -74,7 +81,7 @@ pub fn create_vecs() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(create_vec4());
+        .push(create_vec4().as_top());
     // vec5
     scopes
         .get("Issue10")
@@ -82,7 +89,7 @@ pub fn create_vecs() -> TyVcd {
         .write()
         .unwrap()
         .variables
-        .push(create_vec5());
+        .push(create_vec5().as_top());
     TyVcd { scopes }
 }
 

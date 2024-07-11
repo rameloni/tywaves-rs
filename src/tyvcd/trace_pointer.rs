@@ -12,7 +12,7 @@ pub trait TraceGetter {
         }
     }
     /// Return the path of the object in the trace file (the path is a sequence of scopes + the trace_name).
-    fn get_trace_path(&self) -> Vec<&String>;
+    fn get_trace_path(&self) -> &Vec<String>;
 
     fn get_trace_value(&self) -> &TraceValue;
 
