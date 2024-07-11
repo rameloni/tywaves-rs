@@ -44,6 +44,14 @@ pub enum TraceValue {
     RefTraceValues(Vec<TraceValue>),
 }
 
+impl TraceValue {
+    pub fn is_const(&self) -> bool {
+        match self {
+            TraceValue::RefTraceName(_) | TraceValue::RefTraceValues(_) => false,
+            TraceValue::Constant(_) => true,
+        }
+    }
+}
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConstValue {
     Binary(Vec<u8>, u32),

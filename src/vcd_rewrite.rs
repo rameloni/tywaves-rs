@@ -1,9 +1,10 @@
 use std::collections::vec_deque;
+use std::str::FromStr;
 use std::{fs::File, io::*, path::Path};
 use vcd::{Command, Header, IdCode, Parser, ReferenceIndex, Value, VarType, Writer};
 
 use crate::tyvcd::spec::{self as tyvcd};
-use crate::tyvcd::trace_pointer::TraceGetter;
+use crate::tyvcd::trace_pointer::{TraceGetter, TraceValue};
 
 type TyScope = tyvcd::Scope;
 type TyVariable = tyvcd::Variable;
@@ -303,6 +304,7 @@ impl VcdRewriteVariable {
                 source_id_codes: Vec::new(),
             };
         }
+
         let mut source_id_codes = Vec::with_capacity(ty_variable.kind.find_width() as usize);
         // Collect first existing vcd_names: all the ground variables
         for ty_ground_variable in ty_variable.collect_ground_variables() {
@@ -322,9 +324,22 @@ impl VcdRewriteVariable {
                                 IdCodeWithShift::create(
                                     vcd_var.code,
                                     vcd::Vector::filled(Value::X, width as usize),
+                                    false,
                                 ),
                             );
                         }
+                    } else if ty_ground_variable.get_trace_value().is_const() {
+                        source_id_codes.insert(
+                            0,
+                            IdCodeWithShift::create(
+                                id_code,
+                                Self::initialize_vector_value(
+                                    ty_ground_variable.get_trace_value(),
+                                    ty_ground_variable.kind.find_width() as usize,
+                                ),
+                                true,
+                            ),
+                        );
                     }
                 }
                 TyVarKind::External => {} // Ignore external variables
@@ -339,6 +354,37 @@ impl VcdRewriteVariable {
             id_code,
             width,
             source_id_codes,
+        }
+    }
+
+    // Initialize the value of a vector from a trace_value
+    fn initialize_vector_value(trace_value: &TraceValue, width: usize) -> vcd::Vector {
+        match trace_value {
+            TraceValue::RefTraceName(_) | TraceValue::RefTraceValues(_) => {
+                vcd::Vector::filled(Value::X, width)
+            }
+            TraceValue::Constant(const_value) => {
+                let a = match const_value {
+                    super::tyvcd::trace_pointer::ConstValue::Binary(bv, _width)
+                    | super::tyvcd::trace_pointer::ConstValue::FourValue(bv, _width) => {
+                        bv.to_owned()
+                    }
+                    super::tyvcd::trace_pointer::ConstValue::String(_) => {
+                        return vcd::Vector::filled(Value::X, width)
+                    }
+                    super::tyvcd::trace_pointer::ConstValue::Real(float_value) => {
+                        let a = format!("{:b}", float_value.to_bits());
+                        a.as_bytes().to_vec()
+                    }
+                };
+
+                // Convert each character of
+                let s = std::str::from_utf8(&a).unwrap();
+                match vcd::Vector::from_str(s) {
+                    Ok(v) => v,
+                    Err(_) => vcd::Vector::filled(vcd::Value::Z, width),
+                }
+            }
         }
     }
 
@@ -395,15 +441,16 @@ pub struct IdCodeWithShift {
     // shift_left: u64,
     /// The "non-shifted" value of the original variable, the one read from the original VCD file
     value: vcd::Vector,
+    is_const: bool,
 }
 
 impl IdCodeWithShift {
-    pub fn new(id_code: IdCode, value: vcd::Vector) -> Self {
-        Self { id_code, value }
-    }
-
-    pub fn create(id_code: IdCode, value: vcd::Vector) -> Self {
-        Self { id_code, value }
+    pub fn create(id_code: IdCode, value: vcd::Vector, is_const: bool) -> Self {
+        Self {
+            id_code,
+            value,
+            is_const,
+        }
     }
 
     pub fn get_value(&self) -> &vcd::Vector {
@@ -411,6 +458,10 @@ impl IdCodeWithShift {
     }
 
     pub fn update_value(&mut self, value: vcd::Vector) -> Result<()> {
+        // Do not update
+        if self.is_const {
+            return Ok(());
+        }
         if value.len() != self.value.len() {
             return Err(VcdRewriteError::UpdateValueError {
                 id_code: self.id_code,
